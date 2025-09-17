@@ -9,8 +9,10 @@ import uvicorn
 from contextlib import asynccontextmanager
 
 from config.settings import settings
-from api.routes import predictions, stocks, health, auth, portfolio, goals, recommendations, websocket
-from api.database import mongodb, postgresql
+# Import only health route for now, others commented until modules are ready
+from api.routes import health
+# from api.routes import predictions, stocks, auth, portfolio, goals, recommendations, websocket
+# from api.database import mongodb, postgresql
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -18,16 +20,16 @@ async def lifespan(app: FastAPI):
     # Startup
     print("🚀 Starting Stock Market Prediction API...")
     
-    # Initialize database connections
-    await mongodb.connect()
-    await postgresql.connect()
+    # Database connections commented out until modules are ready
+    # await mongodb.connect()
+    # await postgresql.connect()
     
     yield
     
     # Shutdown
     print("🔴 Shutting down Stock Market Prediction API...")
-    await mongodb.disconnect()
-    await postgresql.disconnect()
+    # await mongodb.disconnect()
+    # await postgresql.disconnect()
 
 # Create FastAPI app
 app = FastAPI(
@@ -48,15 +50,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
+# Include routers - only health for now
 app.include_router(health.router, prefix="/api/v1", tags=["Health"])
-app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
-app.include_router(stocks.router, prefix="/api/v1", tags=["Stocks"])
-app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
-app.include_router(portfolio.router, prefix="/api/v1", tags=["Portfolio"])
-app.include_router(goals.router, prefix="/api/v1", tags=["Goals"])
-app.include_router(recommendations.router, prefix="/api/v1", tags=["Recommendations"])
-app.include_router(websocket.router, prefix="/api/v1", tags=["WebSocket"])
+# app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
+# app.include_router(stocks.router, prefix="/api/v1", tags=["Stocks"])
+# app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
+# app.include_router(portfolio.router, prefix="/api/v1", tags=["Portfolio"])
+# app.include_router(goals.router, prefix="/api/v1", tags=["Goals"])
+# app.include_router(recommendations.router, prefix="/api/v1", tags=["Recommendations"])
+# app.include_router(websocket.router, prefix="/api/v1", tags=["WebSocket"])
 
 @app.get("/")
 async def root():

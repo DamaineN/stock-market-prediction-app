@@ -7,10 +7,11 @@ from datetime import datetime, timedelta
 from pydantic import BaseModel
 import asyncio
 
-from models.lstm.predictor import LSTMPredictor
-from models.arima.predictor import ARIMAPredictor
-from models.ensemble.predictor import EnsemblePredictor
-from api.collectors.yahoo_finance import YahooFinanceCollector
+# Temporarily commented out until ML models are implemented
+# from models.lstm.predictor import LSTMPredictor
+# from models.arima.predictor import ARIMAPredictor
+# from models.ensemble.predictor import EnsemblePredictor
+# from api.collectors.yahoo_finance import YahooFinanceCollector
 
 router = APIRouter()
 
@@ -35,7 +36,7 @@ class ModelTrainingRequest(BaseModel):
 
 @router.post("/predictions/predict")
 async def create_prediction(request: PredictionRequest):
-    \"\"\"Generate stock price predictions using specified model\"\"\"
+    """Generate stock price predictions using specified model"""
     try:
         # Validate model type
         valid_models = ["lstm", "arima", "ensemble", "all"]
@@ -47,32 +48,26 @@ async def create_prediction(request: PredictionRequest):
         
         results = {}
         
+        # Mock predictions until ML models are implemented
+        mock_prediction = {
+            "predictions": [
+                {"date": (datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d"), 
+                 "price": 150.00 + (i * 0.5), 
+                 "confidence": request.confidence_level} 
+                for i in range(request.prediction_days)
+            ],
+            "accuracy": 0.85,
+            "status": "mock_data"
+        }
+        
         if request.model_type == "lstm" or request.model_type == "all":
-            lstm_predictor = LSTMPredictor()
-            lstm_result = await lstm_predictor.predict(
-                request.symbol,
-                request.prediction_days,
-                request.confidence_level
-            )
-            results["lstm"] = lstm_result
+            results["lstm"] = mock_prediction
         
         if request.model_type == "arima" or request.model_type == "all":
-            arima_predictor = ARIMAPredictor()
-            arima_result = await arima_predictor.predict(
-                request.symbol,
-                request.prediction_days,
-                request.confidence_level
-            )
-            results["arima"] = arima_result
+            results["arima"] = mock_prediction
         
         if request.model_type == "ensemble" or request.model_type == "all":
-            ensemble_predictor = EnsemblePredictor()
-            ensemble_result = await ensemble_predictor.predict(
-                request.symbol,
-                request.prediction_days,
-                request.confidence_level
-            )
-            results["ensemble"] = ensemble_result
+            results["ensemble"] = mock_prediction
         
         return {
             "symbol": request.symbol,
@@ -95,7 +90,7 @@ async def get_cached_predictions(
     model_type: Optional[str] = Query(default=None, description="Filter by model type"),
     limit: int = Query(default=10, le=100, description="Number of recent predictions to return")
 ):
-    \"\"\"Get cached predictions for a symbol\"\"\"
+    """Get cached predictions for a symbol"""
     try:
         # This would typically query from database
         # For now, return a placeholder response
@@ -112,7 +107,7 @@ async def get_cached_predictions(
 
 @router.post("/predictions/train")
 async def train_model(request: ModelTrainingRequest, background_tasks: BackgroundTasks):
-    \"\"\"Train a model on historical data\"\"\"
+    """Train a model on historical data"""
     try:
         # Add training task to background
         background_tasks.add_task(
@@ -137,7 +132,7 @@ async def train_model(request: ModelTrainingRequest, background_tasks: Backgroun
 
 @router.get("/predictions/models/status")
 async def get_model_status():
-    \"\"\"Get status of all trained models\"\"\"
+    """Get status of all trained models"""
     try:
         # This would check model files and training status
         return {
@@ -171,23 +166,21 @@ async def backtest_model(
     test_period: str = Query(default="3mo", description="Backtesting period"),
     train_period: str = Query(default="2y", description="Training period")
 ):
-    \"\"\"Backtest model performance on historical data\"\"\"
+    """Backtest model performance on historical data"""
     try:
-        if model_type == "lstm":
-            predictor = LSTMPredictor()
-        elif model_type == "arima":
-            predictor = ARIMAPredictor()
-        elif model_type == "ensemble":
-            predictor = EnsemblePredictor()
-        else:
-            raise HTTPException(status_code=400, detail="Invalid model type")
-        
-        # Perform backtesting
-        backtest_results = await predictor.backtest(
-            symbol.upper(),
-            test_period,
-            train_period
-        )
+        # Mock backtesting results until ML models are implemented
+        backtest_results = {
+            "accuracy": 0.82,
+            "mse": 2.34,
+            "rmse": 1.53,
+            "mae": 1.21,
+            "r2_score": 0.78,
+            "predictions_vs_actual": [
+                {"date": "2024-01-01", "predicted": 150.0, "actual": 148.5},
+                {"date": "2024-01-02", "predicted": 151.0, "actual": 152.1}
+            ],
+            "status": "mock_data"
+        }
         
         return {
             "symbol": symbol.upper(),
@@ -209,19 +202,11 @@ async def _train_model_background(
     training_period: str,
     parameters: Dict[str, Any]
 ):
-    \"\"\"Background task for model training\"\"\"
+    """Background task for model training"""
     try:
-        if model_type == "lstm":
-            predictor = LSTMPredictor()
-        elif model_type == "arima":
-            predictor = ARIMAPredictor()
-        elif model_type == "ensemble":
-            predictor = EnsemblePredictor()
-        else:
-            return
-        
-        await predictor.train(symbol, training_period, parameters)
-        print(f"✅ Model {model_type} training completed for {symbol}")
+        # Mock training process until ML models are implemented
+        await asyncio.sleep(2)  # Simulate training time
+        print(f"✅ Mock training completed for {model_type} model on {symbol}")
         
     except Exception as e:
         print(f"❌ Model training failed for {symbol}: {str(e)}")

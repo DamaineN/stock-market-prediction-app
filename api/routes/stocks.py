@@ -6,8 +6,9 @@ from typing import Optional, List
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 
-from api.collectors.yahoo_finance import YahooFinanceCollector
-from api.collectors.alpha_vantage import AlphaVantageCollector
+# Temporarily commented out until data collectors are implemented
+# from api.collectors.yahoo_finance import YahooFinanceCollector
+# from api.collectors.alpha_vantage import AlphaVantageCollector
 
 router = APIRouter()
 
@@ -30,22 +31,30 @@ async def get_historical_data(
     period: str = Query(default="1y", description="Time period (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)"),
     interval: str = Query(default="1d", description="Data interval (1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo)")
 ):
-    \"\"\"Get historical stock data from Yahoo Finance\"\"\"
+    """Get historical stock data from Yahoo Finance"""
     try:
-        collector = YahooFinanceCollector()
-        data = await collector.get_historical_data(symbol.upper(), period, interval)
-        
-        if not data:
-            raise HTTPException(status_code=404, detail=f"No data found for symbol {symbol}")
+        # Mock historical data until data collectors are implemented
+        mock_data = [
+            {
+                "date": (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d"),
+                "open": 150.0 + (i * 0.1),
+                "high": 155.0 + (i * 0.1),
+                "low": 145.0 + (i * 0.1),
+                "close": 152.0 + (i * 0.1),
+                "volume": 1000000 + (i * 1000)
+            }
+            for i in range(min(30, 365 if period == "1y" else 30))
+        ]
         
         return StockDataResponse(
             symbol=symbol.upper(),
-            data=data,
+            data=mock_data,
             metadata={
                 "period": period,
                 "interval": interval,
-                "count": len(data),
-                "last_updated": datetime.utcnow().isoformat()
+                "count": len(mock_data),
+                "last_updated": datetime.utcnow().isoformat(),
+                "status": "mock_data"
             }
         )
     
@@ -54,7 +63,7 @@ async def get_historical_data(
 
 @router.get("/stocks/{symbol}/info")
 async def get_stock_info(symbol: str):
-    \"\"\"Get basic stock information\"\"\"
+    """Get basic stock information"""
     try:
         collector = YahooFinanceCollector()
         info = await collector.get_stock_info(symbol.upper())
@@ -80,7 +89,7 @@ async def get_intraday_data(
     interval: str = Query(default="5min", description="Intraday interval (1min, 5min, 15min, 30min, 60min)"),
     outputsize: str = Query(default="compact", description="Output size (compact, full)")
 ):
-    \"\"\"Get intraday stock data from Alpha Vantage\"\"\"
+    """Get intraday stock data from Alpha Vantage"""
     try:
         collector = AlphaVantageCollector()
         data = await collector.get_intraday_data(symbol.upper(), interval, outputsize)
@@ -110,7 +119,7 @@ async def get_technical_indicators(
     time_period: int = Query(default=20, description="Time period for the indicator"),
     series_type: str = Query(default="close", description="Price type (open, high, low, close)")
 ):
-    \"\"\"Get technical indicators from Alpha Vantage\"\"\"
+    """Get technical indicators from Alpha Vantage"""
     try:
         collector = AlphaVantageCollector()
         data = await collector.get_technical_indicator(
@@ -150,7 +159,7 @@ async def search_stocks(
     query: str = Query(description="Search query for stock symbols or company names"),
     limit: int = Query(default=10, le=50, description="Maximum number of results")
 ):
-    \"\"\"Search for stocks by symbol or company name\"\"\"
+    """Search for stocks by symbol or company name"""
     try:
         collector = YahooFinanceCollector()
         results = await collector.search_stocks(query, limit)
