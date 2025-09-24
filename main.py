@@ -7,29 +7,48 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
 from contextlib import asynccontextmanager
+import logging
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 from config.settings import settings
+from api.middleware.security import SecurityMiddleware, rate_limit_handler
 # Import only health route for now, others commented until modules are ready
 from api.routes import health
 # from api.routes import predictions, stocks, auth, portfolio, goals, recommendations, websocket
 # from api.database import mongodb, postgresql
 
+# Configure logging
+logging.basicConfig(
+    level=getattr(logging, settings.log_level.upper()),
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('app.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Rate limiter instance
+limiter = Limiter(key_func=get_remote_address)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
     # Startup
-    print("🚀 Starting Stock Market Prediction API...")
+    logger.info("🚀 Starting Stock Market Prediction API...")
     
-    # Database connections commented out until modules are ready
-    # await mongodb.connect()
-    # await postgresql.connect()
+    # Initialize MongoDB connection
+    from api.database.mongodb import mongodb
+    await mongodb.connect()
     
     yield
     
     # Shutdown
     print("🔴 Shutting down Stock Market Prediction API...")
-    # await mongodb.disconnect()
-    # await postgresql.disconnect()
+    from api.database.mongodb import mongodb
+    await mongodb.disconnect()
 
 # Create FastAPI app
 app = FastAPI(
@@ -41,20 +60,29 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Add security middleware
+app.add_middleware(SecurityMiddleware)
+
+# Add rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
-# Include routers - only health for now
+# Include routers
 app.include_router(health.router, prefix="/api/v1", tags=["Health"])
-# app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
-# app.include_router(stocks.router, prefix="/api/v1", tags=["Stocks"])
-# app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
+from api.routes import stocks, predictions, auth, watchlist
+app.include_router(stocks.router, prefix="/api/v1", tags=["Stocks"])
+app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
+app.include_router(watchlist.router, prefix="/api/v1", tags=["Watchlist"])
 # app.include_router(portfolio.router, prefix="/api/v1", tags=["Portfolio"])
 # app.include_router(goals.router, prefix="/api/v1", tags=["Goals"])
 # app.include_router(recommendations.router, prefix="/api/v1", tags=["Recommendations"])

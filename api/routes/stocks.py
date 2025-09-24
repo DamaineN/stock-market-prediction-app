@@ -6,9 +6,8 @@ from typing import Optional, List
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 
-# Temporarily commented out until data collectors are implemented
-# from api.collectors.yahoo_finance import YahooFinanceCollector
-# from api.collectors.alpha_vantage import AlphaVantageCollector
+from api.collectors.yahoo_finance import YahooFinanceCollector
+from api.collectors.alpha_vantage import AlphaVantageCollector
 
 router = APIRouter()
 
@@ -33,28 +32,21 @@ async def get_historical_data(
 ):
     """Get historical stock data from Yahoo Finance"""
     try:
-        # Mock historical data until data collectors are implemented
-        mock_data = [
-            {
-                "date": (datetime.now() - timedelta(days=i)).strftime("%Y-%m-%d"),
-                "open": 150.0 + (i * 0.1),
-                "high": 155.0 + (i * 0.1),
-                "low": 145.0 + (i * 0.1),
-                "close": 152.0 + (i * 0.1),
-                "volume": 1000000 + (i * 1000)
-            }
-            for i in range(min(30, 365 if period == "1y" else 30))
-        ]
+        collector = YahooFinanceCollector()
+        data = await collector.get_historical_data(symbol.upper(), period, interval)
+        
+        if not data:
+            raise HTTPException(status_code=404, detail=f"No data found for symbol {symbol}")
         
         return StockDataResponse(
             symbol=symbol.upper(),
-            data=mock_data,
+            data=data,
             metadata={
                 "period": period,
                 "interval": interval,
-                "count": len(mock_data),
+                "count": len(data),
                 "last_updated": datetime.utcnow().isoformat(),
-                "status": "mock_data"
+                "source": "Yahoo Finance"
             }
         )
     

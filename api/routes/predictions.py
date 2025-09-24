@@ -7,11 +7,12 @@ from datetime import datetime, timedelta
 from pydantic import BaseModel
 import asyncio
 
-# Temporarily commented out until ML models are implemented
+from models.basic.moving_average import MovingAveragePredictor
+from api.collectors.yahoo_finance import YahooFinanceCollector
+# More advanced models can be added later
 # from models.lstm.predictor import LSTMPredictor
 # from models.arima.predictor import ARIMAPredictor
 # from models.ensemble.predictor import EnsemblePredictor
-# from api.collectors.yahoo_finance import YahooFinanceCollector
 
 router = APIRouter()
 
@@ -38,36 +39,64 @@ class ModelTrainingRequest(BaseModel):
 async def create_prediction(request: PredictionRequest):
     """Generate stock price predictions using specified model"""
     try:
-        # Validate model type
-        valid_models = ["lstm", "arima", "ensemble", "all"]
+        # This validation is now done after getting historical data
+        
+        results = {}
+        
+        # Get historical data for the symbol
+        data_collector = YahooFinanceCollector()
+        historical_data = await data_collector.get_historical_data(
+            request.symbol, 
+            period="1y",  # Get 1 year of data for better predictions
+            interval="1d"
+        )
+        
+        if not historical_data:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No historical data available for symbol {request.symbol}"
+            )
+        
+        # Update valid models to include moving_average
+        valid_models = ["moving_average", "lstm", "arima", "ensemble", "all"]
         if request.model_type not in valid_models:
             raise HTTPException(
                 status_code=400, 
                 detail=f"Invalid model type. Choose from: {valid_models}"
             )
         
-        results = {}
+        # Generate predictions based on requested model
+        if request.model_type == "moving_average" or request.model_type == "all":
+            predictor = MovingAveragePredictor()
+            ma_result = await predictor.predict(
+                request.symbol,
+                historical_data,
+                request.prediction_days,
+                request.confidence_level
+            )
+            results["moving_average"] = ma_result
         
-        # Mock predictions until ML models are implemented
-        mock_prediction = {
-            "predictions": [
-                {"date": (datetime.now() + timedelta(days=i)).strftime("%Y-%m-%d"), 
-                 "price": 150.00 + (i * 0.5), 
-                 "confidence": request.confidence_level} 
-                for i in range(request.prediction_days)
-            ],
-            "accuracy": 0.85,
-            "status": "mock_data"
-        }
-        
+        # Placeholder for future ML models
         if request.model_type == "lstm" or request.model_type == "all":
-            results["lstm"] = mock_prediction
+            # TODO: Implement LSTM predictor
+            results["lstm"] = {
+                "status": "not_implemented",
+                "message": "LSTM model coming soon"
+            }
         
         if request.model_type == "arima" or request.model_type == "all":
-            results["arima"] = mock_prediction
+            # TODO: Implement ARIMA predictor
+            results["arima"] = {
+                "status": "not_implemented", 
+                "message": "ARIMA model coming soon"
+            }
         
         if request.model_type == "ensemble" or request.model_type == "all":
-            results["ensemble"] = mock_prediction
+            # TODO: Implement ensemble predictor
+            results["ensemble"] = {
+                "status": "not_implemented",
+                "message": "Ensemble model coming soon"
+            }
         
         return {
             "symbol": request.symbol,
@@ -168,19 +197,41 @@ async def backtest_model(
 ):
     """Backtest model performance on historical data"""
     try:
-        # Mock backtesting results until ML models are implemented
-        backtest_results = {
-            "accuracy": 0.82,
-            "mse": 2.34,
-            "rmse": 1.53,
-            "mae": 1.21,
-            "r2_score": 0.78,
-            "predictions_vs_actual": [
-                {"date": "2024-01-01", "predicted": 150.0, "actual": 148.5},
-                {"date": "2024-01-02", "predicted": 151.0, "actual": 152.1}
-            ],
-            "status": "mock_data"
+        # Get historical data for backtesting
+        data_collector = YahooFinanceCollector()
+        historical_data = await data_collector.get_historical_data(
+            symbol.upper(), 
+            period="2y",  # Get 2 years of data for backtesting
+            interval="1d"
+        )
+        
+        if not historical_data:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No historical data available for symbol {symbol}"
+            )
+        
+        # Determine test period in days
+        period_days = {
+            "1mo": 30, "3mo": 90, "6mo": 180, "1y": 365
         }
+        test_days = period_days.get(test_period, 90)  # Default to 3 months
+        
+        # Create predictor based on model type
+        if model_type.lower() == "moving_average":
+            predictor = MovingAveragePredictor()
+            backtest_results = await predictor.backtest(
+                symbol.upper(),
+                historical_data,
+                test_days
+            )
+        else:
+            # For other models, return not implemented
+            backtest_results = {
+                "status": "not_implemented",
+                "message": f"{model_type} backtesting coming soon",
+                "available_models": ["moving_average"]
+            }
         
         return {
             "symbol": symbol.upper(),

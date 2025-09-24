@@ -1,153 +1,292 @@
 """
 Authentication API routes
 """
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from pydantic import BaseModel, EmailStr
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+from bson import ObjectId
 
-from api.auth.utils import (
-    verify_password, 
-    get_password_hash, 
-    create_access_token,
-    get_user_from_token
+# Import our authentication utilities and models
+from api.auth.utils import AuthUtils, get_current_user, get_current_user_optional
+from api.database.mongodb_models import (
+    UserCreate, UserResponse, UserInDB, LoginRequest, 
+    TokenResponse, PasswordResetRequest, PasswordResetConfirm,
+    ChangePasswordRequest, UserRole, UserStatus
 )
-from api.database.models import User, UserTypeEnum
+from api.database.mongodb import get_database, UserService, AuditService
 
 router = APIRouter()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
 
-# Pydantic Models
-class UserRegister(BaseModel):
-    email: EmailStr
-    password: str
-    user_type: UserTypeEnum = UserTypeEnum.BEGINNER
+# Helper functions
+async def get_client_ip(request: Request) -> str:
+    """Get client IP address"""
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
 
-class UserResponse(BaseModel):
-    user_id: int
-    email: str
-    user_type: str
-    created_date: datetime
-    is_active: bool
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-    user: UserResponse
-
-@router.post("/register", response_model=Token)
-async def register(user_data: UserRegister):
+@router.post("/register", response_model=TokenResponse)
+async def register(
+    user_data: UserCreate,
+    request: Request,
+    db = Depends(get_database)
+):
     """Register a new user"""
-    # TODO: Add database check for existing email
-    # TODO: Add actual database insertion
+    user_service = UserService(db)
+    audit_service = AuditService(db)
     
-    # Placeholder implementation
-    hashed_password = get_password_hash(user_data.password)
-    
-    # Create dummy user response (replace with actual DB operation)
-    user = UserResponse(
-        user_id=1,  # This would come from database
-        email=user_data.email,
-        user_type=user_data.user_type.value,
-        created_date=datetime.utcnow(),
-        is_active=True
-    )
-    
-    # Create access token
-    access_token = create_access_token(
-        data={
-            "sub": str(user.user_id),
-            "email": user.email,
-            "user_type": user.user_type
-        }
-    )
-    
-    return Token(
-        access_token=access_token,
-        token_type="bearer",
-        user=user
-    )
-
-@router.post("/login", response_model=Token)
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    """Login user and return JWT token"""
-    # TODO: Add database user lookup
-    # TODO: Add password verification
-    
-    # Placeholder implementation
-    email = form_data.username  # OAuth2 uses username field for email
-    password = form_data.password
-    
-    # Mock user verification (replace with actual DB lookup)
-    if email == "demo@example.com" and password == "demo123":
-        user = UserResponse(
-            user_id=1,
-            email=email,
-            user_type="beginner",
-            created_date=datetime.utcnow(),
-            is_active=True
-        )
+    try:
+        # Check if user already exists
+        existing_user = await user_service.get_user_by_email(user_data.email)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
         
-        access_token = create_access_token(
-            data={
-                "sub": str(user.user_id),
-                "email": user.email,
-                "user_type": user.user_type
-            }
-        )
+        # Validate password strength
+        password_validation = AuthUtils.validate_password_strength(user_data.password)
+        if not password_validation["is_valid"]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Password validation failed: {', '.join(password_validation['errors'])}"
+            )
         
-        return Token(
+        # Create user document
+        user_doc = UserInDB(
+            **user_data.dict(exclude={"password"}),
+            hashed_password=AuthUtils.get_password_hash(user_data.password),
+            email_verification_token=AuthUtils.generate_secure_token()
+        ).dict(by_alias=True)
+        
+        # Save user to database
+        user_id = await user_service.create_user(user_doc)
+        
+        # Create tokens
+        token_data = {"sub": user_id, "email": user_data.email, "role": user_data.role.value}
+        access_token = AuthUtils.create_access_token(token_data)
+        refresh_token = AuthUtils.create_refresh_token(token_data)
+        
+        # Log the registration
+        await audit_service.log_action({
+            "user_id": ObjectId(user_id),
+            "action": "user_registration",
+            "ip_address": await get_client_ip(request),
+            "user_agent": request.headers.get("User-Agent"),
+            "success": True
+        })
+        
+        return TokenResponse(
             access_token=access_token,
-            token_type="bearer",
-            user=user
+            refresh_token=refresh_token,
+            expires_in=30 * 60  # 30 minutes
         )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Log failed registration
+        await audit_service.log_action({
+            "action": "user_registration",
+            "ip_address": await get_client_ip(request),
+            "user_agent": request.headers.get("User-Agent"),
+            "success": False,
+            "error_message": str(e)
+        })
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Registration failed"
+        )
+
+@router.post("/login", response_model=TokenResponse)
+async def login(
+    login_data: LoginRequest,
+    request: Request,
+    db = Depends(get_database)
+):
+    """Login user and return JWT tokens"""
+    user_service = UserService(db)
+    audit_service = AuditService(db)
     
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Incorrect email or password",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    try:
+        # Find user by email
+        user_doc = await user_service.get_user_by_email(login_data.email)
+        if not user_doc:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password"
+            )
+        
+        # Check if account is locked
+        if user_doc.get("account_locked_until") and datetime.now(timezone.utc) < user_doc["account_locked_until"]:
+            raise HTTPException(
+                status_code=status.HTTP_423_LOCKED,
+                detail="Account is temporarily locked due to multiple failed login attempts"
+            )
+        
+        # Verify password
+        if not AuthUtils.verify_password(login_data.password, user_doc["hashed_password"]):
+            # Increment failed login attempts
+            failed_attempts = user_doc.get("failed_login_attempts", 0) + 1
+            update_data = {"failed_login_attempts": failed_attempts}
+            
+            # Lock account after 5 failed attempts
+            if failed_attempts >= 5:
+                update_data["account_locked_until"] = datetime.now(timezone.utc) + timedelta(minutes=30)
+            
+            await user_service.update_user(str(user_doc["_id"]), update_data)
+            
+            # Log failed login
+            await audit_service.log_action({
+                "user_id": user_doc["_id"],
+                "action": "login_failed",
+                "ip_address": await get_client_ip(request),
+                "user_agent": request.headers.get("User-Agent"),
+                "success": False,
+                "error_message": "Invalid password"
+            })
+            
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password"
+            )
+        
+        # Reset failed login attempts on successful login
+        await user_service.update_user(str(user_doc["_id"]), {
+            "failed_login_attempts": 0,
+            "account_locked_until": None,
+            "last_login": datetime.now(timezone.utc)
+        })
+        
+        # Create tokens
+        token_data = {
+            "sub": str(user_doc["_id"]),
+            "email": user_doc["email"], 
+            "role": user_doc.get("role", "basic")
+        }
+        access_token = AuthUtils.create_access_token(token_data)
+        refresh_token = AuthUtils.create_refresh_token(token_data)
+        
+        # Log successful login
+        await audit_service.log_action({
+            "user_id": user_doc["_id"],
+            "action": "login_success",
+            "ip_address": await get_client_ip(request),
+            "user_agent": request.headers.get("User-Agent"),
+            "success": True
+        })
+        
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=30 * 60  # 30 minutes
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        # Log system error
+        await audit_service.log_action({
+            "action": "login_error",
+            "ip_address": await get_client_ip(request),
+            "user_agent": request.headers.get("User-Agent"),
+            "success": False,
+            "error_message": str(e)
+        })
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Login failed"
+        )
 
 @router.get("/profile", response_model=UserResponse)
-async def get_profile(token: str = Depends(oauth2_scheme)):
+async def get_profile(
+    current_user: dict = Depends(get_current_user),
+    db = Depends(get_database)
+):
     """Get current user profile"""
-    user_data = get_user_from_token(token)
+    user_service = UserService(db)
     
-    # TODO: Fetch full user data from database
-    user = UserResponse(
-        user_id=user_data["user_id"],
-        email=user_data["email"],
-        user_type=user_data["user_type"],
-        created_date=datetime.utcnow(),
-        is_active=True
-    )
-    
-    return user
+    try:
+        # Get full user data from database
+        user_doc = await user_service.get_user_by_id(current_user["user_id"])
+        if not user_doc:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        return UserResponse(
+            id=str(user_doc["_id"]),
+            email=user_doc["email"],
+            full_name=user_doc["full_name"],
+            role=user_doc.get("role", "basic"),
+            is_verified=user_doc.get("is_verified", False),
+            status=user_doc.get("status", "active"),
+            created_at=user_doc["created_at"],
+            updated_at=user_doc["updated_at"],
+            last_login=user_doc.get("last_login")
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error fetching profile"
+        )
 
 @router.get("/verify-token")
-async def verify_user_token(token: str = Depends(oauth2_scheme)):
+async def verify_token(current_user: dict = Depends(get_current_user_optional)):
     """Verify if token is valid"""
-    user_data = get_user_from_token(token)
-    return {
-        "valid": True,
-        "user_id": user_data["user_id"],
-        "user_type": user_data["user_type"]
-    }
+    if current_user:
+        return {
+            "valid": True,
+            "user_id": current_user["user_id"],
+            "email": current_user["email"],
+            "role": current_user["role"]
+        }
+    else:
+        return {"valid": False}
 
-# Dependency for protected routes
-def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
-    """Dependency to get current authenticated user"""
-    return get_user_from_token(token)
-
-def require_user_type(*allowed_types: UserTypeEnum):
-    """Decorator to require specific user types"""
-    def decorator(current_user: dict = Depends(get_current_user)):
-        user_type = current_user.get("user_type")
-        if user_type not in [t.value for t in allowed_types]:
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh_token(refresh_data: dict = {"refresh_token": ""}):
+    """Refresh access token using refresh token"""
+    try:
+        refresh_token = refresh_data.get("refresh_token")
+        if not refresh_token:
             raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Access denied. Required user type: {[t.value for t in allowed_types]}"
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Refresh token required"
             )
-        return current_user
-    return decorator
+        
+        # Verify refresh token
+        payload = AuthUtils.verify_token(refresh_token, "refresh")
+        if not payload:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid refresh token"
+            )
+        
+        # Create new access token
+        token_data = {
+            "sub": payload["sub"],
+            "email": payload["email"],
+            "role": payload.get("role", "basic")
+        }
+        new_access_token = AuthUtils.create_access_token(token_data)
+        new_refresh_token = AuthUtils.create_refresh_token(token_data)
+        
+        return TokenResponse(
+            access_token=new_access_token,
+            refresh_token=new_refresh_token,
+            expires_in=30 * 60
+        )
+        
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Token refresh failed"
+        )
