@@ -3,17 +3,22 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { EyeIcon, EyeSlashIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
+import { EyeIcon, EyeSlashIcon, ExclamationTriangleIcon, ArrowLeftIcon } from '@heroicons/react/24/outline'
 import { AuthService } from '@/lib/services/auth'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import RoleQuiz from '@/components/RoleQuiz'
+import { type UserRole, type QuizAnswers } from '@/lib/quizData'
 
 export default function RegisterPage() {
+  const [currentStep, setCurrentStep] = useState(1) // 1 = form, 2 = quiz
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
     password: '',
     confirmPassword: ''
   })
+  const [userRole, setUserRole] = useState<UserRole | null>(null)
+  const [quizAnswers, setQuizAnswers] = useState<QuizAnswers | null>(null)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -73,20 +78,34 @@ export default function RegisterPage() {
     return true
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!validateForm()) return
 
+    // Move to quiz step instead of registering immediately
+    setCurrentStep(2)
+  }
+
+  const handleQuizComplete = async (role: UserRole, answers: QuizAnswers) => {
+    setUserRole(role)
+    setQuizAnswers(answers)
     setLoading(true)
     setError('')
 
     try {
+      // Store user data temporarily for fallback use
+      localStorage.setItem('temp_user_data', JSON.stringify({
+        full_name: formData.full_name,
+        email: formData.email
+      }))
+      
       await AuthService.register({
         full_name: formData.full_name,
         email: formData.email,
         password: formData.password,
-        role: 'basic'
+        role: role,
+        quiz_answers: answers // Include quiz answers if backend supports it
       })
       router.push('/dashboard')
     } catch (error) {
@@ -114,6 +133,29 @@ export default function RegisterPage() {
     }
   }
 
+  // Show quiz if on step 2
+  if (currentStep === 2) {
+    return (
+      <ProtectedRoute requireAuth={false}>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-4xl">
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md flex items-center space-x-2">
+                <ExclamationTriangleIcon className="w-5 h-5 text-red-500" />
+                <span className="text-sm text-red-600">{error}</span>
+              </div>
+            )}
+            <RoleQuiz
+              onComplete={handleQuizComplete}
+              onBack={() => setCurrentStep(1)}
+            />
+          </div>
+        </div>
+      </ProtectedRoute>
+    )
+  }
+
+  // Show registration form (step 1)
   return (
     <ProtectedRoute requireAuth={false}>
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -127,7 +169,7 @@ export default function RegisterPage() {
             </p>
           </div>
           
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <form className="mt-8 space-y-6" onSubmit={handleFormSubmit}>
             <div className="space-y-4">
               <div>
                 <label htmlFor="full_name" className="sr-only">
@@ -252,7 +294,7 @@ export default function RegisterPage() {
                 disabled={loading}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
               >
-                {loading ? 'Creating account...' : 'Create account'}
+                {loading ? 'Processing...' : 'Continue to Profile Quiz'}
               </button>
             </div>
 

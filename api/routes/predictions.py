@@ -7,12 +7,8 @@ from datetime import datetime, timedelta
 from pydantic import BaseModel
 import asyncio
 
-from models.basic.moving_average import MovingAveragePredictor
+from models.model_manager import ModelManager
 from api.collectors.yahoo_finance import YahooFinanceCollector
-# More advanced models can be added later
-# from models.lstm.predictor import LSTMPredictor
-# from models.arima.predictor import ARIMAPredictor
-# from models.ensemble.predictor import EnsemblePredictor
 
 router = APIRouter()
 
@@ -39,15 +35,11 @@ class ModelTrainingRequest(BaseModel):
 async def create_prediction(request: PredictionRequest):
     """Generate stock price predictions using specified model"""
     try:
-        # This validation is now done after getting historical data
-        
-        results = {}
-        
         # Get historical data for the symbol
         data_collector = YahooFinanceCollector()
         historical_data = await data_collector.get_historical_data(
             request.symbol, 
-            period="1y",  # Get 1 year of data for better predictions
+            period="2y",  # Get 2 years of data for better predictions
             interval="1d"
         )
         
@@ -57,8 +49,13 @@ async def create_prediction(request: PredictionRequest):
                 detail=f"No historical data available for symbol {request.symbol}"
             )
         
-        # Update valid models to include moving_average
-        valid_models = ["moving_average", "lstm", "arima", "ensemble", "all"]
+        # Initialize model manager
+        model_manager = ModelManager()
+        available_models = model_manager.get_available_models()
+        
+        # Update valid models to include all available models plus special options
+        valid_models = available_models + ["all"]
+        
         if request.model_type not in valid_models:
             raise HTTPException(
                 status_code=400, 
@@ -66,37 +63,24 @@ async def create_prediction(request: PredictionRequest):
             )
         
         # Generate predictions based on requested model
-        if request.model_type == "moving_average" or request.model_type == "all":
-            predictor = MovingAveragePredictor()
-            ma_result = await predictor.predict(
-                request.symbol,
-                historical_data,
-                request.prediction_days,
-                request.confidence_level
+        if request.model_type == "all":
+            # Get predictions from all models
+            results = await model_manager.get_all_predictions(
+                symbol=request.symbol,
+                historical_data=historical_data,
+                prediction_days=request.prediction_days,
+                confidence_level=request.confidence_level
             )
-            results["moving_average"] = ma_result
-        
-        # Placeholder for future ML models
-        if request.model_type == "lstm" or request.model_type == "all":
-            # TODO: Implement LSTM predictor
-            results["lstm"] = {
-                "status": "not_implemented",
-                "message": "LSTM model coming soon"
-            }
-        
-        if request.model_type == "arima" or request.model_type == "all":
-            # TODO: Implement ARIMA predictor
-            results["arima"] = {
-                "status": "not_implemented", 
-                "message": "ARIMA model coming soon"
-            }
-        
-        if request.model_type == "ensemble" or request.model_type == "all":
-            # TODO: Implement ensemble predictor
-            results["ensemble"] = {
-                "status": "not_implemented",
-                "message": "Ensemble model coming soon"
-            }
+        else:
+            # Get prediction from single model
+            single_result = await model_manager.get_single_prediction(
+                model_name=request.model_type,
+                symbol=request.symbol,
+                historical_data=historical_data,
+                prediction_days=request.prediction_days,
+                confidence_level=request.confidence_level
+            )
+            results = {request.model_type: single_result}
         
         return {
             "symbol": request.symbol,
@@ -106,7 +90,8 @@ async def create_prediction(request: PredictionRequest):
             "metadata": {
                 "confidence_level": request.confidence_level,
                 "created_at": datetime.utcnow().isoformat(),
-                "models_used": list(results.keys())
+                "models_used": list(results.keys()),
+                "available_models": available_models
             }
         }
     
@@ -159,30 +144,48 @@ async def train_model(request: ModelTrainingRequest, background_tasks: Backgroun
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Training initiation error: {str(e)}")
 
+@router.get("/predictions/models/available")
+async def get_available_models():
+    """Get information about all available prediction models"""
+    try:
+        model_manager = ModelManager()
+        available_models = model_manager.get_available_models()
+        
+        model_info = {}
+        for model_name in available_models:
+            model_info[model_name] = model_manager.get_model_info(model_name)
+        
+        return {
+            "available_models": available_models,
+            "model_details": model_info,
+            "special_options": ["all"],
+            "total_models": len(available_models),
+            "created_at": datetime.utcnow().isoformat()
+        }
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching model information: {str(e)}")
+
 @router.get("/predictions/models/status")
 async def get_model_status():
     """Get status of all trained models"""
     try:
-        # This would check model files and training status
+        model_manager = ModelManager()
+        available_models = model_manager.get_available_models()
+        
+        models_status = {}
+        for model_name in available_models:
+            models_status[model_name] = {
+                "status": "available",
+                "info": model_manager.get_model_info(model_name),
+                "last_trained": "N/A (Real-time training)",
+                "accuracy": "Varies by stock and timeframe"
+            }
+        
         return {
-            "models": {
-                "lstm": {
-                    "status": "not_trained",
-                    "last_trained": None,
-                    "accuracy": None
-                },
-                "arima": {
-                    "status": "not_trained", 
-                    "last_trained": None,
-                    "accuracy": None
-                },
-                "ensemble": {
-                    "status": "not_trained",
-                    "last_trained": None,
-                    "accuracy": None
-                }
-            },
-            "message": "Model status feature coming soon"
+            "models": models_status,
+            "total_available": len(available_models),
+            "created_at": datetime.utcnow().isoformat()
         }
     
     except Exception as e:
@@ -217,21 +220,25 @@ async def backtest_model(
         }
         test_days = period_days.get(test_period, 90)  # Default to 3 months
         
-        # Create predictor based on model type
-        if model_type.lower() == "moving_average":
-            predictor = MovingAveragePredictor()
-            backtest_results = await predictor.backtest(
-                symbol.upper(),
-                historical_data,
-                test_days
+        # Initialize model manager
+        model_manager = ModelManager()
+        
+        # Backtest based on model type
+        if model_type.lower() == "all":
+            # Backtest all models
+            backtest_results = await model_manager.backtest_all_models(
+                symbol=symbol.upper(),
+                historical_data=historical_data,
+                test_days=test_days
             )
         else:
-            # For other models, return not implemented
-            backtest_results = {
-                "status": "not_implemented",
-                "message": f"{model_type} backtesting coming soon",
-                "available_models": ["moving_average"]
-            }
+            # Backtest single model
+            backtest_results = await model_manager.backtest_model(
+                model_name=model_type,
+                symbol=symbol.upper(),
+                historical_data=historical_data,
+                test_days=test_days
+            )
         
         return {
             "symbol": symbol.upper(),
@@ -240,7 +247,8 @@ async def backtest_model(
             "train_period": train_period,
             "results": backtest_results,
             "metadata": {
-                "created_at": datetime.utcnow().isoformat()
+                "created_at": datetime.utcnow().isoformat(),
+                "available_models": model_manager.get_available_models()
             }
         }
     

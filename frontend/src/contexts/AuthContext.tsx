@@ -10,6 +10,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   refreshUser: () => Promise<void>
+  forceRefreshUser: () => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -71,23 +72,80 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Set as authenticated first
       setIsAuthenticated(true)
       
-      // Try to get user profile, but don't fail if it doesn't work
-      try {
-        const userProfile = await AuthService.getProfile()
-        setUser(userProfile)
-      } catch (profileError) {
-        console.warn('Could not fetch profile after login:', profileError)
-        // Create minimal user object from login data
-        setUser({
-          id: 'temp',
-          email: email,
-          full_name: 'User',
-          role: 'basic',
-          is_verified: false,
-          status: 'active',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
+      // Try to get user profile with retry logic
+      let userProfile = null
+      let attempts = 0
+      const maxAttempts = 3
+      
+      while (attempts < maxAttempts && !userProfile) {
+        try {
+          await new Promise(resolve => setTimeout(resolve, attempts * 1000)) // Progressive delay
+          userProfile = await AuthService.getProfile()
+          setUser(userProfile)
+          return // Success, exit early
+        } catch (profileError) {
+          attempts++
+          console.warn(`Profile fetch attempt ${attempts}/${maxAttempts} failed:`, {
+            error: profileError,
+            hasToken: !!localStorage.getItem('access_token'),
+            email: email,
+            attempt: attempts
+          })
+          
+          if (attempts === maxAttempts) {
+            // All attempts failed, use fallback
+            // Try to get the user's name from stored registration data or use email as fallback
+            const storedUserData = localStorage.getItem('temp_user_data')
+            let fallbackFullName = email.split('@')[0] // Use email prefix as fallback
+            
+            if (storedUserData) {
+              try {
+                const parsedUserData = JSON.parse(storedUserData)
+                fallbackFullName = parsedUserData.full_name || fallbackFullName
+                localStorage.removeItem('temp_user_data') // Clean up
+              } catch (e) {
+                // Ignore parsing errors
+              }
+            }
+            
+            // Try to get role from JWT token
+            let userRole = 'beginner' // Default fallback
+            try {
+              const token = localStorage.getItem('access_token')
+              if (token) {
+                const tokenParts = token.split('.')
+                if (tokenParts.length === 3) {
+                  const payload = JSON.parse(atob(tokenParts[1]))
+                  userRole = payload.role || 'beginner'
+                }
+              }
+            } catch (e) {
+              console.log('Could not extract role from token, using default')
+            }
+            
+            setUser({
+              id: 'temp',
+              email: email,
+              full_name: fallbackFullName,
+              role: userRole,
+              is_verified: false,
+              status: 'active',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            })
+            
+            // Set up background retry to get real profile data
+            setTimeout(async () => {
+              try {
+                const realProfile = await AuthService.getProfile()
+                setUser(realProfile)
+                console.log('Successfully updated to real profile data')
+              } catch (e) {
+                console.log('Background profile fetch still failing, will retry later')
+              }
+            }, 5000) // Retry after 5 seconds
+          }
+        }
       }
     } catch (error) {
       setUser(null)
@@ -115,8 +173,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     } catch (error) {
       console.error('Failed to refresh user:', error)
-      // If profile fetch fails, user might need to re-login
-      logout()
+      // Instead of forcing logout, keep the current user data if available
+      if (!user) {
+        // Only logout if we don't have any user data
+        logout()
+      }
+      // Otherwise, keep the existing user object and just log the error
+    }
+  }
+  
+  const forceRefreshUser = async (): Promise<boolean> => {
+    try {
+      if (isAuthenticated) {
+        const userProfile = await AuthService.getProfile()
+        setUser(userProfile)
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error('Force refresh failed:', error)
+      return false
     }
   }
 
@@ -126,7 +202,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isAuthenticated,
     login,
     logout,
-    refreshUser
+    refreshUser,
+    forceRefreshUser
   }
 
   return (

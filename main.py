@@ -37,7 +37,7 @@ limiter = Limiter(key_func=get_remote_address)
 async def lifespan(app: FastAPI):
     """Application lifespan manager"""
     # Startup
-    logger.info("🚀 Starting Stock Market Prediction API...")
+    logger.info("Starting Stock Market Prediction API...")
     
     # Initialize MongoDB connection
     from api.database.mongodb import mongodb
@@ -46,7 +46,7 @@ async def lifespan(app: FastAPI):
     yield
     
     # Shutdown
-    print("🔴 Shutting down Stock Market Prediction API...")
+    print("Shutting down Stock Market Prediction API...")
     from api.database.mongodb import mongodb
     await mongodb.disconnect()
 
@@ -78,14 +78,14 @@ app.add_middleware(
 
 # Include routers
 app.include_router(health.router, prefix="/api/v1", tags=["Health"])
-from api.routes import stocks, predictions, auth, watchlist
+from api.routes import stocks, predictions, auth, watchlist, ai_insights, paper_trading
 app.include_router(stocks.router, prefix="/api/v1", tags=["Stocks"])
 app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(watchlist.router, prefix="/api/v1", tags=["Watchlist"])
-# app.include_router(portfolio.router, prefix="/api/v1", tags=["Portfolio"])
+app.include_router(ai_insights.router, prefix="/api/v1", tags=["AI Insights"])
+app.include_router(paper_trading.router, prefix="/api/v1", tags=["Paper Trading"])
 # app.include_router(goals.router, prefix="/api/v1", tags=["Goals"])
-# app.include_router(recommendations.router, prefix="/api/v1", tags=["Recommendations"])
 # app.include_router(websocket.router, prefix="/api/v1", tags=["WebSocket"])
 
 @app.get("/")
@@ -93,9 +93,24 @@ async def root():
     """Root endpoint"""
     return {
         "message": "Stock Market Prediction API",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "health": "/api/v1/health"
+        "version": "2.0.0",
+        "description": "AI-powered stock market prediction with multiple models, AI insights, and paper trading",
+        "features": {
+            "prediction_models": ["Moving Average", "LSTM", "ARIMA", "Linear Regression", "Random Forest", "XGBoost", "SVR"],
+            "ai_insights": "Buy/Sell/Hold recommendations with confidence scores",
+            "paper_trading": "Virtual portfolio management and trading simulation",
+            "user_roles": ["Beginner", "Casual", "Paper Trader"],
+            "real_time_data": "Live stock prices and market data"
+        },
+        "endpoints": {
+            "docs": "/docs",
+            "health": "/api/v1/health",
+            "predictions": "/api/v1/predictions",
+            "ai_insights": "/api/v1/insights",
+            "paper_trading": "/api/v1/paper-trading",
+            "stocks": "/api/v1/stocks",
+            "auth": "/api/v1/auth"
+        }
     }
 
 @app.exception_handler(HTTPException)

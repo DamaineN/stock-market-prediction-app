@@ -6,6 +6,9 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime, timezone, timedelta
 from bson import ObjectId
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Import our authentication utilities and models
 from api.auth.utils import AuthUtils, get_current_user, get_current_user_optional
@@ -55,10 +58,16 @@ async def register(
         
         # Create user document
         user_doc = UserInDB(
-            **user_data.dict(exclude={"password"}),
+            **user_data.model_dump(exclude={"password"}),
             hashed_password=AuthUtils.get_password_hash(user_data.password),
             email_verification_token=AuthUtils.generate_secure_token()
-        ).dict(by_alias=True)
+        ).model_dump(by_alias=True)
+        
+        # Convert quiz_answers keys to strings for MongoDB compatibility (after model_dump)
+        if user_doc.get("quiz_answers"):
+            user_doc["quiz_answers"] = {
+                str(k): v for k, v in user_doc["quiz_answers"].items()
+            }
         
         # Save user to database
         user_id = await user_service.create_user(user_doc)
@@ -86,17 +95,26 @@ async def register(
     except HTTPException:
         raise
     except Exception as e:
-        # Log failed registration
-        await audit_service.log_action({
-            "action": "user_registration",
-            "ip_address": await get_client_ip(request),
-            "user_agent": request.headers.get("User-Agent"),
-            "success": False,
-            "error_message": str(e)
-        })
+        import traceback
+        error_details = traceback.format_exc()
+        logger.error(f"Registration failed for {user_data.email}: {str(e)}")
+        logger.error(f"Full traceback: {error_details}")
+        
+        # Try to log failed registration (might fail too)
+        try:
+            await audit_service.log_action({
+                "action": "user_registration",
+                "ip_address": await get_client_ip(request),
+                "user_agent": request.headers.get("User-Agent"),
+                "success": False,
+                "error_message": str(e)
+            })
+        except:
+            logger.error("Failed to log audit entry")
+            
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Registration failed"
+            detail=f"Registration failed: {str(e)}"
         )
 
 @router.post("/login", response_model=TokenResponse)

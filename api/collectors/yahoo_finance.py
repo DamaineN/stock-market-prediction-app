@@ -131,39 +131,70 @@ class YahooFinanceCollector:
     async def search_stocks(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
         """
         Search for stocks by symbol or company name
-        Note: This is a simplified search using common symbols
+        Only returns real, valid stocks that exist on major exchanges
         
         Args:
-            query: Search query
+            query: Search query (symbol or company name)
             limit: Maximum number of results
             
         Returns:
-            List of search results
+            List of search results with valid stocks only
         """
         try:
-            # For simplicity, we'll try to get info for the query as a symbol
-            # In a real implementation, you'd use a proper search API
             query = query.upper().strip()
             
-            # Common symbols to try variations
-            symbols_to_try = [query]
-            if len(query) <= 4:
-                # Try common variations for short queries
-                symbols_to_try.extend([f"{query}.TO", f"{query}.L"])
+            # If query looks like a stock symbol, validate it directly
+            if len(query) <= 5 and query.isalpha():
+                info = await self.get_stock_info(query)
+                if info and info.get('symbol') and info.get('longName'):
+                    # Additional validation: check if it has valid market data
+                    if (info.get('currentPrice') or info.get('regularMarketPrice')) and info.get('marketCap'):
+                        return [{
+                            "symbol": query,
+                            "name": info.get("longName") or info.get("shortName"),
+                            "sector": info.get("sector"),
+                            "exchange": info.get("exchange"),
+                            "currency": info.get("currency", "USD"),
+                            "price": info.get('currentPrice') or info.get('regularMarketPrice'),
+                            "marketCap": info.get('marketCap')
+                        }]
+            
+            # For longer queries or company names, use a predefined list of popular stocks
+            # In production, you'd use a proper search API like Alpha Vantage's SYMBOL_SEARCH
+            popular_stocks = {
+                'APPLE': 'AAPL', 'MICROSOFT': 'MSFT', 'GOOGLE': 'GOOGL', 'ALPHABET': 'GOOGL',
+                'AMAZON': 'AMZN', 'TESLA': 'TSLA', 'META': 'META', 'FACEBOOK': 'META',
+                'NVIDIA': 'NVDA', 'NETFLIX': 'NFLX', 'DISNEY': 'DIS', 'COCA-COLA': 'KO',
+                'JOHNSON': 'JNJ', 'WALMART': 'WMT', 'PROCTER': 'PG', 'MASTERCARD': 'MA',
+                'VISA': 'V', 'HOME DEPOT': 'HD', 'BANK OF AMERICA': 'BAC', 'INTEL': 'INTC',
+                'CISCO': 'CSCO', 'PFIZER': 'PFE', 'ORACLE': 'ORCL', 'ADOBE': 'ADBE',
+                'SALESFORCE': 'CRM', 'TWITTER': 'TWTR', 'UBER': 'UBER', 'SPOTIFY': 'SPOT',
+                'ZOOM': 'ZM', 'PAYPAL': 'PYPL', 'SQUARE': 'SQ', 'SHOPIFY': 'SHOP'
+            }
             
             results = []
-            for symbol in symbols_to_try[:limit]:
-                info = await self.get_stock_info(symbol)
-                if info:
-                    results.append({
-                        "symbol": symbol,
-                        "name": info.get("longName") or info.get("shortName"),
-                        "sector": info.get("sector"),
-                        "exchange": info.get("exchange"),
-                        "currency": info.get("currency")
-                    })
             
-            return results
+            # Search in popular stocks for company name matches
+            for company, symbol in popular_stocks.items():
+                if query in company or company in query:
+                    info = await self.get_stock_info(symbol)
+                    if info and info.get('symbol') and (info.get('currentPrice') or info.get('regularMarketPrice')):
+                        results.append({
+                            "symbol": symbol,
+                            "name": info.get("longName") or info.get("shortName"),
+                            "sector": info.get("sector"),
+                            "exchange": info.get("exchange"),
+                            "currency": info.get("currency", "USD"),
+                            "price": info.get('currentPrice') or info.get('regularMarketPrice'),
+                            "marketCap": info.get('marketCap')
+                        })
+                    
+                    if len(results) >= limit:
+                        break
+            
+            # If no results found in popular stocks, the symbol likely doesn't exist
+            return results[:limit]
+            
         except Exception as e:
             logger.error(f"Error searching stocks for query '{query}': {str(e)}")
             return []

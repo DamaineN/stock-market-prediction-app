@@ -50,24 +50,51 @@ export function useRealTimeStocks(initialSymbols: string[] = []) {
     onError: handleError
   })
 
+  // Get realistic base price for symbol
+  const getBasePriceForSymbol = useCallback((symbol: string): number => {
+    const basePrices: Record<string, number> = {
+      'AAPL': 185.50,
+      'GOOGL': 2750.30,
+      'GOOG': 2760.15,
+      'MSFT': 425.75,
+      'TSLA': 245.80,
+      'NVDA': 875.40,
+      'META': 520.25,
+      'AMZN': 3450.80,
+      'NFLX': 485.90,
+      'SPY': 455.30,
+      'QQQ': 390.15,
+      'VTI': 265.80
+    }
+    return basePrices[symbol] || 150.00
+  }, [])
+
   const addSymbol = useCallback((symbol: string) => {
     const upperSymbol = symbol.toUpperCase()
-    subscribe(upperSymbol)
     
-    // Initialize with empty data if not exists
-    if (!stocks[upperSymbol]) {
-      setStocks(prev => ({
-        ...prev,
-        [upperSymbol]: {
-          symbol: upperSymbol,
-          price: 0,
-          change: 0,
-          changePercent: 0,
-          lastUpdate: new Date().toISOString()
+    // Check if already subscribed to avoid duplicate subscriptions
+    setStocks(prev => {
+      if (!prev[upperSymbol]) {
+        console.log(`Adding new symbol: ${upperSymbol}`)
+        subscribe(upperSymbol)
+        
+        const basePrice = getBasePriceForSymbol(upperSymbol)
+        return {
+          ...prev,
+          [upperSymbol]: {
+            symbol: upperSymbol,
+            price: basePrice,
+            change: 0,
+            changePercent: 0,
+            lastUpdate: new Date().toISOString()
+          }
         }
-      }))
-    }
-  }, [subscribe, stocks])
+      } else {
+        console.log(`Symbol ${upperSymbol} already exists, skipping`)
+        return prev
+      }
+    })
+  }, [subscribe, getBasePriceForSymbol])
 
   const removeSymbol = useCallback((symbol: string) => {
     const upperSymbol = symbol.toUpperCase()
@@ -80,19 +107,22 @@ export function useRealTimeStocks(initialSymbols: string[] = []) {
     })
   }, [unsubscribe])
 
-  // Connect on mount and subscribe to initial symbols
+  // Connect on mount and subscribe to initial symbols - only once
   useEffect(() => {
+    console.log('useRealTimeStocks: Initializing with symbols:', initialSymbols)
     connect()
     
-    // Subscribe to initial symbols
+    // Subscribe to initial symbols only on mount
     initialSymbols.forEach(symbol => {
-      addSymbol(symbol)
+      const upperSymbol = symbol.toUpperCase()
+      console.log(`Initial subscription to: ${upperSymbol}`)
+      addSymbol(upperSymbol)
     })
 
     return () => {
       disconnect()
     }
-  }, [connect, disconnect, addSymbol]) // Only include necessary dependencies
+  }, []) // Deliberately empty - only run on mount
 
   // Cleanup on unmount
   useEffect(() => {

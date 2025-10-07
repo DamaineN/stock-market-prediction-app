@@ -1,7 +1,7 @@
 """
 Database models for MongoDB using Motor (async MongoDB driver)
 """
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from pydantic_core import core_schema
@@ -44,8 +44,19 @@ class PyObjectId(ObjectId):
 # Enums
 class UserRole(str, Enum):
     ADMIN = "admin"
-    PREMIUM = "premium"
-    BASIC = "basic"
+    # Use Case roles
+    BEGINNER = "beginner"
+    CASUAL = "casual"
+    PAPER_TRADER = "paper_trader"
+
+class RecommendationType(str, Enum):
+    BUY = "buy"
+    SELL = "sell"
+    HOLD = "hold"
+
+class TradeType(str, Enum):
+    BUY = "buy"
+    SELL = "sell"
 
 class PredictionStatus(str, Enum):
     PENDING = "pending"
@@ -62,12 +73,13 @@ class UserStatus(str, Enum):
 class UserBase(BaseModel):
     email: EmailStr
     full_name: str
-    role: UserRole = UserRole.BASIC
+    role: UserRole = UserRole.BEGINNER
     is_verified: bool = False
     status: UserStatus = UserStatus.ACTIVE
 
 class UserCreate(UserBase):
     password: str
+    quiz_answers: Optional[Dict[int, int]] = None  # Quiz answers for role determination
 
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
@@ -78,6 +90,7 @@ class UserUpdate(BaseModel):
 class UserInDB(UserBase):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     hashed_password: str
+    quiz_answers: Optional[Dict[int, int]] = None  # Store quiz answers
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_login: Optional[datetime] = None
@@ -273,3 +286,306 @@ class PasswordResetConfirm(BaseModel):
 class ChangePasswordRequest(BaseModel):
     current_password: str
     new_password: str
+
+# Extended User Profile with Role System and Gamification
+class UserProfile(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId  # Reference to main User
+    role: UserRole = UserRole.BEGINNER
+    xp_points: int = 0
+    level: int = 1
+    
+    # Role progression tracking
+    predictions_made: int = 0
+    successful_predictions: int = 0
+    days_active: int = 0
+    current_streak: int = 0
+    max_streak: int = 0
+    
+    # Paper trading stats (for Paper Trader role)
+    virtual_portfolio_value: float = 10000.0  # Starting amount
+    total_trades: int = 0
+    successful_trades: int = 0
+    total_profit_loss: float = 0.0
+    
+    # Goals and achievements
+    goals_completed: List[str] = []
+    achievements_earned: List[str] = []
+    
+    # Role upgrade eligibility
+    role_upgrade_eligible: bool = False
+    next_role: Optional[UserRole] = None
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
+
+# Investment Goals (from Use Case: Set Investment Goals)
+class InvestmentGoal(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    goal_name: str
+    target_amount: float
+    current_amount: float = 0.0
+    target_date: Optional[datetime] = None
+    category: str = "general"  # savings, retirement, house, etc.
+    is_active: bool = True
+    is_achieved: bool = False
+    progress_percentage: float = 0.0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
+
+# AI Insights and Recommendations (from Use Case: A.I. Insight, Buy/Sell/Hold Recommendations)
+class AIInsight(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    symbol: str
+    insight_type: RecommendationType
+    confidence_score: float  # 0.0 to 1.0
+    reasoning: str
+    
+    # Supporting data from multiple models
+    model_predictions: List[Dict[str, Any]] = []
+    technical_indicators: Dict[str, float] = {}
+    market_sentiment: str = "neutral"  # bullish, bearish, neutral
+    
+    # Price targets
+    current_price: float
+    target_price: Optional[float] = None
+    stop_loss_price: Optional[float] = None
+    
+    # Insight metadata
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    expires_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc) + timedelta(hours=24))
+    accuracy_score: Optional[float] = None  # Filled after validation
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
+
+# Paper Trading Portfolio (from Use Case: Simulate Trades)
+class PaperTradingPortfolio(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    
+    # Portfolio summary
+    total_value: float = 10000.0  # Starting with $10,000 virtual money
+    available_cash: float = 10000.0
+    invested_amount: float = 0.0
+    unrealized_pnl: float = 0.0
+    realized_pnl: float = 0.0
+    
+    # Portfolio performance
+    total_return_percent: float = 0.0
+    daily_return_percent: float = 0.0
+    best_performing_stock: Optional[str] = None
+    worst_performing_stock: Optional[str] = None
+    
+    # Trading statistics
+    total_trades: int = 0
+    winning_trades: int = 0
+    losing_trades: int = 0
+    win_rate: float = 0.0
+    
+    # Risk metrics
+    portfolio_beta: float = 1.0
+    max_drawdown: float = 0.0
+    sharpe_ratio: float = 0.0
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
+
+# Paper Trading Holdings
+class PaperTradingHolding(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    portfolio_id: PyObjectId
+    
+    # Stock information
+    symbol: str
+    company_name: str
+    
+    # Position details
+    quantity: int
+    average_buy_price: float
+    current_price: float = 0.0
+    
+    # Position value
+    total_invested: float
+    current_value: float = 0.0
+    unrealized_pnl: float = 0.0
+    unrealized_pnl_percent: float = 0.0
+    
+    # Position metadata
+    first_purchase_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_trade_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
+
+# Trade History (from Use Case: Simulate Trades)
+class TradeHistory(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    portfolio_id: PyObjectId
+    
+    # Trade details
+    symbol: str
+    trade_type: TradeType
+    quantity: int
+    price: float
+    total_amount: float
+    
+    # Trade execution
+    order_type: str = "market"  # market, limit, stop
+    trade_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    execution_price: float  # Actual execution price
+    
+    # Trade analysis
+    profit_loss: Optional[float] = None  # For sell trades
+    profit_loss_percent: Optional[float] = None
+    holding_period_days: Optional[int] = None
+    
+    # Trade reasoning (optional)
+    trade_reason: Optional[str] = None
+    ai_recommendation_id: Optional[PyObjectId] = None
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
+
+# Gamification System - User Goals
+class UserGoal(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    
+    # Goal definition
+    goal_id: str  # Unique identifier for goal type
+    goal_name: str
+    goal_description: str
+    
+    # Progress tracking
+    target_value: int  # Target number (e.g., 10 trades, 7 days streak)
+    current_progress: int = 0
+    progress_percentage: float = 0.0
+    
+    # Rewards
+    xp_reward: int = 100
+    badge_reward: Optional[str] = None
+    
+    # Status
+    is_completed: bool = False
+    is_active: bool = True
+    completed_date: Optional[datetime] = None
+    
+    # Goal category (for role progression)
+    category: str = "general"  # beginner, casual, paper_trader, general
+    required_role: Optional[UserRole] = None
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
+
+# Achievement System
+class Achievement(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    achievement_id: str  # Unique identifier
+    name: str
+    description: str
+    icon: str = "🏆"
+    category: str = "general"
+    
+    # Requirements
+    requirement_type: str  # trades, profit, streak, predictions
+    requirement_value: int
+    requirement_description: str
+    
+    # Rewards
+    xp_reward: int = 100
+    badge_unlock: Optional[str] = None
+    role_requirement: Optional[UserRole] = None
+    
+    # Rarity
+    rarity: str = "common"  # common, rare, epic, legendary
+    unlock_percentage: float = 0.0  # % of users who unlocked this
+    
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
+
+# User Achievement Progress
+class UserAchievement(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    achievement_id: str
+    
+    # Progress
+    current_progress: int = 0
+    is_unlocked: bool = False
+    unlocked_date: Optional[datetime] = None
+    
+    # Rewards received
+    xp_earned: int = 0
+    badge_earned: Optional[str] = None
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )
+
+# User Activity Log (for analytics and gamification)
+class UserActivity(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId
+    
+    # Activity details
+    activity_type: str  # login, prediction, trade, goal_complete, etc.
+    activity_description: str
+    
+    # Activity metadata
+    related_symbol: Optional[str] = None
+    related_amount: Optional[float] = None
+    xp_earned: int = 0
+    
+    # Session info
+    session_duration: Optional[int] = None  # in minutes
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
+    
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True
+    )

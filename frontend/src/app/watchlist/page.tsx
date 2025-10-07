@@ -1,14 +1,15 @@
 'use client'
 
 import Layout from '@/components/Layout'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { PlusIcon, TrashIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 import { WatchlistService, WatchlistItem, WatchlistStats } from '@/lib/services/watchlist'
-import { StocksService } from '@/lib/services/stocks'
+import { StocksService, SearchResult } from '@/lib/services/stocks'
 import { useRealTimeStocks } from '@/hooks/useRealTimeStocks'
 import { ConnectionStatus } from '@/components/ui/real-time-stock-price'
 import ErrorBoundary, { ApiErrorFallback } from '@/components/ErrorBoundary'
 import LoadingSpinner, { SkeletonTable } from '@/components/LoadingSpinner'
+import StockSearchDropdown from '@/components/ui/StockSearchDropdown'
 
 const mockWatchlistItems: WatchlistItem[] = [
   { symbol: 'AAPL', name: 'Apple Inc.', price: 185.50, change: 2.30, changePercent: 1.26 },
@@ -20,25 +21,29 @@ const mockWatchlistItems: WatchlistItem[] = [
 export default function WatchlistPage() {
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>([])
   const [stats, setStats] = useState<WatchlistStats | null>(null)
-  const [newSymbol, setNewSymbol] = useState('')
+  const [selectedStock, setSelectedStock] = useState<SearchResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
 
-  // Get symbols from watchlist for real-time updates
-  const watchlistSymbols = watchlist.map(item => item.symbol)
-  const { stocksMap, isConnected, connectionError, addSymbol, removeSymbol } = useRealTimeStocks(watchlistSymbols)
+  // Get symbols from watchlist for real-time updates - use useMemo to prevent infinite re-renders
+  const watchlistSymbols = useMemo(() => {
+    return watchlist.map(item => item.symbol)
+  }, [watchlist])
+  
+  const { stocksMap, isConnected, connectionError, addSymbol, removeSymbol } = useRealTimeStocks()
 
   // Load watchlist on component mount
   useEffect(() => {
     loadWatchlist()
   }, [])
 
-  // Sync real-time tracking with watchlist changes
+  // Sync real-time tracking with watchlist changes - only when watchlist actually changes
   useEffect(() => {
+    console.log('Syncing watchlist symbols:', watchlistSymbols)
     watchlistSymbols.forEach(symbol => {
       addSymbol(symbol)
     })
-  }, [watchlist, addSymbol])
+  }, [watchlistSymbols]) // Only depend on the memoized symbols, not the function
 
   const loadWatchlist = async () => {
     try {
@@ -53,26 +58,21 @@ export default function WatchlistPage() {
     }
   }
 
-  const addToWatchlist = async () => {
-    if (!newSymbol.trim()) return
-
+  const addToWatchlist = async (stock: SearchResult) => {
     setLoading(true)
     try {
-      // Get stock info first
-      const stockInfo = await StocksService.getStockInfo(newSymbol)
-      
       // Add to backend watchlist
       await WatchlistService.addToWatchlist({
-        symbol: newSymbol.toUpperCase(),
-        name: stockInfo.name
+        symbol: stock.symbol,
+        name: stock.name
       })
       
       // Add to real-time tracking
-      addSymbol(newSymbol.toUpperCase())
+      addSymbol(stock.symbol)
       
       // Reload watchlist
       await loadWatchlist()
-      setNewSymbol('')
+      setSelectedStock(null)
     } catch (error) {
       console.error('Failed to add to watchlist:', error)
     } finally {
@@ -128,22 +128,25 @@ export default function WatchlistPage() {
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">Add Stock to Watchlist</h2>
           <div className="flex space-x-4">
-            <input
-              type="text"
-              placeholder="Enter stock symbol"
-              value={newSymbol}
-              onChange={(e) => setNewSymbol(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && addToWatchlist()}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={addToWatchlist}
-              disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
-            >
-              <PlusIcon className="w-5 h-5" />
-              <span>{loading ? 'Adding...' : 'Add'}</span>
-            </button>
+            <div className="flex-1">
+              <StockSearchDropdown
+                onSelect={(stock) => {
+                  setSelectedStock(stock)
+                  addToWatchlist(stock)
+                }}
+                selectedStock={null} // Always clear after selection
+                onClear={() => setSelectedStock(null)}
+                placeholder="Search for a stock to add to watchlist"
+                label=""
+                maxResults={8}
+              />
+            </div>
+            {loading && (
+              <div className="flex items-center px-4 py-2 text-blue-600">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                Adding...
+              </div>
+            )}
           </div>
         </div>
 

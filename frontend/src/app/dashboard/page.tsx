@@ -7,19 +7,15 @@ import { useRealTimeStocks } from '@/hooks/useRealTimeStocks'
 import { RealTimeStockList, ConnectionStatus } from '@/components/ui/real-time-stock-price'
 import Link from 'next/link'
 
-// Mock data for now
-const mockStats = {
-  totalPredictions: 23,
-  accuracy: 78.5,
-  watchlistItems: 5,
-  activeModels: 3
+// Real stats will be fetched from API
+const stats = {
+  totalPredictions: 0,
+  accuracy: 0,
+  watchlistItems: 0,
+  activeModels: 0
 }
 
-const mockRecentPredictions = [
-  { symbol: 'AAPL', model: 'Moving Average', prediction: 185.50, confidence: 0.85, date: '2024-09-24' },
-  { symbol: 'GOOGL', model: 'Moving Average', prediction: 2750.30, confidence: 0.82, date: '2024-09-24' },
-  { symbol: 'MSFT', model: 'Moving Average', prediction: 425.75, confidence: 0.89, date: '2024-09-23' },
-]
+const recentPredictions: any[] = []
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true)
@@ -78,22 +74,22 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-sm font-medium text-gray-500">Total Predictions</h3>
-            <p className="text-2xl font-bold text-gray-900">{mockStats.totalPredictions}</p>
+            <p className="text-2xl font-bold text-gray-900">{stats.totalPredictions}</p>
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-sm font-medium text-gray-500">Model Accuracy</h3>
-            <p className="text-2xl font-bold text-green-600">{mockStats.accuracy}%</p>
+            <p className="text-2xl font-bold text-green-600">{stats.accuracy}%</p>
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-sm font-medium text-gray-500">Watchlist Items</h3>
-            <p className="text-2xl font-bold text-gray-900">{mockStats.watchlistItems}</p>
+            <p className="text-2xl font-bold text-gray-900">{stats.watchlistItems}</p>
           </div>
           
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-sm font-medium text-gray-500">Active Models</h3>
-            <p className="text-2xl font-bold text-blue-600">{mockStats.activeModels}</p>
+            <p className="text-2xl font-bold text-blue-600">{stats.activeModels}</p>
           </div>
         </div>
 
@@ -124,25 +120,39 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {mockRecentPredictions.map((prediction, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-gray-900">{prediction.symbol}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-500">{prediction.model}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-gray-900">${prediction.prediction.toFixed(2)}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-500">{(prediction.confidence * 100).toFixed(0)}%</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {prediction.date}
+                {recentPredictions.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                      <div className="flex flex-col items-center">
+                        <p className="text-lg mb-2">No predictions yet</p>
+                        <p className="text-sm mb-4">Create your first stock prediction to see results here</p>
+                        <Link href="/predictions" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                          Make Prediction
+                        </Link>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  recentPredictions.map((prediction, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-medium text-gray-900">{prediction.symbol}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-500">{prediction.model}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-medium text-gray-900">${prediction.prediction.toFixed(2)}</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm text-gray-500">{(prediction.confidence * 100).toFixed(0)}%</span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {prediction.date}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

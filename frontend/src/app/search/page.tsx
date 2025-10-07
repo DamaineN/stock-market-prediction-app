@@ -2,15 +2,13 @@
 
 import Layout from '@/components/Layout'
 import { useState, useEffect } from 'react'
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 import { StocksService, SearchResult, StockInfo } from '@/lib/services/stocks'
 import { useRealTimeStocks } from '@/hooks/useRealTimeStocks'
 import { RealTimeStockPrice } from '@/components/ui/real-time-stock-price'
 import StockChart from '@/components/StockChart'
+import StockSearchDropdown from '@/components/ui/StockSearchDropdown'
 
 export default function SearchPage() {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [selectedStock, setSelectedStock] = useState<StockInfo | null>(null)
   const [historicalData, setHistoricalData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -20,32 +18,6 @@ export default function SearchPage() {
   const selectedSymbol = selectedStock ? [selectedStock.symbol] : []
   const { getStock, addSymbol, removeSymbol } = useRealTimeStocks(selectedSymbol)
 
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) return
-    
-    setLoading(true)
-    try {
-      const response = await StocksService.searchStocks(searchTerm, 10)
-      setSearchResults(response.results)
-    } catch (error) {
-      console.error('Search failed:', error)
-      // Mock results for demo
-      setSearchResults([
-        {
-          symbol: searchTerm.toUpperCase(),
-          name: `${searchTerm.toUpperCase()} Corporation`,
-          type: 'Stock',
-          region: 'US',
-          marketOpen: '09:30',
-          marketClose: '16:00',
-          timezone: 'EST',
-          currency: 'USD'
-        }
-      ])
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleStockSelect = async (stock: SearchResult) => {
     setSelectedStock(null)
@@ -61,16 +33,29 @@ export default function SearchPage() {
       setChartLoading(true)
       try {
         const historical = await StocksService.getHistoricalData(stock.symbol, '3mo', '1d')
-        const chartData = StocksService.formatChartData(historical.data)
-        setHistoricalData(chartData)
+        console.log('Historical data received:', historical)
+        
+        // Validate that we have data before formatting
+        if (historical.data && historical.data.length > 0) {
+          console.log('Sample data point:', historical.data[0])
+          const chartData = StocksService.formatChartData(historical.data)
+          setHistoricalData(chartData)
+        } else {
+          throw new Error('No historical data available')
+        }
       } catch (chartError) {
         console.error('Failed to get historical data:', chartError)
-        // Generate mock chart data
-        const mockData = Array.from({ length: 60 }, (_, i) => ({
-          date: new Date(Date.now() - (59 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          price: 150 + Math.sin(i / 10) * 20 + Math.random() * 10,
-          volume: Math.floor(Math.random() * 1000000) + 500000
-        }))
+        console.log('Using fallback mock chart data')
+        
+        // Generate mock chart data with proper date formatting
+        const mockData = Array.from({ length: 60 }, (_, i) => {
+          const date = new Date(Date.now() - (59 - i) * 24 * 60 * 60 * 1000)
+          return {
+            date: date.toISOString().split('T')[0],
+            price: Math.round((150 + Math.sin(i / 10) * 20 + Math.random() * 10) * 100) / 100,
+            volume: Math.floor(Math.random() * 1000000) + 500000
+          }
+        })
         setHistoricalData(mockData)
       } finally {
         setChartLoading(false)
@@ -94,58 +79,16 @@ export default function SearchPage() {
   return (
     <Layout>
       <div className="space-y-6">
-        {/* Search Bar */}
+        {/* Stock Search */}
         <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex space-x-4">
-            <div className="flex-1">
-              <input
-                type="text"
-                placeholder="Enter stock symbol (e.g., AAPL, GOOGL, MSFT)"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            <button
-              onClick={handleSearch}
-              disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
-            >
-              <MagnifyingGlassIcon className="w-5 h-5" />
-              <span>{loading ? 'Searching...' : 'Search'}</span>
-            </button>
-          </div>
+          <StockSearchDropdown
+            onSelect={handleStockSelect}
+            placeholder="Search for stocks (e.g., Apple, Google, Microsoft)"
+            label="Search Stocks"
+            maxResults={10}
+            showFullSearch={false}
+          />
         </div>
-
-        {/* Search Results */}
-        {searchResults.length > 0 && (
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Search Results</h2>
-            </div>
-            <div className="divide-y divide-gray-200">
-              {searchResults.map((stock, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleStockSelect(stock)}
-                  className="px-6 py-4 hover:bg-gray-50 cursor-pointer"
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <h3 className="text-sm font-medium text-gray-900">{stock.symbol}</h3>
-                      <p className="text-sm text-gray-500">{stock.name}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500">{stock.type}</p>
-                      <p className="text-xs text-gray-400">{stock.region}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Stock Details */}
         {selectedStock && (

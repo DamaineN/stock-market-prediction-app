@@ -19,30 +19,64 @@ async def get_user_watchlist(
 ):
     """Get current user's watchlist"""
     try:
-        # For now, return mock data since we don't have watchlist collection set up
-        # In a real app, you'd fetch from database
-        mock_watchlist = [
-            {
-                "symbol": "AAPL",
-                "name": "Apple Inc.",
-                "price": 185.50,
-                "change": 2.30,
-                "changePercent": 1.26,
-                "addedAt": "2024-01-15T10:30:00Z"
-            },
-            {
-                "symbol": "GOOGL", 
-                "name": "Alphabet Inc.",
-                "price": 2750.30,
-                "change": -15.20,
-                "changePercent": -0.55,
-                "addedAt": "2024-01-10T14:20:00Z"
+        from bson import ObjectId
+        user_id = ObjectId(current_user["user_id"])
+        
+        # Get user's watchlist from database
+        watchlist = await db.watchlists.find_one({"user_id": user_id})
+        
+        if not watchlist:
+            # Create default watchlist if none exists
+            default_watchlist = {
+                "user_id": user_id,
+                "name": "My Watchlist",
+                "items": [],
+                "created_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc)
             }
-        ]
+            await db.watchlists.insert_one(default_watchlist)
+            return {
+                "items": [],
+                "count": 0,
+                "lastUpdated": datetime.now(timezone.utc).isoformat()
+            }
+        
+        # Get current prices for watchlist items
+        collector = YahooFinanceCollector()
+        updated_items = []
+        
+        for item in watchlist.get("items", []):
+            try:
+                # Get current stock info
+                stock_info = await collector.get_stock_info(item["symbol"])
+                current_price = stock_info.get('currentPrice', stock_info.get('regularMarketPrice', 0))
+                previous_close = stock_info.get('previousClose', current_price)
+                
+                change = current_price - previous_close
+                change_percent = (change / previous_close * 100) if previous_close > 0 else 0
+                
+                updated_items.append({
+                    "symbol": item["symbol"],
+                    "name": stock_info.get('longName', stock_info.get('shortName', item.get("notes", item["symbol"]))),
+                    "price": round(current_price, 2),
+                    "change": round(change, 2),
+                    "changePercent": round(change_percent, 2),
+                    "addedAt": item["added_at"].isoformat() if isinstance(item["added_at"], datetime) else item["added_at"]
+                })
+            except:
+                # If can't get current price, use stored data
+                updated_items.append({
+                    "symbol": item["symbol"],
+                    "name": item.get("notes", item["symbol"]),
+                    "price": 0,
+                    "change": 0,
+                    "changePercent": 0,
+                    "addedAt": item["added_at"].isoformat() if isinstance(item["added_at"], datetime) else item["added_at"]
+                })
         
         return {
-            "items": mock_watchlist,
-            "count": len(mock_watchlist),
+            "items": updated_items,
+            "count": len(updated_items),
             "lastUpdated": datetime.now(timezone.utc).isoformat()
         }
     except Exception as e:
@@ -59,8 +93,8 @@ async def add_to_watchlist(
 ):
     """Add a stock to user's watchlist"""
     try:
-        symbol = item.get("symbol", "").upper()
-        name = item.get("name", "")
+        from bson import ObjectId
+        symbol = item.get("symbol", "").upper().strip()
         
         if not symbol:
             raise HTTPException(
@@ -68,29 +102,81 @@ async def add_to_watchlist(
                 detail="Stock symbol is required"
             )
         
-        # Get current stock price from Yahoo Finance
+        # Validate stock symbol by trying to fetch real data
         collector = YahooFinanceCollector()
         try:
             stock_info = await collector.get_stock_info(symbol)
+            if not stock_info or not stock_info.get('symbol'):
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Stock symbol '{symbol}' not found or doesn't exist"
+                )
             current_price = stock_info.get('currentPrice', stock_info.get('regularMarketPrice', 0))
-            company_name = stock_info.get('longName', stock_info.get('shortName', name))
-        except:
-            # If can't fetch real data, use provided data
-            current_price = 100.0
-            company_name = name or f"{symbol} Corporation"
+            company_name = stock_info.get('longName', stock_info.get('shortName', symbol))
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Unable to validate stock symbol '{symbol}'. It may not exist."
+            )
         
-        # In a real app, you'd save to database
-        # For now, return the added item
-        watchlist_item = {
+        user_id = ObjectId(current_user["user_id"])
+        
+        # Get or create user's watchlist
+        watchlist = await db.watchlists.find_one({"user_id": user_id})
+        
+        if not watchlist:
+            # Create new watchlist
+            watchlist = {
+                "user_id": user_id,
+                "name": "My Watchlist",
+                "items": [],
+                "created_at": datetime.now(timezone.utc),
+                "updated_at": datetime.now(timezone.utc)
+            }
+            await db.watchlists.insert_one(watchlist)
+        
+        # Check if symbol already exists in watchlist
+        existing_symbols = [item["symbol"] for item in watchlist.get("items", [])]
+        if symbol in existing_symbols:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Stock '{symbol}' is already in your watchlist"
+            )
+        
+        # Create watchlist item
+        watchlist_item_db = {
             "symbol": symbol,
-            "name": company_name,
-            "price": current_price,
-            "change": 0.0,
-            "changePercent": 0.0,
-            "addedAt": datetime.now(timezone.utc).isoformat()
+            "added_at": datetime.now(timezone.utc),
+            "notes": company_name,
+            "target_price": None,
+            "stop_loss": None
         }
         
-        return watchlist_item
+        # Add to watchlist
+        await db.watchlists.update_one(
+            {"user_id": user_id},
+            {
+                "$push": {"items": watchlist_item_db},
+                "$set": {"updated_at": datetime.now(timezone.utc)}
+            }
+        )
+        
+        # Return the added item with current price info
+        previous_close = stock_info.get('previousClose', current_price)
+        change = current_price - previous_close
+        change_percent = (change / previous_close * 100) if previous_close > 0 else 0
+        
+        return {
+            "symbol": symbol,
+            "name": company_name,
+            "price": round(current_price, 2),
+            "change": round(change, 2),
+            "changePercent": round(change_percent, 2),
+            "addedAt": watchlist_item_db["added_at"].isoformat(),
+            "message": f"Successfully added {symbol} to your watchlist"
+        }
         
     except HTTPException:
         raise
@@ -108,9 +194,26 @@ async def remove_from_watchlist(
 ):
     """Remove a stock from user's watchlist"""
     try:
-        # In a real app, you'd remove from database
-        # For now, just return success
-        return {"message": f"Removed {symbol.upper()} from watchlist"}
+        from bson import ObjectId
+        user_id = ObjectId(current_user["user_id"])
+        symbol = symbol.upper().strip()
+        
+        # Remove from watchlist
+        result = await db.watchlists.update_one(
+            {"user_id": user_id},
+            {
+                "$pull": {"items": {"symbol": symbol}},
+                "$set": {"updated_at": datetime.now(timezone.utc)}
+            }
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Stock '{symbol}' not found in your watchlist"
+            )
+        
+        return {"message": f"Successfully removed {symbol} from watchlist"}
         
     except Exception as e:
         raise HTTPException(

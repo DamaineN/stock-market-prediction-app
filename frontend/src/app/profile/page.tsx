@@ -4,15 +4,16 @@ import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
 import { useState, useEffect } from 'react'
-import { UserIcon, EnvelopeIcon, CalendarIcon, ShieldCheckIcon } from '@heroicons/react/24/outline'
+import { UserIcon, EnvelopeIcon, CalendarIcon, ShieldCheckIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
 
 export default function ProfilePage() {
-  const { user, refreshUser } = useAuth()
+  const { user, refreshUser, forceRefreshUser } = useAuth()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
   })
+  const [refreshing, setRefreshing] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -49,6 +50,22 @@ export default function ProfilePage() {
     setIsEditing(false)
   }
 
+  const handleRefreshProfile = async () => {
+    setRefreshing(true)
+    try {
+      const success = await forceRefreshUser()
+      if (success) {
+        console.log('Profile refreshed successfully')
+      } else {
+        console.log('Profile refresh failed')
+      }
+    } catch (error) {
+      console.error('Error refreshing profile:', error)
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   if (!user) {
     return (
       <ProtectedRoute>
@@ -71,9 +88,21 @@ export default function ProfilePage() {
               <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
                 <UserIcon className="w-12 h-12 text-gray-400" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{user.full_name || 'User'}</h1>
-                <p className="text-gray-600">{user.email}</p>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-900">{user.full_name || 'User'}</h1>
+                    <p className="text-gray-600">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={handleRefreshProfile}
+                    disabled={refreshing}
+                    className="ml-4 p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                    title="Refresh profile data"
+                  >
+                    <ArrowPathIcon className={`w-5 h-5 ${refreshing ? 'animate-spin' : ''}`} />
+                  </button>
+                </div>
                 <div className="flex items-center mt-2 space-x-4">
                   <div className="flex items-center text-sm text-gray-500">
                     <ShieldCheckIcon className="w-4 h-4 mr-1" />

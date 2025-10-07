@@ -1,0 +1,108 @@
+/* Text utility classes for consistent dark text across all pages */
+
+/* Primary text colors - use these classes for consistent text styling */
+.text-primary {
+  color: #111827 !important; /* Very dark gray - for headings and important text */
+}
+
+.text-secondary {
+  color: #374151 !important; /* Dark gray - for body text and labels */
+}
+
+.text-muted {
+  color: #6b7280 !important; /* Medium gray - for less important text */
+}
+
+.text-accent {
+  color: #1d4ed8 !important; /* Blue - for links and accents */
+}
+
+/* Page-specific text overrides */
+.page-container {
+  color: #374151;
+}
+
+.page-container h1,
+.page-container h2,
+.page-container h3,
+.page-container h4,
+.page-container h5,
+.page-container h6 {
+  color: #111827 !important;
+}
+
+.page-container p,
+.page-container span,
+.page-container div,
+.page-container label {
+  color: #374151 !important;
+}
+
+/* Form elements styling */
+.form-input {
+  color: #111827 !important;
+  background-color: #ffffff !important;
+}
+
+.form-input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Button text overrides */
+.btn-dark-text {
+  color: #111827 !important;
+}
+
+.btn-light-text {
+  color: #ffffff !important;
+}
+
+/* Card and container text */
+.card-container {
+  color: #374151;
+}
+
+.card-container h1,
+.card-container h2,
+.card-container h3,
+.card-container h4,
+.card-container h5,
+.card-container h6 {
+  color: #111827 !important;
+}
+
+/* Navigation text - preserve existing styling but ensure readability */
+.nav-text {
+  color: #4b5563 !important;
+}
+
+.nav-text-active {
+  color: #1d4ed8 !important;
+}
+
+/* Error and success text */
+.text-error {
+  color: #dc2626 !important;
+}
+
+.text-success {
+  color: #059669 !important;
+}
+
+.text-warning {
+  color: #d97706 !important;
+}
+
+/* Override any accidentally light text */
+.force-dark-text * {
+  color: #374151 !important;
+}
+
+.force-dark-text h1,
+.force-dark-text h2,
+.force-dark-text h3,
+.force-dark-text h4,
+.force-dark-text h5,
+.force-dark-text h6 {
+  color: #111827 !important;
+}
