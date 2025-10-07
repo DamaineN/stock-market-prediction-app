@@ -10,6 +10,7 @@ import {
   MagnifyingGlassIcon,
   BookmarkIcon,
   UserIcon,
+  TrophyIcon,
   Bars3Icon,
   XMarkIcon,
   BellIcon,
@@ -20,7 +21,8 @@ import {
   HomeIcon as HomeSolid,
   MagnifyingGlassIcon as MagnifyingSolid,
   BookmarkIcon as BookmarkSolid,
-  UserIcon as UserSolid
+  UserIcon as UserSolid,
+  TrophyIcon as TrophySolid
 } from '@heroicons/react/24/solid'
 
 interface LayoutProps {
@@ -32,6 +34,7 @@ const navigation = [
   { name: 'Search Stocks', href: '/search', icon: MagnifyingGlassIcon, iconSolid: MagnifyingSolid },
   { name: 'Predictions', href: '/predictions', icon: ChartBarIcon, iconSolid: ChartBarSolid },
   { name: 'Watchlist', href: '/watchlist', icon: BookmarkIcon, iconSolid: BookmarkSolid },
+  { name: 'Goals', href: '/goals', icon: TrophyIcon, iconSolid: TrophySolid },
   { name: 'Profile', href: '/profile', icon: UserIcon, iconSolid: UserSolid },
 ]
 

@@ -119,18 +119,43 @@ class UserService:
         return await self.collection.find_one({"email": email})
     
     async def get_user_by_id(self, user_id: str) -> Optional[dict]:
-        """Get user by ID"""
+        """Get user by ID - handles both ObjectId and string formats"""
         from bson import ObjectId
-        return await self.collection.find_one({"_id": ObjectId(user_id)})
+        
+        # Try ObjectId format first
+        if ObjectId.is_valid(user_id):
+            try:
+                user_doc = await self.collection.find_one({"_id": ObjectId(user_id)})
+                if user_doc:
+                    return user_doc
+            except:
+                pass
+        
+        # If not found, try string format
+        return await self.collection.find_one({"_id": user_id})
     
     async def update_user(self, user_id: str, update_data: dict) -> bool:
-        """Update user data"""
+        """Update user data - handles both ObjectId and string formats"""
         from bson import ObjectId
         from datetime import datetime, timezone
         
         update_data["updated_at"] = datetime.now(timezone.utc)
+        
+        # Try ObjectId format first
+        if ObjectId.is_valid(user_id):
+            try:
+                result = await self.collection.update_one(
+                    {"_id": ObjectId(user_id)},
+                    {"$set": update_data}
+                )
+                if result.modified_count > 0:
+                    return True
+            except:
+                pass
+        
+        # If not successful, try string format
         result = await self.collection.update_one(
-            {"_id": ObjectId(user_id)},
+            {"_id": user_id},
             {"$set": update_data}
         )
         return result.modified_count > 0

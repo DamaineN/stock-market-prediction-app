@@ -9,6 +9,7 @@ from api.auth.utils import get_current_user
 from api.database.mongodb import get_database, UserService
 from api.database.mongodb_models import WatchlistItem, Watchlist
 from api.collectors.yahoo_finance import YahooFinanceCollector
+from api.services.xp_service import XPService
 
 router = APIRouter()
 
@@ -20,15 +21,21 @@ async def get_user_watchlist(
     """Get current user's watchlist"""
     try:
         from bson import ObjectId
-        user_id = ObjectId(current_user["user_id"])
+        
+        # Handle both ObjectId and string user ID formats
+        user_id = current_user["user_id"]
+        if ObjectId.is_valid(user_id):
+            user_id_query = ObjectId(user_id)
+        else:
+            user_id_query = user_id
         
         # Get user's watchlist from database
-        watchlist = await db.watchlists.find_one({"user_id": user_id})
+        watchlist = await db.watchlists.find_one({"user_id": user_id_query})
         
         if not watchlist:
             # Create default watchlist if none exists
             default_watchlist = {
-                "user_id": user_id,
+                "user_id": user_id_query,
                 "name": "My Watchlist",
                 "items": [],
                 "created_at": datetime.now(timezone.utc),
@@ -121,15 +128,20 @@ async def add_to_watchlist(
                 detail=f"Unable to validate stock symbol '{symbol}'. It may not exist."
             )
         
-        user_id = ObjectId(current_user["user_id"])
+        # Handle both ObjectId and string user ID formats
+        user_id = current_user["user_id"]
+        if ObjectId.is_valid(user_id):
+            user_id_query = ObjectId(user_id)
+        else:
+            user_id_query = user_id
         
         # Get or create user's watchlist
-        watchlist = await db.watchlists.find_one({"user_id": user_id})
+        watchlist = await db.watchlists.find_one({"user_id": user_id_query})
         
         if not watchlist:
             # Create new watchlist
             watchlist = {
-                "user_id": user_id,
+                "user_id": user_id_query,
                 "name": "My Watchlist",
                 "items": [],
                 "created_at": datetime.now(timezone.utc),
@@ -156,12 +168,23 @@ async def add_to_watchlist(
         
         # Add to watchlist
         await db.watchlists.update_one(
-            {"user_id": user_id},
+            {"user_id": user_id_query},
             {
                 "$push": {"items": watchlist_item_db},
                 "$set": {"updated_at": datetime.now(timezone.utc)}
             }
         )
+        
+        # Award XP for adding to watchlist
+        try:
+            xp_service = XPService(db)
+            await xp_service.track_watchlist_add(
+                user_id=current_user["user_id"],
+                symbol=symbol
+            )
+        except Exception as xp_error:
+            # Don't fail the watchlist operation if XP tracking fails
+            print(f"XP tracking failed: {xp_error}")
         
         # Return the added item with current price info
         previous_close = stock_info.get('previousClose', current_price)
@@ -195,12 +218,19 @@ async def remove_from_watchlist(
     """Remove a stock from user's watchlist"""
     try:
         from bson import ObjectId
-        user_id = ObjectId(current_user["user_id"])
+        
+        # Handle both ObjectId and string user ID formats
+        user_id = current_user["user_id"]
+        if ObjectId.is_valid(user_id):
+            user_id_query = ObjectId(user_id)
+        else:
+            user_id_query = user_id
+            
         symbol = symbol.upper().strip()
         
         # Remove from watchlist
         result = await db.watchlists.update_one(
-            {"user_id": user_id},
+            {"user_id": user_id_query},
             {
                 "$pull": {"items": {"symbol": symbol}},
                 "$set": {"updated_at": datetime.now(timezone.utc)}

@@ -1,7 +1,7 @@
 """
 ML Prediction API routes
 """
-from fastapi import APIRouter, HTTPException, Query, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Depends
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timedelta
 from pydantic import BaseModel
@@ -9,6 +9,9 @@ import asyncio
 
 from models.model_manager import ModelManager
 from api.collectors.yahoo_finance import YahooFinanceCollector
+from api.auth.utils import get_current_user
+from api.database.mongodb import get_database
+from api.services.xp_service import XPService
 
 router = APIRouter()
 
@@ -32,7 +35,12 @@ class ModelTrainingRequest(BaseModel):
     parameters: Optional[Dict[str, Any]] = None
 
 @router.post("/predictions/predict")
-async def create_prediction(request: PredictionRequest):
+async def create_prediction(
+    request: PredictionRequest,
+    background_tasks: BackgroundTasks,
+    current_user: dict = Depends(get_current_user),
+    db = Depends(get_database)
+):
     """Generate stock price predictions using specified model"""
     try:
         # Get historical data for the symbol
@@ -81,6 +89,72 @@ async def create_prediction(request: PredictionRequest):
                 confidence_level=request.confidence_level
             )
             results = {request.model_type: single_result}
+        
+        # Award XP for generating prediction
+        try:
+            xp_service = XPService(db)
+            await xp_service.track_prediction(
+                user_id=current_user["user_id"],
+                symbol=request.symbol.upper(),
+                model_type=request.model_type
+            )
+        except Exception as xp_error:
+            # Don't fail the prediction if XP tracking fails
+            print(f"XP tracking failed: {xp_error}")
+        
+        # Store prediction in database for future reference
+        try:
+            predictions_collection = db["predictions"]
+            from bson import ObjectId
+            
+            # Calculate a representative prediction value for storage
+            representative_prediction = None
+            confidence = 0.0
+            
+            if results:
+                # Get the first model's prediction as representative
+                first_model_results = next(iter(results.values()))
+                if first_model_results and 'predictions' in first_model_results:
+                    predictions_data = first_model_results['predictions']
+                    if isinstance(predictions_data, list) and len(predictions_data) > 0:
+                        # Use the next day's prediction as representative
+                        first_prediction = predictions_data[0]
+                        representative_prediction = first_prediction.get('predicted_price')
+                        confidence = first_prediction.get('confidence', 0.0)
+                    
+                    # Also try to get accuracy from metadata as backup confidence
+                    if confidence == 0.0 and 'metadata' in first_model_results:
+                        metadata = first_model_results['metadata']
+                        confidence = metadata.get('accuracy_score', 0.0)
+            
+            # Create a structured record with properly formatted values
+            # Handle both ObjectId and string user ID formats
+            user_id = current_user["user_id"]
+            if ObjectId.is_valid(user_id):
+                user_id_obj = ObjectId(user_id)
+            else:
+                user_id_obj = user_id
+                
+            prediction_record = {
+                "user_id": user_id_obj,
+                "symbol": request.symbol.upper(),
+                "model_type": request.model_type,
+                "predicted_price": representative_prediction,
+                "confidence": confidence if 0 < confidence <= 1 else 0.85,  # Default to 85% if missing or invalid
+                "prediction_days": request.prediction_days,
+                "results": results,
+                "status": "active",
+                "created_at": datetime.utcnow()
+            }
+            
+            # Log the prediction details for debugging
+            print(f"Storing prediction: {request.symbol.upper()} with {request.model_type} model")
+            print(f"Predicted price: {representative_prediction}, Confidence: {confidence}")
+            
+            await predictions_collection.insert_one(prediction_record)
+        except Exception as storage_error:
+            # Don't fail the prediction if storage fails
+            print(f"Prediction storage failed: {storage_error}")
         
         return {
             "symbol": request.symbol,

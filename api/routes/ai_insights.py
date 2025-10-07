@@ -9,6 +9,8 @@ from pydantic import BaseModel
 from api.services.ai_insights import AIInsightsService
 from api.auth.utils import get_current_user
 from api.database.mongodb_models import UserInDB, RecommendationType
+from api.services.xp_service import XPService
+from api.database.mongodb import get_database
 
 router = APIRouter()
 
@@ -39,7 +41,8 @@ class InsightResponse(BaseModel):
 @router.post("/insights/generate", response_model=InsightResponse)
 async def generate_ai_insight(
     request: InsightRequest,
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: UserInDB = Depends(get_current_user),
+    db = Depends(get_database)
 ):
     """Generate AI insight and recommendation for a single stock"""
     try:
@@ -58,6 +61,17 @@ async def generate_ai_insight(
                 status_code=400,
                 detail=f"Error generating insight for {request.symbol}: {insight['error']}"
             )
+        
+        # Award XP for viewing AI insight
+        try:
+            xp_service = XPService(db)
+            await xp_service.track_ai_insight_view(
+                user_id=current_user["user_id"],
+                symbol=request.symbol.upper()
+            )
+        except Exception as xp_error:
+            # Don't fail the insight if XP tracking fails
+            print(f"XP tracking failed: {xp_error}")
         
         return insight
         

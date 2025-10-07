@@ -69,6 +69,17 @@ class UserStatus(str, Enum):
     INACTIVE = "inactive"
     SUSPENDED = "suspended"
 
+
+class XPActivityType(str, Enum):
+    PREDICTION_USED = "prediction_used"
+    STOCK_ADDED_WATCHLIST = "stock_added_watchlist"
+    DAILY_LOGIN = "daily_login"
+    AI_INSIGHT_VIEWED = "ai_insight_viewed"
+    PROFILE_COMPLETED = "profile_completed"
+    QUIZ_PASSED = "quiz_passed"
+    TRADING_ACTION = "trading_action"
+    ROLE_UPGRADED = "role_upgraded"
+
 # User Models
 class UserBase(BaseModel):
     email: EmailStr
@@ -91,6 +102,14 @@ class UserInDB(UserBase):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     hashed_password: str
     quiz_answers: Optional[Dict[int, int]] = None  # Store quiz answers
+    
+    # XP and Goals System
+    total_xp: int = 0
+    current_role_xp: int = 0  # XP within current role
+    last_daily_xp: Optional[datetime] = None  # Last daily XP reward
+    last_daily_checkin_date: Optional[datetime] = None  # Last daily check-in date for validation
+    role_progression_history: List[Dict[str, Any]] = []  # Track role changes
+    
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_login: Optional[datetime] = None
@@ -308,11 +327,7 @@ class UserProfile(BaseModel):
     successful_trades: int = 0
     total_profit_loss: float = 0.0
     
-    # Goals and achievements
-    goals_completed: List[str] = []
-    achievements_earned: List[str] = []
-    
-    # Role upgrade eligibility
+    # Role upgrade eligibility (based on XP thresholds)
     role_upgrade_eligible: bool = False
     next_role: Optional[UserRole] = None
     
@@ -474,95 +489,29 @@ class TradeHistory(BaseModel):
         arbitrary_types_allowed=True
     )
 
-# Gamification System - User Goals
-class UserGoal(BaseModel):
+# XP Activity Tracking
+class XPActivity(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     user_id: PyObjectId
     
-    # Goal definition
-    goal_id: str  # Unique identifier for goal type
-    goal_name: str
-    goal_description: str
+    # Activity details
+    activity_type: XPActivityType
+    activity_description: str
+    xp_earned: int
     
-    # Progress tracking
-    target_value: int  # Target number (e.g., 10 trades, 7 days streak)
-    current_progress: int = 0
-    progress_percentage: float = 0.0
+    # Activity metadata
+    related_entity_id: Optional[str] = None  # e.g., stock symbol, prediction ID
+    related_entity_type: Optional[str] = None  # e.g., "stock", "prediction"
+    multiplier: float = 1.0  # For bonus XP events
     
-    # Rewards
-    xp_reward: int = 100
-    badge_reward: Optional[str] = None
+    # Timestamps
+    earned_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
-    # Status
-    is_completed: bool = False
-    is_active: bool = True
-    completed_date: Optional[datetime] = None
-    
-    # Goal category (for role progression)
-    category: str = "general"  # beginner, casual, paper_trader, general
-    required_role: Optional[UserRole] = None
-    
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True
     )
 
-# Achievement System
-class Achievement(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    achievement_id: str  # Unique identifier
-    name: str
-    description: str
-    icon: str = "🏆"
-    category: str = "general"
-    
-    # Requirements
-    requirement_type: str  # trades, profit, streak, predictions
-    requirement_value: int
-    requirement_description: str
-    
-    # Rewards
-    xp_reward: int = 100
-    badge_unlock: Optional[str] = None
-    role_requirement: Optional[UserRole] = None
-    
-    # Rarity
-    rarity: str = "common"  # common, rare, epic, legendary
-    unlock_percentage: float = 0.0  # % of users who unlocked this
-    
-    is_active: bool = True
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True
-    )
-
-# User Achievement Progress
-class UserAchievement(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    user_id: PyObjectId
-    achievement_id: str
-    
-    # Progress
-    current_progress: int = 0
-    is_unlocked: bool = False
-    unlocked_date: Optional[datetime] = None
-    
-    # Rewards received
-    xp_earned: int = 0
-    badge_earned: Optional[str] = None
-    
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-    model_config = ConfigDict(
-        populate_by_name=True,
-        arbitrary_types_allowed=True
-    )
 
 # User Activity Log (for analytics and gamification)
 class UserActivity(BaseModel):

@@ -4,30 +4,27 @@ import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useState, useEffect } from 'react'
 import { useRealTimeStocks } from '@/hooks/useRealTimeStocks'
+import { useDashboardSummary, useRecentPredictions } from '@/hooks/useDashboardStats'
 import { RealTimeStockList, ConnectionStatus } from '@/components/ui/real-time-stock-price'
 import Link from 'next/link'
-
-// Real stats will be fetched from API
-const stats = {
-  totalPredictions: 0,
-  accuracy: 0,
-  watchlistItems: 0,
-  activeModels: 0
-}
-
-const recentPredictions: any[] = []
+import { ArrowPathIcon } from '@heroicons/react/24/outline'
 
 export default function Dashboard() {
-  const [isLoading, setIsLoading] = useState(true)
+  // Get real-time dashboard data
+  const { summary, loading: summaryLoading, error: summaryError, refreshSummary } = useDashboardSummary()
+  const { predictions, totalCount, loading: predictionsLoading, error: predictionsError, refreshPredictions } = useRecentPredictions()
   
   // Initialize real-time stocks with popular symbols
   const watchedSymbols = ['AAPL', 'GOOGL', 'MSFT', 'TSLA', 'NVDA']
   const { stocks, isConnected, connectionError, addSymbol, removeSymbol } = useRealTimeStocks(watchedSymbols)
 
-  useEffect(() => {
-    // Simulate loading
-    setTimeout(() => setIsLoading(false), 1000)
-  }, [])
+  const isLoading = summaryLoading || predictionsLoading
+  const hasError = summaryError || predictionsError
+  
+  const handleRefresh = () => {
+    refreshSummary()
+    refreshPredictions()
+  }
 
   if (isLoading) {
     return (
@@ -70,28 +67,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Total Predictions</h3>
-            <p className="text-2xl font-bold text-gray-900">{stats.totalPredictions}</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Model Accuracy</h3>
-            <p className="text-2xl font-bold text-green-600">{stats.accuracy}%</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Watchlist Items</h3>
-            <p className="text-2xl font-bold text-gray-900">{stats.watchlistItems}</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-sm font-medium text-gray-500">Active Models</h3>
-            <p className="text-2xl font-bold text-blue-600">{stats.activeModels}</p>
-          </div>
-        </div>
 
         {/* Recent Predictions */}
         <div className="bg-white shadow rounded-lg">
@@ -120,7 +95,31 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {recentPredictions.length === 0 ? (
+                {predictionsLoading ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-2"></div>
+                        Loading predictions...
+                      </div>
+                    </td>
+                  </tr>
+                ) : predictionsError ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-8 text-center text-red-500">
+                      <div className="flex flex-col items-center">
+                        <p className="text-lg mb-2">Error loading predictions</p>
+                        <p className="text-sm mb-4">{predictionsError}</p>
+                        <button 
+                          onClick={refreshPredictions}
+                          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                        >
+                          Retry
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ) : predictions.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
                       <div className="flex flex-col items-center">
@@ -133,8 +132,8 @@ export default function Dashboard() {
                     </td>
                   </tr>
                 ) : (
-                  recentPredictions.map((prediction, index) => (
-                    <tr key={index}>
+                  predictions.map((prediction, index) => (
+                    <tr key={prediction.id || index}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-medium text-gray-900">{prediction.symbol}</span>
                       </td>
@@ -142,13 +141,13 @@ export default function Dashboard() {
                         <span className="text-sm text-gray-500">{prediction.model}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">${prediction.prediction.toFixed(2)}</span>
+                        <span className="text-sm font-medium text-gray-900">${prediction.prediction ? prediction.prediction.toFixed(2) : prediction.predicted_price ? prediction.predicted_price.toFixed(2) : 'N/A'}</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-500">{(prediction.confidence * 100).toFixed(0)}%</span>
+                        <span className="text-sm text-gray-500">{((prediction.confidence || 0) * 100).toFixed(0)}%</span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {prediction.date}
+                        {prediction.date ? new Date(prediction.date).toLocaleDateString() : 'N/A'}
                       </td>
                     </tr>
                   ))

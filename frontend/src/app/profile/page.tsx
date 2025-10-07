@@ -4,16 +4,48 @@ import Layout from '@/components/Layout'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuth } from '@/contexts/AuthContext'
 import { useState, useEffect } from 'react'
-import { UserIcon, EnvelopeIcon, CalendarIcon, ShieldCheckIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
+import { useActivityStats } from '@/hooks/useDashboardStats'
+import { useXPProgress } from '@/hooks/useXPProgress'
+import { UserIcon, EnvelopeIcon, CalendarIcon, ShieldCheckIcon, ArrowPathIcon, TrophyIcon, StarIcon, FireIcon } from '@heroicons/react/24/outline'
+import { TrophyIcon as TrophySolid, StarIcon as StarSolid } from '@heroicons/react/24/solid'
 
 export default function ProfilePage() {
   const { user, refreshUser, forceRefreshUser } = useAuth()
+  const { activityStats, loading: activityLoading, error: activityError, refreshActivityStats } = useActivityStats()
+  const { xpProgress, loading: xpLoading, error: xpError, refreshXPProgress } = useXPProgress()
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
   })
   const [refreshing, setRefreshing] = useState(false)
+
+  // Helper functions for role display
+  const getRoleIcon = (role: string) => {
+    switch (role.toLowerCase()) {
+      case 'beginner':
+        return <StarIcon className="w-6 h-6 text-yellow-500" />
+      case 'casual':
+        return <StarSolid className="w-6 h-6 text-blue-500" />
+      case 'paper_trader':
+        return <TrophySolid className="w-6 h-6 text-purple-500" />
+      default:
+        return <StarIcon className="w-6 h-6 text-gray-500" />
+    }
+  }
+
+  const getRoleColor = (role: string) => {
+    switch (role.toLowerCase()) {
+      case 'beginner':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200'
+      case 'casual':
+        return 'text-blue-600 bg-blue-50 border-blue-200'
+      case 'paper_trader':
+        return 'text-purple-600 bg-purple-50 border-purple-200'
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200'
+    }
+  }
 
   useEffect(() => {
     if (user) {
@@ -219,25 +251,162 @@ export default function ProfilePage() {
           {/* Account Stats */}
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Account Activity</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-medium text-gray-900">Account Activity</h2>
+                <button
+                  onClick={refreshActivityStats}
+                  disabled={activityLoading}
+                  className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                  title="Refresh activity data"
+                >
+                  <ArrowPathIcon className={`w-5 h-5 ${activityLoading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
             </div>
             <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">0</div>
-                  <div className="text-sm text-gray-500">Predictions Made</div>
+              {activityError ? (
+                <div className="text-center text-red-500 py-4">
+                  <p>Error loading activity data: {activityError}</p>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">0</div>
-                  <div className="text-sm text-gray-500">Stocks Watched</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-900">
+                      {activityLoading ? '...' : activityStats?.predictions_made || 0}
+                    </div>
+                    <div className="text-sm text-gray-500">Predictions Made</div>
                   </div>
-                  <div className="text-sm text-gray-500">Last Login</div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-900">
+                      {activityLoading ? '...' : activityStats?.stocks_watched || 0}
+                    </div>
+                    <div className="text-sm text-gray-500">Stocks Watched</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-900">
+                      {activityLoading ? '...' : (
+                        activityStats?.last_login
+                          ? new Date(activityStats.last_login).toLocaleDateString()
+                          : user?.last_login
+                            ? new Date(user.last_login).toLocaleDateString()
+                            : 'Never'
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-500">Last Login</div>
+                  </div>
                 </div>
-              </div>
+              )}
+              
+              {/* XP Progress Summary */}
+              {(xpProgress || activityStats?.xp_info) && (
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-md font-medium text-gray-900 flex items-center">
+                      <TrophyIcon className="w-5 h-5 mr-2 text-yellow-500" />
+                      XP Progress
+                    </h3>
+                    <button
+                      onClick={refreshXPProgress}
+                      disabled={xpLoading}
+                      className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                      title="Refresh XP data"
+                    >
+                      <ArrowPathIcon className={`w-4 h-4 ${xpLoading ? 'animate-spin' : ''}`} />
+                    </button>
+                  </div>
+                  
+                  {xpError ? (
+                    <div className="text-center text-red-500 py-4">
+                      <p>Error loading XP data: {xpError}</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* Current Role & XP */}
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="text-center p-4 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg border border-yellow-200">
+                          <div className="flex items-center justify-center mb-2">
+                            {getRoleIcon(xpProgress?.current_role || activityStats?.xp_info?.current_role || user.role)}
+                          </div>
+                          <div className="text-lg font-bold text-gray-900 capitalize">
+                            {xpProgress?.current_role || activityStats?.xp_info?.current_role || user.role}
+                          </div>
+                          <div className="text-xs text-gray-600">Current Role</div>
+                        </div>
+                        
+                        <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                          <div className="flex items-center justify-center mb-2">
+                            <StarIcon className="w-6 h-6 text-blue-500" />
+                          </div>
+                          <div className="text-lg font-bold text-gray-900">
+                            {xpProgress?.total_xp || activityStats?.xp_info?.total_xp || 0}
+                          </div>
+                          <div className="text-xs text-gray-600">Total XP</div>
+                        </div>
+                      </div>
+                      
+                      {/* Role Progress Bar */}
+                      {xpProgress?.next_role && (
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-gray-700">
+                              Progress to {xpProgress.next_role.next_role.charAt(0).toUpperCase() + xpProgress.next_role.next_role.slice(1)}
+                            </span>
+                            <span className="text-sm text-gray-500">
+                              {xpProgress.next_role.remaining_xp} XP remaining
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-3">
+                            <div
+                              className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                              style={{ width: `${Math.min(xpProgress.next_role.progress_percentage, 100)}%` }}
+                            ></div>
+                          </div>
+                          <div className="flex justify-between text-xs text-gray-500 mt-1">
+                            <span>{xpProgress.next_role.current_xp} XP</span>
+                            <span>{xpProgress.next_role.required_xp} XP</span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {/* Recent XP Activities */}
+                      {xpProgress?.recent_activities && xpProgress.recent_activities.length > 0 && (
+                        <div className="mt-4">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">Recent XP Gains</h4>
+                          <div className="space-y-2 max-h-32 overflow-y-auto">
+                            {xpProgress.recent_activities.slice(0, 3).map((activity) => (
+                              <div key={activity.id} className="flex items-center justify-between py-1 px-2 bg-green-50 rounded text-sm">
+                                <span className="text-gray-700">{activity.description}</span>
+                                <span className="font-semibold text-green-600">+{activity.xp_earned} XP</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Activity Streak */}
+              {activityStats?.activity_streak && !activityLoading && (
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="text-md font-medium text-gray-900 mb-4">Activity Streak</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-orange-600">
+                        {activityStats.activity_streak.current_streak} days
+                      </div>
+                      <div className="text-xs text-gray-500">Current Streak</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xl font-bold text-red-600">
+                        {activityStats.activity_streak.longest_streak} days
+                      </div>
+                      <div className="text-xs text-gray-500">Longest Streak</div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

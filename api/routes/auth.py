@@ -195,6 +195,15 @@ async def login(
             "success": True
         })
         
+        # Track daily login for XP
+        try:
+            from api.services.xp_service import XPService
+            xp_service = XPService(db)
+            await xp_service.track_login(user_id=str(user_doc["_id"]))
+        except Exception as xp_error:
+            # Don't fail the login if XP tracking fails
+            logger.warning(f"Login XP tracking failed: {xp_error}")
+        
         return TokenResponse(
             access_token=access_token,
             refresh_token=refresh_token,

@@ -1,13 +1,16 @@
 """
 Stock data API routes
 """
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import Optional, List
 from datetime import datetime, timedelta
 from pydantic import BaseModel
 
 from api.collectors.yahoo_finance import YahooFinanceCollector
 from api.collectors.alpha_vantage import AlphaVantageCollector
+from api.auth.utils import get_current_user_optional
+from api.database.mongodb import get_database
+from api.services.xp_service import XPService
 
 router = APIRouter()
 
@@ -28,7 +31,9 @@ class StockInfo(BaseModel):
 async def get_historical_data(
     symbol: str,
     period: str = Query(default="1y", description="Time period (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max)"),
-    interval: str = Query(default="1d", description="Data interval (1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo)")
+    interval: str = Query(default="1d", description="Data interval (1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo)"),
+    current_user: dict = Depends(get_current_user_optional),
+    db = Depends(get_database)
 ):
     """Get historical stock data from Yahoo Finance"""
     try:
@@ -37,6 +42,17 @@ async def get_historical_data(
         
         if not data:
             raise HTTPException(status_code=404, detail=f"No data found for symbol {symbol}")
+        
+        # Award XP for viewing historical data if user is logged in
+        if current_user:
+            try:
+                xp_service = XPService(db)
+                await xp_service.track_historical_data_view(
+                    user_id=current_user["user_id"],
+                    symbol=symbol.upper()
+                )
+            except Exception as xp_error:
+                print(f"XP tracking failed: {xp_error}")
         
         return StockDataResponse(
             symbol=symbol.upper(),
