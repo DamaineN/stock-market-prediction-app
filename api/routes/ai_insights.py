@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 from api.services.ai_insights import AIInsightsService
 from api.auth.utils import get_current_user
-from api.database.mongodb_models import UserInDB, RecommendationType
+from api.database.mongodb_models import RecommendationType
 from api.services.xp_service import XPService
 from api.database.mongodb import get_database
 
@@ -41,7 +41,7 @@ class InsightResponse(BaseModel):
 @router.post("/insights/generate", response_model=InsightResponse)
 async def generate_ai_insight(
     request: InsightRequest,
-    current_user: UserInDB = Depends(get_current_user),
+    current_user: Dict = Depends(get_current_user),
     db = Depends(get_database)
 ):
     """Generate AI insight and recommendation for a single stock"""
@@ -84,7 +84,7 @@ async def generate_ai_insight(
 @router.post("/insights/multiple")
 async def generate_multiple_insights(
     request: MultipleInsightRequest,
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: Dict = Depends(get_current_user)
 ):
     """Generate AI insights for multiple stocks"""
     try:
@@ -119,7 +119,7 @@ async def generate_multiple_insights(
 async def get_insight_for_symbol(
     symbol: str,
     user_role: Optional[str] = Query(default="beginner", description="User role for personalized insights"),
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: Dict = Depends(get_current_user)
 ):
     """Get AI insight for a specific symbol (convenience endpoint)"""
     try:
@@ -148,7 +148,7 @@ async def get_insight_for_symbol(
 async def get_watchlist_insights(
     user_id: str,
     user_role: Optional[str] = Query(default="beginner", description="User role for personalized insights"),
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: Dict = Depends(get_current_user)
 ):
     """Generate insights for all stocks in user's watchlist"""
     try:
@@ -205,7 +205,7 @@ async def get_watchlist_insights(
 @router.get("/insights/market-overview")
 async def get_market_overview(
     user_role: Optional[str] = Query(default="beginner", description="User role for personalized insights"),
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: Dict = Depends(get_current_user)
 ):
     """Get market overview with insights for major stocks"""
     try:
@@ -267,7 +267,7 @@ async def get_market_overview(
 async def get_recommendation_summary(
     symbols: Optional[str] = Query(default=None, description="Comma-separated list of symbols"),
     user_role: Optional[str] = Query(default="beginner", description="User role for personalized insights"),
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: Dict = Depends(get_current_user)
 ):
     """Get summary of recommendations for specified symbols or popular stocks"""
     try:

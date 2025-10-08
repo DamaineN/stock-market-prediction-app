@@ -2,11 +2,13 @@
 
 import Layout from '@/components/Layout'
 import { useState, useEffect } from 'react'
+import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { StocksService, SearchResult, StockInfo } from '@/lib/services/stocks'
 import { useRealTimeStocks } from '@/hooks/useRealTimeStocks'
 import { RealTimeStockPrice } from '@/components/ui/real-time-stock-price'
 import StockChart from '@/components/StockChart'
 import StockSearchDropdown from '@/components/ui/StockSearchDropdown'
+import PaperTrade from '@/components/trading/PaperTrade'
 
 export default function SearchPage() {
   const [selectedStock, setSelectedStock] = useState<StockInfo | null>(null)
@@ -166,16 +168,66 @@ export default function SearchPage() {
               )}
               
               {/* Action Buttons */}
-              <div className="mt-6 flex space-x-4">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                  Get Prediction
+              <div className="mt-6 flex flex-wrap gap-4">
+                <button 
+                  onClick={() => window.location.href = `/predictions?symbol=${selectedStock.symbol}`}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center space-x-2"
+                >
+                  <ChartBarIcon className="w-4 h-4" />
+                  <span>Get Prediction</span>
                 </button>
-                <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
-                  Add to Watchlist
+                <button 
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/v1/watchlist/add', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                        },
+                        body: JSON.stringify({ symbol: selectedStock.symbol })
+                      })
+                      if (response.ok) {
+                        alert('Stock added to watchlist!')
+                      }
+                    } catch (error) {
+                      console.error('Error adding to watchlist:', error)
+                    }
+                  }}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center space-x-2"
+                >
+                  <span>Add to Watchlist</span>
                 </button>
-                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
-                  View Historical Data
+                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 flex items-center space-x-2">
+                  <span>View Historical Data</span>
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Paper Trading */}
+        {selectedStock && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <PaperTrade
+              symbol={selectedStock.symbol}
+              companyName={selectedStock.name}
+              currentPrice={getStock(selectedStock.symbol)?.price || selectedStock.price}
+              onTradeExecuted={(tradeDetails) => {
+                console.log('Trade executed:', tradeDetails)
+              }}
+              className=""
+            />
+            
+            {/* Placeholder for additional content */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Trading Tips</h3>
+              <div className="space-y-3 text-sm text-gray-600">
+                <p>• Paper trading is a great way to practice without real money</p>
+                <p>• Consider the AI insights when making trading decisions</p>
+                <p>• Track your performance to improve your strategy</p>
+                <p>• Start with small positions to learn market dynamics</p>
+                <p>• Always have a plan before entering a trade</p>
               </div>
             </div>
           </div>

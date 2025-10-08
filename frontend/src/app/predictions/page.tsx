@@ -1,14 +1,17 @@
 'use client'
 
 import Layout from '@/components/Layout'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { ChartBarIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import { PredictionsService, PredictionRequest, PredictionResponse } from '@/lib/services/predictions'
 import { SearchResult } from '@/lib/services/stocks'
 import StockChart from '@/components/StockChart'
 import StockSearchDropdown from '@/components/ui/StockSearchDropdown'
+import AIInsight from '@/components/ai/AIInsight'
 
 export default function PredictionsPage() {
+  const searchParams = useSearchParams()
   const [symbol, setSymbol] = useState('')
   const [selectedStock, setSelectedStock] = useState<SearchResult | null>(null)
   const [modelType, setModelType] = useState('lstm')
@@ -27,6 +30,19 @@ export default function PredictionsPage() {
     setSelectedStock(null)
     setSymbol('')
   }
+
+  // Handle URL parameters
+  useEffect(() => {
+    const symbolParam = searchParams.get('symbol')
+    if (symbolParam) {
+      setSymbol(symbolParam.toUpperCase())
+      // Create a mock selected stock for the URL parameter
+      setSelectedStock({
+        symbol: symbolParam.toUpperCase(),
+        name: symbolParam.toUpperCase() // We'll use the symbol as name for now
+      })
+    }
+  }, [searchParams])
 
   // Helper function to map frontend model names to backend model names
   const mapToBackendModelName = (frontendName: string): string => {
@@ -258,6 +274,15 @@ export default function PredictionsPage() {
               </div>
             </div>
           </div>
+        )}
+
+        {/* AI Insights */}
+        {prediction && symbol && (
+          <AIInsight 
+            symbol={symbol.toUpperCase()}
+            userRole="beginner"
+            className=""
+          />
         )}
       </div>
     </Layout>

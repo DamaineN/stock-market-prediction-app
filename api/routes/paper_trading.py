@@ -8,7 +8,8 @@ from pydantic import BaseModel
 
 from api.services.paper_trading import PaperTradingService
 from api.auth.utils import get_current_user
-from api.database.mongodb_models import UserInDB, TradeType
+from api.database.mongodb_models import TradeType
+from typing import Dict
 
 router = APIRouter()
 
@@ -24,12 +25,12 @@ class TradeResponse(BaseModel):
     trade_details: Optional[Dict[str, Any]] = None
 
 @router.post("/paper-trading/portfolio/create")
-async def create_portfolio(current_user: UserInDB = Depends(get_current_user)):
+async def create_portfolio(current_user: Dict = Depends(get_current_user)):
     """Create a new paper trading portfolio for the user"""
     try:
         paper_trading_service = PaperTradingService()
         
-        result = await paper_trading_service.create_portfolio(str(current_user.id))
+        result = await paper_trading_service.create_portfolio(current_user["user_id"])
         
         if not result["success"]:
             raise HTTPException(status_code=400, detail=result["message"])
@@ -43,12 +44,12 @@ async def create_portfolio(current_user: UserInDB = Depends(get_current_user)):
         )
 
 @router.get("/paper-trading/portfolio")
-async def get_portfolio(current_user: UserInDB = Depends(get_current_user)):
+async def get_portfolio(current_user: Dict = Depends(get_current_user)):
     """Get user's paper trading portfolio with current values"""
     try:
         paper_trading_service = PaperTradingService()
         
-        result = await paper_trading_service.get_portfolio(str(current_user.id))
+        result = await paper_trading_service.get_portfolio(current_user["user_id"])
         
         if not result["success"]:
             if "No portfolio found" in result["message"]:
@@ -69,7 +70,7 @@ async def get_portfolio(current_user: UserInDB = Depends(get_current_user)):
 @router.post("/paper-trading/trade", response_model=TradeResponse)
 async def execute_trade(
     request: TradeRequest,
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: Dict = Depends(get_current_user)
 ):
     """Execute a paper trade (buy or sell)"""
     try:
@@ -82,7 +83,7 @@ async def execute_trade(
         paper_trading_service = PaperTradingService()
         
         result = await paper_trading_service.execute_trade(
-            user_id=str(current_user.id),
+            user_id=current_user["user_id"],
             symbol=request.symbol.upper(),
             trade_type=request.trade_type.lower(),
             quantity=request.quantity,
@@ -105,14 +106,14 @@ async def execute_trade(
 @router.get("/paper-trading/history")
 async def get_trade_history(
     limit: int = Query(default=50, ge=1, le=500, description="Number of trades to return"),
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: Dict = Depends(get_current_user)
 ):
     """Get user's trading history"""
     try:
         paper_trading_service = PaperTradingService()
         
         result = await paper_trading_service.get_trade_history(
-            user_id=str(current_user.id),
+            user_id=current_user["user_id"],
             limit=limit
         )
         
@@ -133,13 +134,13 @@ async def get_trade_history(
         )
 
 @router.get("/paper-trading/performance")
-async def get_portfolio_performance(current_user: UserInDB = Depends(get_current_user)):
+async def get_portfolio_performance(current_user: Dict = Depends(get_current_user)):
     """Get detailed portfolio performance analytics"""
     try:
         paper_trading_service = PaperTradingService()
         
         result = await paper_trading_service.get_portfolio_performance(
-            user_id=str(current_user.id)
+            user_id=current_user["user_id"]
         )
         
         if not result["success"]:
@@ -159,12 +160,12 @@ async def get_portfolio_performance(current_user: UserInDB = Depends(get_current
         )
 
 @router.post("/paper-trading/portfolio/reset")
-async def reset_portfolio(current_user: UserInDB = Depends(get_current_user)):
+async def reset_portfolio(current_user: Dict = Depends(get_current_user)):
     """Reset user's paper trading portfolio (for learning purposes)"""
     try:
         paper_trading_service = PaperTradingService()
         
-        result = await paper_trading_service.reset_portfolio(str(current_user.id))
+        result = await paper_trading_service.reset_portfolio(current_user["user_id"])
         
         if not result["success"]:
             raise HTTPException(status_code=400, detail=result["message"])
@@ -208,23 +209,23 @@ async def get_stock_quote(symbol: str):
         )
 
 @router.get("/paper-trading/dashboard")
-async def get_trading_dashboard(current_user: UserInDB = Depends(get_current_user)):
+async def get_trading_dashboard(current_user: Dict = Depends(get_current_user)):
     """Get comprehensive trading dashboard data"""
     try:
         paper_trading_service = PaperTradingService()
         
         # Get portfolio data
-        portfolio_result = await paper_trading_service.get_portfolio(str(current_user.id))
+        portfolio_result = await paper_trading_service.get_portfolio(current_user["user_id"])
         
         # Get performance data
-        performance_result = await paper_trading_service.get_portfolio_performance(str(current_user.id))
+        performance_result = await paper_trading_service.get_portfolio_performance(current_user["user_id"])
         
         # Get recent trades
-        history_result = await paper_trading_service.get_trade_history(str(current_user.id), limit=10)
+        history_result = await paper_trading_service.get_trade_history(current_user["user_id"], limit=10)
         
         # Combine all data
         dashboard_data = {
-            "user_id": str(current_user.id),
+            "user_id": current_user["user_id"],
             "timestamp": datetime.utcnow().isoformat()
         }
         
