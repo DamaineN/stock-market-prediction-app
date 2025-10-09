@@ -6,19 +6,29 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useState, useEffect } from 'react'
 import { useActivityStats } from '@/hooks/useDashboardStats'
 import { useXPProgress } from '@/hooks/useXPProgress'
-import { UserIcon, EnvelopeIcon, CalendarIcon, ShieldCheckIcon, ArrowPathIcon, TrophyIcon, StarIcon, FireIcon } from '@heroicons/react/24/outline'
+import { useRoleSync } from '@/hooks/useRoleSync'
+import { UserIcon, EnvelopeIcon, CalendarIcon, ShieldCheckIcon, ArrowPathIcon, TrophyIcon, StarIcon, FireIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline'
 import { TrophyIcon as TrophySolid, StarIcon as StarSolid } from '@heroicons/react/24/solid'
+import { Toast } from '@/components/ui/Toast'
+import { ToastType } from '@/components/ui/Toast'
 
 export default function ProfilePage() {
   const { user, refreshUser, forceRefreshUser } = useAuth()
   const { activityStats, loading: activityLoading, error: activityError, refreshActivityStats } = useActivityStats()
   const { xpProgress, loading: xpLoading, error: xpError, refreshXPProgress } = useXPProgress()
+  const { syncRole, syncing: roleSyncing, error: roleSyncError } = useRoleSync()
+  
+  // Get the most accurate role - prioritize XP-calculated role over stored database role
+  const getCurrentRole = () => {
+    return xpProgress?.current_role || activityStats?.xp_info?.current_role || user?.role || 'beginner'
+  }
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
   })
   const [refreshing, setRefreshing] = useState(false)
+  const [toasts, setToasts] = useState<Array<{id: string, message: string, type: ToastType}>>([]))
 
   // Helper functions for role display
   const getRoleIcon = (role: string) => {
@@ -98,6 +108,45 @@ export default function ProfilePage() {
     }
   }
 
+  const showToast = (message: string, type: ToastType) => {
+    const id = Date.now().toString()
+    setToasts(prev => [...prev, { id, message, type }])
+  }
+
+  const removeToast = (id: string) => {
+    setToasts(prev => prev.filter(toast => toast.id !== id))
+  }
+
+  const handleSyncRole = async () => {
+    try {
+      const result = await syncRole()
+      if (result && result.success) {
+        console.log('Role sync result:', result)
+        
+        if (result.role_updated) {
+          showToast(
+            `Role updated from ${result.previous_role} to ${result.new_role}!`,
+            'success'
+          )
+        } else {
+          showToast(
+            `Role is already synced: ${result.current_role}`,
+            'info'
+          )
+        }
+        
+        // Refresh user data and XP progress after successful sync
+        await refreshUser()
+        await refreshXPProgress()
+      } else {
+        showToast('Failed to sync role. Please try again.', 'error')
+      }
+    } catch (error) {
+      console.error('Error syncing role:', error)
+      showToast('Error syncing role. Please try again.', 'error')
+    }
+  }
+
   if (!user) {
     return (
       <ProtectedRoute>
@@ -138,7 +187,7 @@ export default function ProfilePage() {
                 <div className="flex items-center mt-2 space-x-4">
                   <div className="flex items-center text-sm text-gray-500">
                     <ShieldCheckIcon className="w-4 h-4 mr-1" />
-                    <span className="capitalize">{user.role}</span>
+                    <span className="capitalize">{getCurrentRole()}</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-500">
                     <CalendarIcon className="w-4 h-4 mr-1" />
@@ -224,10 +273,28 @@ export default function ProfilePage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Account Role
                   </label>
-                  <div className="flex items-center">
-                    <ShieldCheckIcon className="w-5 h-5 text-gray-400 mr-2" />
-                    <span className="text-gray-900 capitalize">{user.role}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <ShieldCheckIcon className="w-5 h-5 text-gray-400 mr-2" />
+                      <span className="text-gray-900 capitalize">{getCurrentRole()}</span>
+                      {xpProgress?.current_role && user?.role && xpProgress.current_role !== user.role && (
+                        <span className="ml-2 text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                          Updated via XP
+                        </span>
+                      )}
+                    </div>
+                    <button
+                      onClick={handleSyncRole}
+                      disabled={roleSyncing}
+                      className="ml-2 p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                      title="Sync role with current XP"
+                    >
+                      <ArrowTopRightOnSquareIcon className={`w-4 h-4 ${roleSyncing ? 'animate-pulse' : ''}`} />
+                    </button>
                   </div>
+                  {roleSyncError && (
+                    <div className="mt-1 text-xs text-red-500">{roleSyncError}</div>
+                  )}
                 </div>
 
                 <div>
@@ -413,6 +480,16 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+        
+        {/* Toast notifications */}
+        {toasts.map(toast => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => removeToast(toast.id)}
+          />
+        ))}
       </Layout>
     </ProtectedRoute>
   )

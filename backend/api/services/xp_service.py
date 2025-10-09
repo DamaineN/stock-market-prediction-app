@@ -380,3 +380,77 @@ class XPService:
             description=f"Completed learning module: {module_title}",
             related_entity=module_id
         )
+    
+    async def sync_user_role(self, user_id: str) -> Dict[str, Any]:
+        """Synchronize user's role in database with their current XP total"""
+        try:
+            # Get current user data - try both ObjectId and string lookups
+            user_doc = None
+            
+            # First try as ObjectId if it's a valid ObjectId
+            if ObjectId.is_valid(user_id):
+                try:
+                    user_doc = await self.users_collection.find_one({"_id": ObjectId(user_id)})
+                except:
+                    pass
+            
+            # If not found, try as string
+            if not user_doc:
+                user_doc = await self.users_collection.find_one({"_id": user_id})
+                
+            if not user_doc:
+                raise ValueError(f"User {user_id} not found")
+            
+            current_xp = user_doc.get("total_xp", 0)
+            stored_role = user_doc.get("role", UserRole.BEGINNER)
+            
+            # Calculate what role should be based on XP
+            calculated_role = self._calculate_role_from_xp(current_xp)
+            
+            # Check if role needs updating
+            if stored_role != calculated_role:
+                # Update user's role in database
+                update_data = {
+                    "role": calculated_role,
+                    "updated_at": datetime.now(timezone.utc)
+                }
+                
+                # Add to role progression history
+                role_change_entry = {
+                    "from_role": stored_role,
+                    "to_role": calculated_role,
+                    "xp_at_change": current_xp,
+                    "changed_at": datetime.now(timezone.utc),
+                    "sync_correction": True  # Mark this as a sync correction
+                }
+                
+                await self.users_collection.update_one(
+                    {"_id": user_id},  # Use string ID directly
+                    {
+                        "$set": update_data,
+                        "$push": {"role_progression_history": role_change_entry}
+                    }
+                )
+                
+                return {
+                    "success": True,
+                    "role_updated": True,
+                    "previous_role": stored_role,
+                    "new_role": calculated_role,
+                    "current_xp": current_xp,
+                    "message": f"Role synchronized from {stored_role} to {calculated_role}"
+                }
+            else:
+                return {
+                    "success": True,
+                    "role_updated": False,
+                    "current_role": stored_role,
+                    "current_xp": current_xp,
+                    "message": "Role already synchronized"
+                }
+                
+        except Exception as e:
+            return {
+                "success": False,
+                "error": str(e)
+            }

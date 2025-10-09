@@ -361,6 +361,31 @@ async def get_learning_progress(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get learning progress: {str(e)}")
 
+@router.post("/sync-role")
+async def sync_user_role(
+    current_user: dict = Depends(get_current_user),
+    db = Depends(get_database)
+):
+    """Synchronize user's role in database with their current XP total"""
+    try:
+        xp_service = XPService(db)
+        
+        result = await xp_service.sync_user_role(
+            user_id=current_user["user_id"]
+        )
+        
+        return {
+            "success": result.get("success", False),
+            "role_updated": result.get("role_updated", False),
+            "previous_role": result.get("previous_role"),
+            "new_role": result.get("new_role"),
+            "current_role": result.get("current_role", result.get("new_role")),
+            "current_xp": result.get("current_xp", 0),
+            "message": result.get("message", "Role synchronization completed")
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to sync user role: {str(e)}")
+
 def _get_activity_description(activity_type: str) -> str:
     """Get human-readable description for activity types"""
     descriptions = {
