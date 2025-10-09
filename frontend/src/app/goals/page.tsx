@@ -161,6 +161,14 @@ export default function GoalsPage() {
     }
   }
 
+  // Helper function for role display
+  const formatRoleName = (role: string) => {
+    if (!role) return 'Unknown'
+    return role.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ')
+  }
+
   const getRoleIcon = (role: string) => {
     switch (role.toLowerCase()) {
       case 'beginner':
@@ -258,49 +266,51 @@ export default function GoalsPage() {
         </div>
 
         {/* Current Role & XP Progress */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Current Role */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center space-x-3 mb-4">
-              {getRoleIcon(userProgress.current_role)}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-6 lg:space-y-0">
+            {/* Current Role Section */}
+            <div className="flex items-center space-x-4">
+              <div className="flex-shrink-0">
+                {getRoleIcon(userProgress.current_role)}
+              </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Current Role</h3>
-                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getRoleColor(userProgress.current_role)}`}>
-                  {userProgress.current_role.charAt(0).toUpperCase() + userProgress.current_role.slice(1)}
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Current Role</h3>
+                <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${getRoleColor(userProgress.current_role)} mb-3`}>
+                  {formatRoleName(userProgress.current_role)}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <StarIcon className="w-5 h-5 text-yellow-500" />
+                  <span className="text-2xl font-bold text-gray-900">{userProgress.total_xp}</span>
+                  <span className="text-gray-500">Total XP</span>
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <StarIcon className="w-5 h-5 text-yellow-500" />
-              <span className="text-2xl font-bold text-gray-900">{userProgress.total_xp}</span>
-              <span className="text-gray-500">Total XP</span>
-            </div>
-          </div>
 
-          {/* Next Role Progress */}
-          {userProgress.next_role && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Next Role Progress</h3>
-                <ArrowUpIcon className="w-5 h-5 text-green-500" />
-              </div>
-              <div className="mb-4">
-                <div className="flex justify-between text-sm text-gray-600 mb-1">
-                  <span>Progress to {userProgress.next_role.next_role}</span>
-                  <span>{userProgress.next_role.remaining_xp} XP remaining</span>
+            {/* Next Role Progress Section */}
+            {userProgress.next_role && (
+              <div className="flex-1 lg:max-w-md lg:ml-8">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-gray-900">Next Role Progress</h3>
+                  <ArrowUpIcon className="w-5 h-5 text-green-500" />
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="bg-blue-600 h-3 rounded-full transition-all duration-300"
-                    style={{ width: `${userProgress.next_role.progress_percentage}%` }}
-                  ></div>
+                <div className="mb-3">
+                  <div className="flex justify-between text-sm text-gray-600 mb-2">
+                    <span>Progress to {formatRoleName(userProgress.next_role.next_role)}</span>
+                    <span>{userProgress.next_role.remaining_xp} XP remaining</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                      style={{ width: `${userProgress.next_role.progress_percentage}%` }}
+                    ></div>
+                  </div>
                 </div>
+                <p className="text-sm text-gray-600">
+                  {userProgress.next_role.current_xp} / {userProgress.next_role.required_xp} XP
+                </p>
               </div>
-              <p className="text-sm text-gray-600">
-                {userProgress.next_role.current_xp} / {userProgress.next_role.required_xp} XP
-              </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* How to Earn XP */}

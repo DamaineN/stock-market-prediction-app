@@ -88,3 +88,150 @@ a {
 a:hover {
   color: #1e40af !important;
 }
+
+/* Enhanced UI/UX Improvements */
+
+/* Better shadows and transitions */
+.shadow {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.shadow:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Enhanced rounded corners */
+.rounded-lg {
+  border-radius: 0.75rem;
+}
+
+/* Improved spacing and typography */
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Better button hover effects */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+/* Enhanced form inputs */
+input, select, textarea {
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1);
+}
+
+/* Improved table styling */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table th:first-child {
+  border-top-left-radius: 0.5rem;
+}
+
+table th:last-child {
+  border-top-right-radius: 0.5rem;
+}
+
+table tbody tr {
+  transition: background-color 0.15s ease-in-out;
+}
+
+table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 0.5rem;
+}
+
+table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 0.5rem;
+}
+
+/* Loading animation improvements */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Enhanced link interactions */
+a {
+  transition: color 0.15s ease-in-out;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Improved card layouts */
+.bg-white {
+  border: 1px solid #e5e7eb;
+}
+
+/* Better spacing for grid layouts */
+.gap-6 {
+  gap: 1.5rem;
+}
+
+/* Enhanced text hierarchy */
+h1 {
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+h2 {
+  font-weight: 600;
+  line-height: 1.375;
+}
+
+h3 {
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+/* Better spacing for paragraphs */
+p {
+  line-height: 1.625;
+}
+
+/* Improved accessibility focus states */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}

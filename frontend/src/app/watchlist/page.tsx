@@ -10,6 +10,7 @@ import { ConnectionStatus } from '@/components/ui/real-time-stock-price'
 import ErrorBoundary, { ApiErrorFallback } from '@/components/ErrorBoundary'
 import LoadingSpinner, { SkeletonTable } from '@/components/LoadingSpinner'
 import StockSearchDropdown from '@/components/ui/StockSearchDropdown'
+import StockDetailModal from '@/components/modals/StockDetailModal'
 
 const mockWatchlistItems: WatchlistItem[] = [
   { symbol: 'AAPL', name: 'Apple Inc.', price: 185.50, change: 2.30, changePercent: 1.26 },
@@ -24,6 +25,8 @@ export default function WatchlistPage() {
   const [selectedStock, setSelectedStock] = useState<SearchResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  const [detailModalOpen, setDetailModalOpen] = useState(false)
+  const [selectedWatchlistItem, setSelectedWatchlistItem] = useState<WatchlistItem | null>(null)
 
   // Get symbols from watchlist for real-time updates - use useMemo to prevent infinite re-renders
   const watchlistSymbols = useMemo(() => {
@@ -232,10 +235,23 @@ export default function WatchlistPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
-                          <button className="text-blue-600 hover:text-blue-800 text-sm">
+                          <button 
+                            onClick={() => {
+                              window.location.href = `/predictions?symbol=${item.symbol}&name=${encodeURIComponent(item.name)}`
+                            }}
+                            className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200"
+                            title={`Make prediction for ${item.symbol}`}
+                          >
                             Predict
                           </button>
-                          <button className="text-green-600 hover:text-green-800 text-sm">
+                          <button 
+                            onClick={() => {
+                              setSelectedWatchlistItem(item)
+                              setDetailModalOpen(true)
+                            }}
+                            className="text-green-600 hover:text-green-800 text-sm font-medium transition-colors duration-200"
+                            title={`View details for ${item.symbol}`}
+                          >
                             View
                           </button>
                           <button
@@ -254,6 +270,18 @@ export default function WatchlistPage() {
           )}
         </div>
       </div>
+      
+      {/* Stock Detail Modal */}
+      {selectedWatchlistItem && (
+        <StockDetailModal
+          isOpen={detailModalOpen}
+          onClose={() => {
+            setDetailModalOpen(false)
+            setSelectedWatchlistItem(null)
+          }}
+          watchlistItem={selectedWatchlistItem}
+        />
+      )}
     </Layout>
   )
 }

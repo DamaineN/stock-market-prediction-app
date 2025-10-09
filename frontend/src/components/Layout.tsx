@@ -13,7 +13,6 @@ import {
   TrophyIcon,
   Bars3Icon,
   XMarkIcon,
-  BellIcon,
   ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline'
 import {
@@ -24,6 +23,7 @@ import {
   UserIcon as UserSolid,
   TrophyIcon as TrophySolid
 } from '@heroicons/react/24/solid'
+import { ProfilePicture } from '@/components/profile/ProfilePictureSelector'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -50,7 +50,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
         <div className="fixed top-0 left-0 bottom-0 w-64 bg-white shadow-xl">
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Stock Predictor</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Stolckr</h2>
             <button
               onClick={() => setSidebarOpen(false)}
               className="text-gray-400 hover:text-gray-600"
@@ -94,7 +94,7 @@ export default function Layout({ children }: LayoutProps) {
                   </div>
                 </div>
                 <div className="ml-3">
-                  <h2 className="text-lg font-semibold text-gray-900">Stock Predictor</h2>
+                  <h2 className="text-lg font-semibold text-gray-900">Stolckr</h2>
                 </div>
               </div>
             </div>
@@ -144,13 +144,13 @@ export default function Layout({ children }: LayoutProps) {
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <button className="text-gray-400 hover:text-gray-500">
-                  <BellIcon className="w-6 h-6" />
-                </button>
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <UserIcon className="w-5 h-5 text-gray-600" />
-                  </div>
+                  <ProfilePicture 
+                    pictureId={user?.profile_picture} 
+                    className="w-8 h-8" 
+                    userName={user?.full_name || user?.email}
+                    showInitials={false}
+                  />
                   <span className="text-sm font-medium text-gray-700 hidden sm:block">
                     {user?.full_name || user?.email || 'User'}
                   </span>

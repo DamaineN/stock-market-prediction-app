@@ -11,6 +11,7 @@ import { UserIcon, EnvelopeIcon, CalendarIcon, ShieldCheckIcon, ArrowPathIcon, T
 import { TrophyIcon as TrophySolid, StarIcon as StarSolid } from '@heroicons/react/24/solid'
 import { Toast } from '@/components/ui/Toast'
 import { ToastType } from '@/components/ui/Toast'
+import ProfilePictureSelector, { ProfilePicture } from '@/components/profile/ProfilePictureSelector'
 
 export default function ProfilePage() {
   const { user, refreshUser, forceRefreshUser } = useAuth()
@@ -28,6 +29,8 @@ export default function ProfilePage() {
     email: '',
   })
   const [updating, setUpdating] = useState(false)
+  const [pictureModalOpen, setPictureModalOpen] = useState(false)
+  const [updatingPicture, setUpdatingPicture] = useState(false)
   
   // Check if form data has changed from original user data
   const hasChanges = () => {
@@ -188,6 +191,43 @@ export default function ProfilePage() {
     setToasts(prev => prev.filter(toast => toast.id !== id))
   }
 
+  const handleUpdateProfilePicture = async (pictureId: string) => {
+    setUpdatingPicture(true)
+    try {
+      const token = localStorage.getItem('access_token')
+      if (!token) {
+        showToast('Authentication required. Please log in again.', 'error')
+        return
+      }
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const response = await fetch(`${apiUrl}/api/v1/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          profile_picture: pictureId
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`)
+      }
+
+      showToast('Profile picture updated successfully!', 'success')
+      await refreshUser()
+    } catch (error) {
+      console.error('Failed to update profile picture:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      showToast(`Failed to update profile picture: ${errorMessage}`, 'error')
+    } finally {
+      setUpdatingPicture(false)
+    }
+  }
+
   const handleSyncRole = async () => {
     try {
       const result = await syncRole()
@@ -237,8 +277,30 @@ export default function ProfilePage() {
           {/* Profile Header */}
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center space-x-6">
-              <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center">
-                <UserIcon className="w-12 h-12 text-gray-400" />
+              <div className="relative">
+                <button
+                  onClick={() => setPictureModalOpen(true)}
+                  className="group relative hover:scale-105 transition-transform duration-200"
+                  title="Click to change profile picture"
+                >
+                  <ProfilePicture 
+                    pictureId={user.profile_picture} 
+                    className="w-24 h-24" 
+                    userName={user.full_name || user.email}
+                    showInitials={false}
+                  />
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-full transition-all duration-200 flex items-center justify-center">
+                    <span className="text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      Change
+                    </span>
+                  </div>
+                  {updatingPicture && (
+                    <div className="absolute inset-0 bg-white bg-opacity-75 rounded-full flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    </div>
+                  )}
+                </button>
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
@@ -569,6 +631,14 @@ export default function ProfilePage() {
             onClose={() => removeToast(toast.id)}
           />
         ))}
+        
+        {/* Profile Picture Selector Modal */}
+        <ProfilePictureSelector
+          isOpen={pictureModalOpen}
+          onClose={() => setPictureModalOpen(false)}
+          currentPicture={user.profile_picture}
+          onSelect={handleUpdateProfilePicture}
+        />
       </Layout>
     </ProtectedRoute>
   )

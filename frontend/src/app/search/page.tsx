@@ -4,6 +4,7 @@ import Layout from '@/components/Layout'
 import { useState, useEffect } from 'react'
 import { ChartBarIcon } from '@heroicons/react/24/outline'
 import { StocksService, SearchResult, StockInfo } from '@/lib/services/stocks'
+import { WatchlistService } from '@/lib/services/watchlist'
 import { useRealTimeStocks } from '@/hooks/useRealTimeStocks'
 import { RealTimeStockPrice } from '@/components/ui/real-time-stock-price'
 import StockChart from '@/components/StockChart'
@@ -17,6 +18,13 @@ export default function SearchPage() {
   const [historicalData, setHistoricalData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [chartLoading, setChartLoading] = useState(false)
+  const [addingToWatchlist, setAddingToWatchlist] = useState(false)
+  const [watchlistMessage, setWatchlistMessage] = useState<string | null>(null)
+  const [chartPeriod, setChartPeriod] = useState<{ period: string; interval: string; label: string }>({ 
+    period: '3mo', 
+    interval: '1d', 
+    label: '3 months' 
+  })
   
   // Get user's actual role based on XP progress
   const { xpProgress, loading: xpLoading, error: xpError } = useXPProgress()
@@ -51,6 +59,15 @@ export default function SearchPage() {
     }
   }
   
+  // Chart period options
+  const chartPeriodOptions = [
+    { period: '7d', interval: '1h', label: '7 days' },
+    { period: '1mo', interval: '1d', label: '1 month' },
+    { period: '3mo', interval: '1d', label: '3 months' },
+    { period: '6mo', interval: '1d', label: '6 months' },
+    { period: '1y', interval: '1d', label: '12 months' }
+  ]
+  
   // Real-time stock updates for selected stock
   const selectedSymbol = selectedStock ? [selectedStock.symbol] : []
   const { getStock, addSymbol, removeSymbol } = useRealTimeStocks(selectedSymbol)
@@ -60,6 +77,8 @@ export default function SearchPage() {
     setSelectedStock(null)
     setHistoricalData([])
     setLoading(true)
+    // Reset to default period when selecting new stock
+    setChartPeriod({ period: '3mo', interval: '1d', label: '3 months' })
     
     try {
       const stockData = await StocksService.getStockInfo(stock.symbol)
@@ -69,7 +88,7 @@ export default function SearchPage() {
       // Fetch historical data for chart
       setChartLoading(true)
       try {
-        const historical = await StocksService.getHistoricalData(stock.symbol, '3mo', '1d')
+        const historical = await StocksService.getHistoricalData(stock.symbol, chartPeriod.period, chartPeriod.interval)
         console.log('Historical data received:', historical)
         
         // Validate that we have data before formatting
@@ -110,6 +129,32 @@ export default function SearchPage() {
       })
     } finally {
       setLoading(false)
+    }
+  }
+  
+  const handleChartPeriodChange = async (newPeriod: { period: string; interval: string; label: string }) => {
+    if (!selectedStock) return
+    
+    setChartPeriod(newPeriod)
+    setChartLoading(true)
+    
+    try {
+      const historical = await StocksService.getHistoricalData(selectedStock.symbol, newPeriod.period, newPeriod.interval)
+      console.log('Historical data received:', historical)
+      
+      if (historical.data && historical.data.length > 0) {
+        console.log('Sample data point:', historical.data[0])
+        const chartData = StocksService.formatChartData(historical.data)
+        setHistoricalData(chartData)
+      } else {
+        console.error('No historical data available for this period')
+        setHistoricalData([])
+      }
+    } catch (error) {
+      console.error('Failed to get historical data:', error)
+      setHistoricalData([])
+    } finally {
+      setChartLoading(false)
     }
   }
 
@@ -180,7 +225,27 @@ export default function SearchPage() {
               {/* Stock Chart */}
               {historicalData.length > 0 && (
                 <div className="mt-6">
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">3-Month Price History</h4>
+                  <div className="mb-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                      <h4 className="text-lg font-medium text-gray-900 mb-3 sm:mb-0">{chartPeriod.label} Price History</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {chartPeriodOptions.map((option) => (
+                          <button
+                            key={option.period}
+                            onClick={() => handleChartPeriodChange(option)}
+                            className={`px-3 py-2 text-sm font-medium rounded-md border transition-all duration-200 ${
+                              chartPeriod.period === option.period
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-400'
+                            } ${chartLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                            disabled={chartLoading}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                   {chartLoading ? (
                     <div className="flex items-center justify-center h-64 bg-gray-50 rounded-lg">
                       <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -213,30 +278,51 @@ export default function SearchPage() {
                 </button>
                 <button 
                   onClick={async () => {
+                    setAddingToWatchlist(true)
+                    setWatchlistMessage(null)
                     try {
-                      const response = await fetch('/api/v1/watchlist/add', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                        },
-                        body: JSON.stringify({ symbol: selectedStock.symbol })
+                      await WatchlistService.addToWatchlist({
+                        symbol: selectedStock.symbol,
+                        name: selectedStock.name
                       })
-                      if (response.ok) {
-                        alert('Stock added to watchlist!')
-                      }
+                      
+                      setWatchlistMessage(`${selectedStock.symbol} added to watchlist successfully!`)
+                      setTimeout(() => setWatchlistMessage(null), 3000)
                     } catch (error) {
                       console.error('Error adding to watchlist:', error)
+                      const errorMessage = error instanceof Error ? error.message : 'Failed to add to watchlist'
+                      setWatchlistMessage(`Error: ${errorMessage}`)
+                      setTimeout(() => setWatchlistMessage(null), 5000)
+                    } finally {
+                      setAddingToWatchlist(false)
                     }
                   }}
-                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 flex items-center space-x-2"
+                  disabled={addingToWatchlist}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-green-400 flex items-center space-x-2 transition-colors duration-200"
                 >
-                  <span>Add to Watchlist</span>
-                </button>
-                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 flex items-center space-x-2">
-                  <span>View Historical Data</span>
+                  {addingToWatchlist ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      <span>Adding...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Add to Watchlist</span>
+                    </>
+                  )}
                 </button>
               </div>
+              
+              {/* Watchlist Message */}
+              {watchlistMessage && (
+                <div className={`mt-4 p-3 rounded-md ${
+                  watchlistMessage.startsWith('Error') 
+                    ? 'bg-red-50 border border-red-200 text-red-700'
+                    : 'bg-green-50 border border-green-200 text-green-700'
+                }`}>
+                  <p className="text-sm font-medium">{watchlistMessage}</p>
+                </div>
+              )}
             </div>
           </div>
         )}

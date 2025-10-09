@@ -48,7 +48,7 @@ export default function LoginPage() {
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Access your stock market prediction dashboard
+            Access your Stolckr dashboard
           </p>
         </div>
         

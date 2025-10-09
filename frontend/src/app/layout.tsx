@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stock Market Prediction App",
+  title: "Stolckr",
   description: "AI-powered stock market analysis and prediction platform",
 };
 

@@ -32,11 +32,19 @@ export default function Dashboard() {
         <div className="animate-pulse">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white p-6 rounded-lg shadow">
-                <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded"></div>
+              <div key={i} className="bg-white p-8 rounded-lg shadow">
+                <div className="h-4 bg-gray-200 rounded-md mb-6"></div>
+                <div className="h-8 bg-gray-200 rounded-md"></div>
               </div>
             ))}
+          </div>
+          <div className="bg-white p-8 rounded-lg shadow mb-6">
+            <div className="h-6 bg-gray-200 rounded-md mb-6 w-1/4"></div>
+            <div className="space-y-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-4 bg-gray-200 rounded-md"></div>
+              ))}
+            </div>
           </div>
         </div>
       </Layout>
@@ -46,21 +54,27 @@ export default function Dashboard() {
   return (
     <ProtectedRoute>
       <Layout>
-      <div className="space-y-6">
+      <div className="space-y-8">
         {/* Market Overview */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
+        <div className="bg-white shadow-sm rounded-xl border border-gray-100">
+          <div className="px-8 py-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-medium text-gray-900">Live Market Overview</h2>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-1">Live Market Overview</h2>
+                <p className="text-sm text-gray-600">Real-time data from your tracked stocks</p>
+              </div>
               <ConnectionStatus isConnected={isConnected} error={connectionError} />
             </div>
           </div>
-          <div className="p-6">
+          <div className="p-8">
             <RealTimeStockList stocks={stocks.slice(0, 3)} />
             {stocks.length > 3 && (
-              <div className="mt-4 text-center">
-                <Link href="/watchlist" className="text-blue-600 hover:text-blue-800 text-sm">
-                  View all {stocks.length} tracked stocks →
+              <div className="mt-6 text-center">
+                <Link href="/watchlist" className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200">
+                  View all tracked stocks 
+                  <svg className="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </Link>
               </div>
             )}
@@ -69,50 +83,53 @@ export default function Dashboard() {
 
 
         {/* Recent Predictions */}
-        <div className="bg-white shadow rounded-lg">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Recent Predictions</h2>
+        <div className="bg-white shadow-sm rounded-xl border border-gray-100 overflow-hidden">
+          <div className="px-8 py-6 border-b border-gray-100">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-1">Recent Predictions</h2>
+              <p className="text-sm text-gray-600">Your latest AI-powered stock predictions</p>
+            </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full">
+              <thead className="bg-gray-50/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
                     Symbol
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
                     Model
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
                     Prediction
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
                     Confidence
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">
                     Date
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white divide-y divide-gray-100">
                 {predictionsLoading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                      <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-2"></div>
-                        Loading predictions...
+                    <td colSpan={5} className="px-8 py-12 text-center text-gray-500">
+                      <div className="flex flex-col items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-3"></div>
+                        <p className="text-sm font-medium">Loading predictions...</p>
                       </div>
                     </td>
                   </tr>
                 ) : predictionsError ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-red-500">
+                    <td colSpan={5} className="px-8 py-12 text-center text-red-500">
                       <div className="flex flex-col items-center">
-                        <p className="text-lg mb-2">Error loading predictions</p>
-                        <p className="text-sm mb-4">{predictionsError}</p>
+                        <p className="text-lg font-medium mb-2">Error loading predictions</p>
+                        <p className="text-sm mb-4 text-red-400">{predictionsError}</p>
                         <button 
                           onClick={refreshPredictions}
-                          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
+                          className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200 font-medium"
                         >
                           Retry
                         </button>
@@ -121,11 +138,11 @@ export default function Dashboard() {
                   </tr>
                 ) : predictions.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={5} className="px-8 py-12 text-center text-gray-500">
                       <div className="flex flex-col items-center">
-                        <p className="text-lg mb-2">No predictions yet</p>
-                        <p className="text-sm mb-4">Create your first stock prediction to see results here</p>
-                        <Link href="/predictions" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        <p className="text-lg font-medium mb-2">No predictions yet</p>
+                        <p className="text-sm mb-4 text-gray-400">Create your first stock prediction to see results here</p>
+                        <Link href="/predictions" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
                           Make Prediction
                         </Link>
                       </div>
@@ -133,20 +150,25 @@ export default function Dashboard() {
                   </tr>
                 ) : (
                   predictions.map((prediction, index) => (
-                    <tr key={prediction.id || index}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">{prediction.symbol}</span>
+                    <tr key={prediction.id || index} className="hover:bg-gray-50 transition-colors duration-150">
+                      <td className="px-8 py-5 whitespace-nowrap">
+                        <span className="text-sm font-semibold text-gray-900 tracking-wide">{prediction.symbol}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-500">{prediction.model}</span>
+                      <td className="px-8 py-5 whitespace-nowrap">
+                        <span className="text-sm text-gray-600 font-medium">{prediction.model}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-medium text-gray-900">${prediction.prediction ? prediction.prediction.toFixed(2) : prediction.predicted_price ? prediction.predicted_price.toFixed(2) : 'N/A'}</span>
+                      <td className="px-8 py-5 whitespace-nowrap">
+                        <span className="text-sm font-semibold text-gray-900">${prediction.prediction ? prediction.prediction.toFixed(2) : prediction.predicted_price ? prediction.predicted_price.toFixed(2) : 'N/A'}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-500">{((prediction.confidence || 0) * 100).toFixed(0)}%</span>
+                      <td className="px-8 py-5 whitespace-nowrap">
+                        <span className={`text-sm font-medium ${
+                          (prediction.confidence || 0) >= 0.7 ? 'text-green-600' : 
+                          (prediction.confidence || 0) >= 0.5 ? 'text-yellow-600' : 'text-red-600'
+                        }`}>
+                          {((prediction.confidence || 0) * 100).toFixed(0)}%
+                        </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-8 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
                         {prediction.date ? new Date(prediction.date).toLocaleDateString() : 'N/A'}
                       </td>
                     </tr>
@@ -159,31 +181,31 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Quick Prediction</h3>
-            <p className="text-sm text-gray-500 mb-4">Get a quick stock prediction</p>
+          <div className="bg-white p-7 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Quick Prediction</h3>
+            <p className="text-sm text-gray-600 mb-5">Get an AI-powered stock prediction instantly</p>
             <Link href="/predictions" className="block">
-              <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+              <button className="w-full bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-sm">
                 Make Prediction
               </button>
             </Link>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Search Stocks</h3>
-            <p className="text-sm text-gray-500 mb-4">Find and analyze stocks</p>
+          <div className="bg-white p-7 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Search Stocks</h3>
+            <p className="text-sm text-gray-600 mb-5">Find and analyze stocks with advanced search</p>
             <Link href="/search" className="block">
-              <button className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+              <button className="w-full bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 transition-colors duration-200 font-medium text-sm">
                 Search Now
               </button>
             </Link>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">View Watchlist</h3>
-            <p className="text-sm text-gray-500 mb-4">Monitor your favorite stocks</p>
+          <div className="bg-white p-7 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">View Watchlist</h3>
+            <p className="text-sm text-gray-600 mb-5">Monitor and track your favorite stocks with our watchlist</p>
             <Link href="/watchlist" className="block">
-              <button className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700">
+              <button className="w-full bg-purple-600 text-white px-4 py-2.5 rounded-lg hover:bg-purple-700 transition-colors duration-200 font-medium text-sm">
                 View List
               </button>
             </Link>
