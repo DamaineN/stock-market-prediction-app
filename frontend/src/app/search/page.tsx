@@ -9,7 +9,7 @@ import { useRealTimeStocks } from '@/hooks/useRealTimeStocks'
 import { RealTimeStockPrice } from '@/components/ui/real-time-stock-price'
 import StockChart from '@/components/StockChart'
 import StockSearchDropdown from '@/components/ui/StockSearchDropdown'
-import PaperTrade from '@/components/trading/PaperTrade'
+import SimplePaperTrading from '@/components/trading/SimplePaperTrading'
 import RoleBasedFeatures from '@/components/features/RoleBasedFeatures'
 import { useXPProgress } from '@/hooks/useXPProgress'
 
@@ -369,15 +369,7 @@ export default function SearchPage() {
                 } : undefined}
               >
                 {selectedStock ? (
-                  <PaperTrade
-                    symbol={selectedStock.symbol}
-                    companyName={selectedStock.name}
-                    currentPrice={getStock(selectedStock.symbol)?.price || selectedStock.price}
-                    onTradeExecuted={(tradeDetails) => {
-                      console.log('Trade executed:', tradeDetails)
-                    }}
-                    className=""
-                  />
+                  <SimplePaperTrading />
                 ) : (
                   <div className="bg-gray-50 border rounded-md p-4 text-sm text-gray-600">
                     Select a stock above to begin paper trading and receive AI coaching after each trade.
