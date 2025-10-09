@@ -72,6 +72,9 @@ class AIInsightsService:
                     {"close": 148.0, "volume": 900000, "date": "2024-01-03"}
                 ]
             
+            # Analyze current market data first
+            current_price = historical_data[-1]["close"]
+            
             # Get predictions from all models (using mock data for now)
             # all_predictions = await self.model_manager.get_all_predictions(
             #     symbol=symbol,
@@ -100,9 +103,6 @@ class AIInsightsService:
                     "metadata": {"accuracy_score": 0.78}
                 }
             }
-            
-            # Analyze current market data
-            current_price = historical_data[-1]["close"]
             technical_indicators = self._calculate_technical_indicators(historical_data)
             
             # Generate prediction analysis

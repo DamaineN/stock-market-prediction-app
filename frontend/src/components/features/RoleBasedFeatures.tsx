@@ -260,9 +260,40 @@ const RoleBasedFeatures: React.FC<RoleBasedFeaturesProps> = ({
     ]
   };
 
+  // Debug logging
+  console.log('RoleBasedFeatures - currentRole:', currentRole, typeof currentRole);
+  
+  // Ensure we have a valid role configuration with fallback
+  // Debug logging
+  console.log('RoleBasedFeatures - currentRole:', currentRole, typeof currentRole);
+  
+  // Get role configuration with safety check
   const currentRoleConfig = roleConfigs[currentRole];
+  
+  if (!currentRoleConfig) {
+    console.error('RoleBasedFeatures: No configuration found for role:', currentRole);
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <h3 className="text-red-800 font-semibold mb-2">Configuration Error</h3>
+        <p className="text-red-700 text-sm">
+          No feature configuration found for role: {currentRole}
+        </p>
+      </div>
+    );
+  }
+  
   const primaryFeature = currentRoleConfig.find(feature => feature.isPrimary);
   const secondaryFeatures = currentRoleConfig.filter(feature => !feature.isPrimary);
+  
+  // Additional safety check
+  if (!currentRoleConfig) {
+    console.error('No role configuration found for:', currentRole);
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p className="text-red-800">Error: Invalid user role configuration</p>
+      </div>
+    );
+  }
 
   const getRoleBadgeColor = (role: UserRole) => {
     switch (role) {

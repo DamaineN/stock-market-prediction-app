@@ -19,8 +19,37 @@ export default function SearchPage() {
   const [chartLoading, setChartLoading] = useState(false)
   
   // Get user's actual role based on XP progress
-  const { xpProgress } = useXPProgress()
-  const userRole = (xpProgress?.current_role || 'beginner') as 'beginner' | 'casual' | 'paper-trader'
+  const { xpProgress, loading: xpLoading, error: xpError } = useXPProgress()
+  
+  // Map backend role to frontend role format - NO FALLBACKS
+  const mapRole = (backendRole: string): 'beginner' | 'casual' | 'paper-trader' => {
+    const normalized = backendRole.toLowerCase().trim()
+    console.log('Mapping backend role:', backendRole, '-> normalized:', normalized)
+    
+    // Handle different role formats
+    if (normalized.includes('paper') || normalized.includes('trade')) {
+      return 'paper-trader'
+    }
+    if (normalized === 'casual' || normalized.includes('casual')) {
+      return 'casual'
+    }
+    if (normalized === 'beginner' || normalized.includes('beginner')) {
+      return 'beginner'
+    }
+    
+    throw new Error(`Unknown role format: ${backendRole}`)
+  }
+  
+  // Only map role if we have valid XP progress data
+  let userRole: 'beginner' | 'casual' | 'paper-trader' | null = null
+  if (xpProgress?.current_role) {
+    try {
+      userRole = mapRole(xpProgress.current_role)
+      console.log('Final mapped userRole:', userRole)
+    } catch (error) {
+      console.error('Failed to map user role:', error)
+    }
+  }
   
   // Real-time stock updates for selected stock
   const selectedSymbol = selectedStock ? [selectedStock.symbol] : []
@@ -219,30 +248,57 @@ export default function SearchPage() {
             <p className="text-sm text-gray-500 mt-1">Switch roles to focus on Learning, AI Insights, or Paper Trading. All features remain accessible.</p>
           </div>
           <div className="p-6">
-            <RoleBasedFeatures 
-              currentRole={userRole}
-              selectedStock={selectedStock ? {
-                symbol: selectedStock.symbol,
-                name: selectedStock.name,
-                price: getStock(selectedStock.symbol)?.price || selectedStock.price
-              } : undefined}
-            >
-              {selectedStock ? (
-                <PaperTrade
-                  symbol={selectedStock.symbol}
-                  companyName={selectedStock.name}
-                  currentPrice={getStock(selectedStock.symbol)?.price || selectedStock.price}
-                  onTradeExecuted={(tradeDetails) => {
-                    console.log('Trade executed:', tradeDetails)
-                  }}
-                  className=""
-                />
-              ) : (
-                <div className="bg-gray-50 border rounded-md p-4 text-sm text-gray-600">
-                  Select a stock above to begin paper trading and receive AI coaching after each trade.
-                </div>
-              )}
-            </RoleBasedFeatures>
+            {xpLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600">Loading your experience workspace...</span>
+              </div>
+            ) : xpError ? (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <h3 className="text-red-800 font-semibold mb-2">Unable to Load Experience Data</h3>
+                <p className="text-red-700 text-sm">
+                  Error: {xpError}
+                </p>
+                <p className="text-red-600 text-sm mt-2">
+                  Please ensure you are logged in and the backend is running.
+                </p>
+              </div>
+            ) : !userRole ? (
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h3 className="text-yellow-800 font-semibold mb-2">Invalid User Role</h3>
+                <p className="text-yellow-700 text-sm">
+                  Unable to determine your experience level from: {xpProgress?.current_role || 'undefined'}
+                </p>
+                <p className="text-yellow-600 text-sm mt-2">
+                  Please contact support or check your account settings.
+                </p>
+              </div>
+            ) : (
+              <RoleBasedFeatures 
+                currentRole={userRole}
+                selectedStock={selectedStock ? {
+                  symbol: selectedStock.symbol,
+                  name: selectedStock.name,
+                  price: getStock(selectedStock.symbol)?.price || selectedStock.price
+                } : undefined}
+              >
+                {selectedStock ? (
+                  <PaperTrade
+                    symbol={selectedStock.symbol}
+                    companyName={selectedStock.name}
+                    currentPrice={getStock(selectedStock.symbol)?.price || selectedStock.price}
+                    onTradeExecuted={(tradeDetails) => {
+                      console.log('Trade executed:', tradeDetails)
+                    }}
+                    className=""
+                  />
+                ) : (
+                  <div className="bg-gray-50 border rounded-md p-4 text-sm text-gray-600">
+                    Select a stock above to begin paper trading and receive AI coaching after each trade.
+                  </div>
+                )}
+              </RoleBasedFeatures>
+            )}
           </div>
         </div>
       </div>
