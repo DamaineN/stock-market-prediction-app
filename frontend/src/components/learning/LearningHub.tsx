@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useLearningProgress } from '@/hooks/useLearningProgress';
 import { 
   BookOpen, 
   PlayCircle, 
@@ -55,11 +56,14 @@ interface LearningPath {
 }
 
 const LearningHub: React.FC = () => {
-  const [completedModules, setCompletedModules] = useState<string[]>([]);
   const [activeModule, setActiveModule] = useState<string | null>(null);
   const [selectedPath, setSelectedPath] = useState<string>('complete-beginner');
   const [expandedResources, setExpandedResources] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'paths' | 'progress' | 'resources'>('overview');
+  const [completingModule, setCompletingModule] = useState<string | null>(null);
+  
+  // Use backend learning progress hook
+  const { learningProgress, loading, error, completeModule, isModuleCompleted } = useLearningProgress();
 
   const learningModules: LearningModule[] = [
     {
@@ -69,7 +73,7 @@ const LearningHub: React.FC = () => {
       duration: '5 min',
       difficulty: 'Beginner',
       icon: <BookOpen className="h-6 w-6" />,
-      completed: completedModules.includes('what-are-stocks'),
+      completed: isModuleCompleted('what-are-stocks'),
       category: 'fundamentals',
       xpReward: 50,
       keyPoints: [
@@ -86,7 +90,7 @@ const LearningHub: React.FC = () => {
       duration: '5 min',
       difficulty: 'Beginner',
       icon: <Globe className="h-6 w-6" />,
-      completed: completedModules.includes('stock-market-basics'),
+      completed: isModuleCompleted('stock-market-basics'),
       category: 'fundamentals',
       xpReward: 50,
       keyPoints: [
@@ -103,7 +107,7 @@ const LearningHub: React.FC = () => {
       duration: '5 min',
       difficulty: 'Beginner',
       icon: <Target className="h-6 w-6" />,
-      completed: completedModules.includes('reading-stock-quotes'),
+      completed: isModuleCompleted('reading-stock-quotes'),
       category: 'fundamentals',
       xpReward: 40,
       keyPoints: [
@@ -120,7 +124,7 @@ const LearningHub: React.FC = () => {
       duration: '5 min',
       difficulty: 'Beginner',
       icon: <Calculator className="h-6 w-6" />,
-      completed: completedModules.includes('order-types'),
+      completed: isModuleCompleted('order-types'),
       category: 'trading',
       xpReward: 50,
       keyPoints: [
@@ -137,7 +141,7 @@ const LearningHub: React.FC = () => {
       duration: '7 min',
       difficulty: 'Intermediate',
       icon: <PieChart className="h-6 w-6" />,
-      completed: completedModules.includes('company-analysis'),
+      completed: isModuleCompleted('company-analysis'),
       category: 'analysis',
       xpReward: 60,
       keyPoints: [
@@ -154,7 +158,7 @@ const LearningHub: React.FC = () => {
       duration: '7 min',
       difficulty: 'Intermediate',
       icon: <LineChart className="h-6 w-6" />,
-      completed: completedModules.includes('reading-charts'),
+      completed: isModuleCompleted('reading-charts'),
       category: 'analysis',
       xpReward: 60,
       keyPoints: [
@@ -171,7 +175,7 @@ const LearningHub: React.FC = () => {
       duration: '6 min',
       difficulty: 'Beginner',
       icon: <Shield className="h-6 w-6" />,
-      completed: completedModules.includes('risk-management'),
+      completed: isModuleCompleted('risk-management'),
       category: 'trading',
       xpReward: 60,
       keyPoints: [
@@ -188,7 +192,7 @@ const LearningHub: React.FC = () => {
       duration: '6 min',
       difficulty: 'Intermediate',
       icon: <Brain className="h-6 w-6" />,
-      completed: completedModules.includes('trading-psychology'),
+      completed: isModuleCompleted('trading-psychology'),
       category: 'psychology',
       xpReward: 50,
       keyPoints: [
@@ -200,12 +204,38 @@ const LearningHub: React.FC = () => {
     }
   ];
 
-  const toggleModuleCompletion = (moduleId: string) => {
-    setCompletedModules(prev => 
-      prev.includes(moduleId) 
-        ? prev.filter(id => id !== moduleId)
-        : [...prev, moduleId]
-    );
+  const handleModuleCompletion = async (module: LearningModule) => {
+    if (completingModule === module.id) return; // Prevent double clicks
+    
+    setCompletingModule(module.id);
+    
+    try {
+      const result = await completeModule(module.id, module.title, module.xpReward);
+      
+      if (result.success) {
+        // Show success message
+        console.log('Module completed!', result.message);
+        
+        // TODO: Show toast notification
+        // toast.success(result.message)
+        
+        if (result.role_changed) {
+          console.log('Role upgraded!', result.new_role);
+          // TODO: Show role upgrade notification
+          // toast.success(`Congratulations! You've been promoted to ${result.new_role}!`)
+        }
+      } else {
+        console.log('Module completion failed or already completed:', result.message);
+        // TODO: Show info/warning notification
+        // toast.info(result.message)
+      }
+    } catch (error) {
+      console.error('Error completing module:', error);
+      // TODO: Show error notification
+      // toast.error('Failed to complete module. Please try again.')
+    } finally {
+      setCompletingModule(null);
+    }
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -217,10 +247,10 @@ const LearningHub: React.FC = () => {
     }
   };
 
-  const completionPercentage = Math.round((completedModules.length / learningModules.length) * 100);
-  const totalXP = learningModules.reduce((sum, module) => {
-    return sum + (completedModules.includes(module.id) ? module.xpReward : 0);
-  }, 0);
+  // Calculate progress from backend data or fallback to 0
+  const completedModuleIds = learningProgress?.completed_modules || [];
+  const completionPercentage = Math.round((completedModuleIds.length / learningModules.length) * 100);
+  const totalXP = learningProgress?.total_learning_xp || 0;
   const maxXP = learningModules.reduce((sum, module) => sum + module.xpReward, 0);
   
   // Calculate category completion
@@ -232,9 +262,44 @@ const LearningHub: React.FC = () => {
   };
   
   const getCategoryProgress = (categoryModules: LearningModule[]) => {
-    const completed = categoryModules.filter(m => completedModules.includes(m.id)).length;
+    const completed = categoryModules.filter(m => completedModuleIds.includes(m.id)).length;
     return Math.round((completed / categoryModules.length) * 100);
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-gray-600">Loading your learning progress...</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center">
+              <div className="text-red-600 mb-2">Failed to load learning progress</div>
+              <div className="text-sm text-gray-600 mb-4">{error}</div>
+              <Button onClick={() => window.location.reload()} variant="outline">
+                Retry
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -261,7 +326,7 @@ const LearningHub: React.FC = () => {
                 ></div>
               </div>
               <div className="flex items-center justify-between mt-2 text-sm text-gray-600">
-                <span>{completedModules.length} of {learningModules.length} modules completed</span>
+                <span>{completedModuleIds.length} of {learningModules.length} modules completed</span>
                 <div className="flex items-center gap-1">
                   <Award className="h-4 w-4 text-yellow-600" />
                   <span>{totalXP}/{maxXP} XP</span>
@@ -430,22 +495,29 @@ const LearningHub: React.FC = () => {
                       </Button>
                       
                       <Button
-                        onClick={() => toggleModuleCompletion(module.id)}
+                        onClick={() => handleModuleCompletion(module)}
                         size="sm"
+                        disabled={completingModule === module.id}
                         className={module.completed ? 'bg-green-600 hover:bg-green-700' : ''}
                       >
-                        <PlayCircle className="mr-2 h-4 w-4" />
-                        {module.completed ? 'Review' : 'Start Learning'}
+                        {completingModule === module.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Completing...
+                          </>
+                        ) : (
+                          <>
+                            <PlayCircle className="mr-2 h-4 w-4" />
+                            {module.completed ? 'Review' : 'Start Learning'}
+                          </>
+                        )}
                       </Button>
                       
                       {module.completed && (
-                        <Button
-                          onClick={() => toggleModuleCompletion(module.id)}
-                          variant="ghost"
-                          size="sm"
-                        >
-                          Mark as Incomplete
-                        </Button>
+                        <div className="flex items-center gap-2 text-green-600">
+                          <CheckCircle2 className="h-4 w-4" />
+                          <span className="text-sm font-medium">Completed (+{module.xpReward} XP)</span>
+                        </div>
                       )}
                     </div>
                   </div>

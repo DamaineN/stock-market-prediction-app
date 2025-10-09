@@ -25,6 +25,7 @@ class XPService:
         "historical_data_viewed": 15,  # Custom action
         "dashboard_viewed": 5,
         "portfolio_updated": 20,
+        "learning_module_completed": 50,  # Learning Hub module completion
     }
     
     # XP thresholds for role progression
@@ -368,4 +369,14 @@ class XPService:
             activity_type="historical_data_viewed",
             description=f"Viewed historical data for {symbol}",
             related_entity=symbol
+        )
+    
+    async def track_learning_module_completion(self, user_id: str, module_id: str, module_title: str, custom_xp: Optional[int] = None) -> Dict[str, Any]:
+        """Track learning module completion"""
+        return await self.award_xp(
+            user_id=user_id,
+            activity_type="learning_module_completed",
+            xp_amount=custom_xp,  # Allow custom XP from module definition
+            description=f"Completed learning module: {module_title}",
+            related_entity=module_id
         )

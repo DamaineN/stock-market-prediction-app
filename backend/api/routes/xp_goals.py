@@ -280,6 +280,84 @@ async def get_activity_types():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get activity types: {str(e)}")
 
+@router.post("/learning/complete-module")
+async def complete_learning_module(
+    module_id: str,
+    module_title: str,
+    xp_reward: int = 50,
+    current_user: dict = Depends(get_current_user),
+    db = Depends(get_database)
+):
+    """Mark a learning module as completed and award XP"""
+    try:
+        xp_service = XPService(db)
+        
+        # Check if module was already completed by this user
+        existing_completion = await db.xp_activities.find_one({
+            "user_id": current_user["user_id"],
+            "activity_type": "learning_module_completed",
+            "related_entity_id": module_id
+        })
+        
+        if existing_completion:
+            return {
+                "success": False,
+                "message": "Module already completed",
+                "already_completed": True,
+                "xp_earned": 0
+            }
+        
+        result = await xp_service.track_learning_module_completion(
+            user_id=current_user["user_id"],
+            module_id=module_id,
+            module_title=module_title,
+            custom_xp=xp_reward
+        )
+        
+        return {
+            "success": True,
+            "xp_earned": result.get("xp_awarded", 0),
+            "message": f"Completed '{module_title}' - Earned {result.get('xp_awarded', 0)} XP!",
+            "new_total_xp": result.get("new_total_xp", 0),
+            "role_changed": result.get("role_changed", False),
+            "new_role": result.get("new_role")
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to complete learning module: {str(e)}")
+
+@router.get("/learning/progress")
+async def get_learning_progress(
+    current_user: dict = Depends(get_current_user),
+    db = Depends(get_database)
+):
+    """Get user's learning module completion progress"""
+    try:
+        # Get all completed learning modules for this user
+        completed_modules = await db.xp_activities.find({
+            "user_id": current_user["user_id"],
+            "activity_type": "learning_module_completed"
+        }).to_list(length=None)
+        
+        completed_module_ids = [activity["related_entity_id"] for activity in completed_modules]
+        
+        # Calculate total learning XP earned
+        total_learning_xp = sum(activity["xp_earned"] for activity in completed_modules)
+        
+        return {
+            "user_id": current_user["user_id"],
+            "completed_modules": completed_module_ids,
+            "total_modules_completed": len(completed_module_ids),
+            "total_learning_xp": total_learning_xp,
+            "completion_history": [{
+                "module_id": activity["related_entity_id"],
+                "module_title": activity["activity_description"].replace("Completed learning module: ", ""),
+                "xp_earned": activity["xp_earned"],
+                "completed_at": activity["earned_at"].isoformat()
+            } for activity in completed_modules]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get learning progress: {str(e)}")
+
 def _get_activity_description(activity_type: str) -> str:
     """Get human-readable description for activity types"""
     descriptions = {
@@ -290,6 +368,7 @@ def _get_activity_description(activity_type: str) -> str:
         "profile_completed": "Complete your user profile",
         "quiz_passed": "Pass knowledge assessment quizzes",
         "trading_action": "Execute paper trading transactions",
-        "role_upgraded": "Advance to a higher user role"
+        "role_upgraded": "Advance to a higher user role",
+        "learning_module_completed": "Complete learning modules"
     }
     return descriptions.get(activity_type, "Unknown activity")
