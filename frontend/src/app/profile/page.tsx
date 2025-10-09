@@ -28,7 +28,7 @@ export default function ProfilePage() {
     email: '',
   })
   const [refreshing, setRefreshing] = useState(false)
-  const [toasts, setToasts] = useState<Array<{id: string, message: string, type: ToastType}>>([]))
+  const [toasts, setToasts] = useState<Array<{id: string, message: string, type: ToastType}>>([]);
 
   // Helper functions for role display
   const getRoleIcon = (role: string) => {
