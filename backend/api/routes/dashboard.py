@@ -11,6 +11,81 @@ from api.auth.utils import get_current_user
 from api.database.mongodb import get_database
 from api.services.xp_service import XPService
 
+def calculate_activity_streak(recent_logins: list) -> tuple[int, int, str]:
+    """Calculate current and longest activity streaks from login data
+    
+    Args:
+        recent_logins: List of XP activity records for daily_login activities
+        
+    Returns:
+        tuple: (current_streak, longest_streak, last_activity_date)
+    """
+    current_streak = 0
+    longest_streak = 0
+    last_activity = None
+    
+    if not recent_logins:
+        return current_streak, longest_streak, last_activity
+    
+    # Convert login dates to unique days
+    login_dates = []
+    for login in recent_logins:
+        login_date = login["earned_at"].date()
+        if login_date not in login_dates:
+            login_dates.append(login_date)
+    
+    # Sort dates in descending order (most recent first)
+    login_dates.sort(reverse=True)
+    last_activity = login_dates[0].isoformat() if login_dates else None
+    
+    # Calculate current streak
+    today = datetime.now(timezone.utc).date()
+    yesterday = today - timedelta(days=1)
+    
+    # Start checking from today or yesterday
+    if login_dates and login_dates[0] == today:
+        # Logged in today, start streak from today
+        current_streak = 1
+        check_date = today - timedelta(days=1)
+    elif login_dates and login_dates[0] == yesterday:
+        # Logged in yesterday but not today, start streak from yesterday
+        current_streak = 1
+        check_date = yesterday - timedelta(days=1)
+    else:
+        # Haven't logged in today or yesterday, no current streak
+        current_streak = 0
+        check_date = None
+    
+    # Continue counting consecutive days backwards
+    if check_date is not None:
+        for date in login_dates[1:]:  # Skip the first date we already counted
+            if date == check_date:
+                current_streak += 1
+                check_date = check_date - timedelta(days=1)
+            else:
+                break
+    
+    # Calculate longest streak
+    if len(login_dates) > 1:
+        max_streak = 0
+        current_longest = 1
+        
+        for i in range(1, len(login_dates)):
+            # Check if consecutive days
+            if login_dates[i-1] - login_dates[i] == timedelta(days=1):
+                current_longest += 1
+            else:
+                max_streak = max(max_streak, current_longest)
+                current_longest = 1
+        
+        longest_streak = max(max_streak, current_longest)
+    elif len(login_dates) == 1:
+        longest_streak = 1
+    else:
+        longest_streak = 0
+    
+    return current_streak, longest_streak, last_activity
+
 router = APIRouter()
 
 @router.get("/stats")
@@ -111,23 +186,13 @@ async def get_activity_stats(
         watchlist_doc = await db.watchlists.find_one({"user_id": user_id_obj})
         stocks_watched = len(watchlist_doc.get("items", [])) if watchlist_doc else 0
         
-        # Calculate activity streak from XP activities
+        # Calculate activity streak from XP activities - proper implementation
         recent_logins = await db.xp_activities.find({
             "user_id": user_id,  # Use string format for XP activities
             "activity_type": "daily_login"
-        }).sort("earned_at", -1).limit(30).to_list(length=30)
+        }).sort("earned_at", -1).limit(100).to_list(length=100)  # Get more records for proper calculation
         
-        current_streak = 0
-        longest_streak = 0
-        last_activity = None
-        
-        if recent_logins:
-            last_activity = recent_logins[0]["earned_at"].date().isoformat()
-            # Simple streak calculation
-            today = datetime.now(timezone.utc).date()
-            if recent_logins[0]["earned_at"].date() >= today - timedelta(days=1):
-                current_streak = 1  # At least 1 if logged in recently
-            longest_streak = min(len(recent_logins), 7)  # Simple approximation
+        current_streak, longest_streak, last_activity = calculate_activity_streak(recent_logins)
         
         return {
             "predictions_made": predictions_made,
@@ -267,23 +332,13 @@ async def get_activity_streak(
         user_id = ObjectId(current_user["user_id"])
         xp_service = XPService(db)
         
-        # Calculate activity streak from XP activities
+        # Calculate activity streak from XP activities using helper function
         recent_logins = await db.xp_activities.find({
-            "user_id": user_id,
+            "user_id": current_user["user_id"],  # Use string format for XP activities consistency
             "activity_type": "daily_login"
-        }).sort("earned_at", -1).limit(30).to_list(length=30)
+        }).sort("earned_at", -1).limit(100).to_list(length=100)
         
-        current_streak = 0
-        longest_streak = 0
-        last_activity = None
-        
-        if recent_logins:
-            last_activity = recent_logins[0]["earned_at"].date().isoformat()
-            # Simple streak calculation
-            today = datetime.now(timezone.utc).date()
-            if recent_logins[0]["earned_at"].date() >= today - timedelta(days=1):
-                current_streak = 1  # At least 1 if logged in recently
-            longest_streak = min(len(recent_logins), 7)  # Simple approximation
+        current_streak, longest_streak, last_activity = calculate_activity_streak(recent_logins)
         
         # Get XP info
         xp_stats = await xp_service.get_user_xp_stats(current_user["user_id"])
