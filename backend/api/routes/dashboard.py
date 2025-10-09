@@ -43,15 +43,21 @@ async def get_dashboard_stats(
             "user_id": ObjectId(current_user["user_id"])
         }).sort("created_at", -1).limit(5).to_list(length=5)
         
-        # Format predictions data
+        # Format predictions data with frontend-expected field names
         formatted_predictions = []
         for pred in recent_predictions:
             formatted_predictions.append({
                 "id": str(pred["_id"]),
                 "symbol": pred.get("symbol", "N/A"),
-                "prediction_type": pred.get("prediction_type", "unknown"),
-                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,
-                "status": pred.get("status", "pending")
+                "model": pred.get("prediction_type", pred.get("model", "LSTM")),  # Map to 'model'
+                "prediction": pred.get("target_price", pred.get("predicted_price")),  # Map to 'prediction'
+                "predicted_price": pred.get("target_price", pred.get("predicted_price")),  # Also provide as fallback
+                "date": pred.get("created_at").isoformat() if pred.get("created_at") else None,  # Map to 'date'
+                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,  # Also keep original
+                "confidence": pred.get("confidence", 0.95),  # Default confidence if missing
+                "status": pred.get("status", "pending"),
+                # Legacy fields for compatibility
+                "prediction_type": pred.get("prediction_type", "unknown")
             })
         
         stats = {
@@ -198,17 +204,22 @@ async def get_recent_predictions(
             "user_id": user_id
         }).sort("created_at", -1).limit(limit).to_list(length=limit)
         
-        # Format predictions data
+        # Format predictions data with frontend-expected field names
         formatted_predictions = []
         for pred in recent_predictions:
             formatted_predictions.append({
                 "id": str(pred["_id"]),
                 "symbol": pred.get("symbol", "N/A"),
-                "prediction_type": pred.get("prediction_type", "unknown"),
-                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,
+                "model": pred.get("prediction_type", pred.get("model", "LSTM")),  # Map to 'model'
+                "prediction": pred.get("target_price", pred.get("predicted_price")),  # Map to 'prediction'
+                "predicted_price": pred.get("target_price", pred.get("predicted_price")),  # Also provide as fallback
+                "date": pred.get("created_at").isoformat() if pred.get("created_at") else None,  # Map to 'date'
+                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,  # Also keep original
+                "confidence": pred.get("confidence", 0.95),  # Default confidence if missing
                 "status": pred.get("status", "pending"),
-                "target_price": pred.get("target_price"),
-                "confidence": pred.get("confidence")
+                # Legacy fields for compatibility
+                "prediction_type": pred.get("prediction_type", "unknown"),
+                "target_price": pred.get("target_price")
             })
         
         return {

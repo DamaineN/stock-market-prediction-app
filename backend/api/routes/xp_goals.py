@@ -280,11 +280,14 @@ async def get_activity_types():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get activity types: {str(e)}")
 
+class LearningModuleCompletionRequest(BaseModel):
+    module_id: str
+    module_title: str
+    xp_reward: int = 50
+
 @router.post("/learning/complete-module")
 async def complete_learning_module(
-    module_id: str,
-    module_title: str,
-    xp_reward: int = 50,
+    request: LearningModuleCompletionRequest,
     current_user: dict = Depends(get_current_user),
     db = Depends(get_database)
 ):
@@ -296,7 +299,7 @@ async def complete_learning_module(
         existing_completion = await db.xp_activities.find_one({
             "user_id": current_user["user_id"],
             "activity_type": "learning_module_completed",
-            "related_entity_id": module_id
+            "related_entity_id": request.module_id
         })
         
         if existing_completion:
@@ -309,15 +312,15 @@ async def complete_learning_module(
         
         result = await xp_service.track_learning_module_completion(
             user_id=current_user["user_id"],
-            module_id=module_id,
-            module_title=module_title,
-            custom_xp=xp_reward
+            module_id=request.module_id,
+            module_title=request.module_title,
+            custom_xp=request.xp_reward
         )
         
         return {
             "success": True,
             "xp_earned": result.get("xp_awarded", 0),
-            "message": f"Completed '{module_title}' - Earned {result.get('xp_awarded', 0)} XP!",
+            "message": f"Completed '{request.module_title}' - Earned {result.get('xp_awarded', 0)} XP!",
             "new_total_xp": result.get("new_total_xp", 0),
             "role_changed": result.get("role_changed", False),
             "new_role": result.get("new_role")
