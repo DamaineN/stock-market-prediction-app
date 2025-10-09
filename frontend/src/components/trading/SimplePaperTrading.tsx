@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import AITradingCoach from '@/components/ai/AITradingCoach';
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -77,6 +78,8 @@ const SimplePaperTrading: React.FC = () => {
   const [action, setAction] = useState<'buy' | 'sell'>('buy');
   const [stockPrice, setStockPrice] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'trade' | 'positions' | 'history'>('trade');
+  const [showAICoach, setShowAICoach] = useState(false);
+  const [tradeAnalysis, setTradeAnalysis] = useState<any>(null);
 
   const API_BASE = 'http://localhost:8000/api/v1';
 
@@ -184,8 +187,29 @@ const SimplePaperTrading: React.FC = () => {
       
       if (data.success) {
         setMessage({ type: 'success', text: data.message });
+        
+        // Prepare trade analysis for AI Coach
+        const analysis = {
+          tradeDetails: {
+            symbol: symbol.toUpperCase(),
+            action: action as 'buy' | 'sell',
+            quantity: parseInt(quantity),
+            price: stockPrice,
+            total_amount: stockPrice * parseInt(quantity),
+            ...data.trade_details // Include profit_loss if it's a sell trade
+          },
+          stockPrice: stockPrice
+        };
+        
         // Reload portfolio and history
         await loadPortfolio(portfolio.id);
+        
+        // Show AI Coach after trade
+        setTimeout(() => {
+          setTradeAnalysis(analysis);
+          setShowAICoach(true);
+        }, 1000);
+        
         setSymbol('');
         setQuantity('');
         setStockPrice(null);
@@ -397,263 +421,277 @@ const SimplePaperTrading: React.FC = () => {
         </nav>
       </div>
 
-        {/* Trading Tab */}
-        {activeTab === 'trade' && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Trading Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Execute Trade</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Stock Symbol</label>
-                  <input
-                    type="text"
-                    value={symbol}
-                    onChange={(e) => handleSymbolChange(e.target.value)}
-                    placeholder="e.g., AAPL, GOOGL, TSLA"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
-                  />
-                  {stockPrice && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      Current Price: {formatCurrency(stockPrice)}
-                    </p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Quantity</label>
-                  <input
-                    type="number"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    placeholder="Number of shares"
-                    min="1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">Action</label>
-                  <div className="flex gap-2">
-                    <Button
-                      variant={action === 'buy' ? 'default' : 'outline'}
-                      onClick={() => setAction('buy')}
-                      className="flex-1"
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Buy
-                    </Button>
-                    <Button
-                      variant={action === 'sell' ? 'default' : 'outline'}
-                      onClick={() => setAction('sell')}
-                      className="flex-1"
-                    >
-                      <MinusCircle className="mr-2 h-4 w-4" />
-                      Sell
-                    </Button>
-                  </div>
-                </div>
-
-                {stockPrice && quantity && (
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <p className="text-sm text-gray-600">
-                      Total {action === 'buy' ? 'Cost' : 'Value'}: {formatCurrency(stockPrice * parseInt(quantity || '0'))}
-                    </p>
-                  </div>
-                )}
-
-                <Button
-                  onClick={executeTrade}
-                  disabled={loading || !symbol || !quantity || !stockPrice}
-                  className="w-full"
-                >
-                  {loading ? (
-                    <>
-                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                      Executing...
-                    </>
-                  ) : (
-                    `${action === 'buy' ? 'Buy' : 'Sell'} ${symbol.toUpperCase()}`
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Portfolio Actions */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Portfolio Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <p className="text-sm text-gray-600">Portfolio ID:</p>
-                  <code className="text-xs bg-gray-100 p-2 rounded block break-all">
-                    {portfolio.id}
-                  </code>
-                </div>
-
-                <div className="space-y-2">
-                  <p className="text-sm text-gray-600">Created:</p>
-                  <p className="text-sm">{formatDate(portfolio.created_at)}</p>
-                </div>
-
-                <Button
-                  onClick={resetPortfolio}
-                  disabled={loading}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Reset Portfolio
-                </Button>
-
-                <Button
-                  onClick={() => loadPortfolio(portfolio.id)}
-                  disabled={loading}
-                  variant="outline"
-                  className="w-full"
-                >
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                  Refresh Data
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Positions Tab */}
-        {activeTab === 'positions' && (
+      {/* Trading Tab */}
+      {activeTab === 'trade' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Trading Form */}
           <Card>
             <CardHeader>
-              <CardTitle>Current Positions</CardTitle>
+              <CardTitle>Execute Trade</CardTitle>
             </CardHeader>
-            <CardContent>
-              {Object.keys(portfolio.positions).length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No positions yet. Start trading to see your holdings!</p>
-              ) : (
-                <div className="space-y-4">
-                  {Object.entries(portfolio.positions).map(([symbol, position]) => (
-                    <div key={symbol} className="border rounded-lg p-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-lg">{symbol}</h3>
-                        <Badge variant={position.unrealized_pnl && position.unrealized_pnl >= 0 ? 'default' : 'destructive'}>
-                          {position.unrealized_pnl_percent ? formatPercent(position.unrealized_pnl_percent) : 'N/A'}
-                        </Badge>
+            <CardContent className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Stock Symbol</label>
+                <input
+                  type="text"
+                  value={symbol}
+                  onChange={(e) => handleSymbolChange(e.target.value)}
+                  placeholder="e.g., AAPL, GOOGL, TSLA"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 uppercase"
+                />
+                {stockPrice && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Current Price: {formatCurrency(stockPrice)}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Quantity</label>
+                <input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  placeholder="Number of shares"
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Action</label>
+                <div className="flex gap-2">
+                  <Button
+                    variant={action === 'buy' ? 'default' : 'outline'}
+                    onClick={() => setAction('buy')}
+                    className="flex-1"
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Buy
+                  </Button>
+                  <Button
+                    variant={action === 'sell' ? 'default' : 'outline'}
+                    onClick={() => setAction('sell')}
+                    className="flex-1"
+                  >
+                    <MinusCircle className="mr-2 h-4 w-4" />
+                    Sell
+                  </Button>
+                </div>
+              </div>
+
+              {stockPrice && quantity && (
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-600">
+                    Total {action === 'buy' ? 'Cost' : 'Value'}: {formatCurrency(stockPrice * parseInt(quantity || '0'))}
+                  </p>
+                </div>
+              )}
+
+              <Button
+                onClick={executeTrade}
+                disabled={loading || !symbol || !quantity || !stockPrice}
+                className="w-full"
+              >
+                {loading ? (
+                  <>
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                    Executing...
+                  </>
+                ) : (
+                  `${action === 'buy' ? 'Buy' : 'Sell'} ${symbol.toUpperCase()}`
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Portfolio Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Portfolio Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">Portfolio ID:</p>
+                <code className="text-xs bg-gray-100 p-2 rounded block break-all">
+                  {portfolio.id}
+                </code>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-sm text-gray-600">Created:</p>
+                <p className="text-sm">{formatDate(portfolio.created_at)}</p>
+              </div>
+
+              <Button
+                onClick={resetPortfolio}
+                disabled={loading}
+                variant="outline"
+                className="w-full"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Reset Portfolio
+              </Button>
+
+              <Button
+                onClick={() => loadPortfolio(portfolio.id)}
+                disabled={loading}
+                variant="outline"
+                className="w-full"
+              >
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Refresh Data
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Positions Tab */}
+      {activeTab === 'positions' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Current Positions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {Object.keys(portfolio.positions).length === 0 ? (
+              <p className="text-center text-gray-500 py-8">No positions yet. Start trading to see your holdings!</p>
+            ) : (
+              <div className="space-y-4">
+                {Object.entries(portfolio.positions).map(([symbol, position]) => (
+                  <div key={symbol} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-lg">{symbol}</h3>
+                      <Badge variant={position.unrealized_pnl && position.unrealized_pnl >= 0 ? 'default' : 'destructive'}>
+                        {position.unrealized_pnl_percent ? formatPercent(position.unrealized_pnl_percent) : 'N/A'}
+                      </Badge>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <p className="text-gray-600">Quantity</p>
+                        <p className="font-medium">{position.quantity} shares</p>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <p className="text-gray-600">Quantity</p>
-                          <p className="font-medium">{position.quantity} shares</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600">Avg Price</p>
-                          <p className="font-medium">{formatCurrency(position.avg_price)}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600">Current Price</p>
-                          <p className="font-medium">{position.current_price ? formatCurrency(position.current_price) : 'Loading...'}</p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600">P&L</p>
-                          <p className={`font-medium ${position.unrealized_pnl && position.unrealized_pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {position.unrealized_pnl ? formatCurrency(position.unrealized_pnl) : 'N/A'}
-                          </p>
-                        </div>
+                      <div>
+                        <p className="text-gray-600">Avg Price</p>
+                        <p className="font-medium">{formatCurrency(position.avg_price)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Current Price</p>
+                        <p className="font-medium">{position.current_price ? formatCurrency(position.current_price) : 'Loading...'}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">P&L</p>
+                        <p className={`font-medium ${position.unrealized_pnl && position.unrealized_pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {position.unrealized_pnl ? formatCurrency(position.unrealized_pnl) : 'N/A'}
+                        </p>
                       </div>
                     </div>
-                  ))}
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* History Tab */}
+      {activeTab === 'history' && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Trade Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Trading Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {tradeHistory ? (
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Trades:</span>
+                    <span className="font-medium">{tradeHistory.summary.total_trades}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Win Rate:</span>
+                    <span className="font-medium">{tradeHistory.summary.win_rate.toFixed(1)}%</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Realized P&L:</span>
+                    <span className={`font-medium ${tradeHistory.summary.total_realized_pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {formatCurrency(tradeHistory.summary.total_realized_pnl)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Profitable Trades:</span>
+                    <span className="font-medium text-green-600">{tradeHistory.summary.profitable_trades}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Losing Trades:</span>
+                    <span className="font-medium text-red-600">{tradeHistory.summary.losing_trades}</span>
+                  </div>
                 </div>
+              ) : (
+                <p className="text-gray-500">No trades yet</p>
               )}
             </CardContent>
           </Card>
-        )}
 
-        {/* History Tab */}
-        {activeTab === 'history' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Trade Summary */}
+          {/* Recent Trades */}
+          <div className="lg:col-span-2">
             <Card>
               <CardHeader>
-                <CardTitle>Trading Summary</CardTitle>
+                <CardTitle>Trade History</CardTitle>
               </CardHeader>
               <CardContent>
-                {tradeHistory ? (
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Total Trades:</span>
-                      <span className="font-medium">{tradeHistory.summary.total_trades}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Win Rate:</span>
-                      <span className="font-medium">{tradeHistory.summary.win_rate.toFixed(1)}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Realized P&L:</span>
-                      <span className={`font-medium ${tradeHistory.summary.total_realized_pnl >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {formatCurrency(tradeHistory.summary.total_realized_pnl)}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Profitable Trades:</span>
-                      <span className="font-medium text-green-600">{tradeHistory.summary.profitable_trades}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Losing Trades:</span>
-                      <span className="font-medium text-red-600">{tradeHistory.summary.losing_trades}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-gray-500">No trades yet</p>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Recent Trades */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Trade History</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {tradeHistory && tradeHistory.trades.length > 0 ? (
-                    <div className="space-y-2 max-h-96 overflow-y-auto">
-                      {tradeHistory.trades.map((trade, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                          <div className="flex items-center gap-3">
-                            <Badge variant={trade.action === 'buy' ? 'default' : 'secondary'}>
-                              {trade.action.toUpperCase()}
-                            </Badge>
-                            <div>
-                              <p className="font-medium">{trade.symbol}</p>
-                              <p className="text-sm text-gray-600">
-                                {trade.quantity} shares @ {formatCurrency(trade.price)}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">{formatCurrency(trade.total_amount)}</p>
-                            {trade.profit_loss !== undefined && (
-                              <p className={`text-sm ${trade.profit_loss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {formatCurrency(trade.profit_loss)}
-                              </p>
-                            )}
-                            <p className="text-xs text-gray-500">
-                              {formatDate(trade.timestamp)}
+                {tradeHistory && tradeHistory.trades.length > 0 ? (
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {tradeHistory.trades.map((trade, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Badge variant={trade.action === 'buy' ? 'default' : 'secondary'}>
+                            {trade.action.toUpperCase()}
+                          </Badge>
+                          <div>
+                            <p className="font-medium">{trade.symbol}</p>
+                            <p className="text-sm text-gray-600">
+                              {trade.quantity} shares @ {formatCurrency(trade.price)}
                             </p>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-center text-gray-500 py-8">No trades yet</p>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+                        <div className="text-right">
+                          <p className="font-medium">{formatCurrency(trade.total_amount)}</p>
+                          {trade.profit_loss !== undefined && (
+                            <p className={`text-sm ${trade.profit_loss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {formatCurrency(trade.profit_loss)}
+                            </p>
+                          )}
+                          <p className="text-xs text-gray-500">
+                            {formatDate(trade.timestamp)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-gray-500 py-8">No trades yet</p>
+                )}
+              </CardContent>
+            </Card>
           </div>
-        )}
+        </div>
+      )}
+
+      {/* AI Trading Coach Modal */}
+      {showAICoach && tradeAnalysis && (
+        <AITradingCoach
+          tradeAnalysis={tradeAnalysis}
+          portfolioValue={portfolio?.total_value || 10000}
+          totalTrades={portfolio?.trade_count || 0}
+          winRate={tradeHistory?.summary?.win_rate || 0}
+          onDismiss={() => {
+            setShowAICoach(false);
+            setTradeAnalysis(null);
+          }}
+        />
+      )}
     </div>
   );
 };

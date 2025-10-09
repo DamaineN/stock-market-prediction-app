@@ -9,12 +9,18 @@ import { RealTimeStockPrice } from '@/components/ui/real-time-stock-price'
 import StockChart from '@/components/StockChart'
 import StockSearchDropdown from '@/components/ui/StockSearchDropdown'
 import PaperTrade from '@/components/trading/PaperTrade'
+import RoleBasedFeatures from '@/components/features/RoleBasedFeatures'
+import { useXPProgress } from '@/hooks/useXPProgress'
 
 export default function SearchPage() {
   const [selectedStock, setSelectedStock] = useState<StockInfo | null>(null)
   const [historicalData, setHistoricalData] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [chartLoading, setChartLoading] = useState(false)
+  
+  // Get user's actual role based on XP progress
+  const { xpProgress } = useXPProgress()
+  const userRole = (xpProgress?.current_role || 'beginner') as 'beginner' | 'casual' | 'paper-trader'
   
   // Real-time stock updates for selected stock
   const selectedSymbol = selectedStock ? [selectedStock.symbol] : []
@@ -206,32 +212,39 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* Paper Trading */}
-        {selectedStock && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <PaperTrade
-              symbol={selectedStock.symbol}
-              companyName={selectedStock.name}
-              currentPrice={getStock(selectedStock.symbol)?.price || selectedStock.price}
-              onTradeExecuted={(tradeDetails) => {
-                console.log('Trade executed:', tradeDetails)
-              }}
-              className=""
-            />
-            
-            {/* Placeholder for additional content */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Trading Tips</h3>
-              <div className="space-y-3 text-sm text-gray-600">
-                <p>• Paper trading is a great way to practice without real money</p>
-                <p>• Consider the AI insights when making trading decisions</p>
-                <p>• Track your performance to improve your strategy</p>
-                <p>• Start with small positions to learn market dynamics</p>
-                <p>• Always have a plan before entering a trade</p>
-              </div>
-            </div>
+        {/* Role-based Features - includes Paper Trading as primary for 'paper-trader' */}
+        <div className="bg-white rounded-lg shadow">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h2 className="text-lg font-medium text-gray-900">Your Experience Workspace</h2>
+            <p className="text-sm text-gray-500 mt-1">Switch roles to focus on Learning, AI Insights, or Paper Trading. All features remain accessible.</p>
           </div>
-        )}
+          <div className="p-6">
+            <RoleBasedFeatures 
+              currentRole={userRole}
+              selectedStock={selectedStock ? {
+                symbol: selectedStock.symbol,
+                name: selectedStock.name,
+                price: getStock(selectedStock.symbol)?.price || selectedStock.price
+              } : undefined}
+            >
+              {selectedStock ? (
+                <PaperTrade
+                  symbol={selectedStock.symbol}
+                  companyName={selectedStock.name}
+                  currentPrice={getStock(selectedStock.symbol)?.price || selectedStock.price}
+                  onTradeExecuted={(tradeDetails) => {
+                    console.log('Trade executed:', tradeDetails)
+                  }}
+                  className=""
+                />
+              ) : (
+                <div className="bg-gray-50 border rounded-md p-4 text-sm text-gray-600">
+                  Select a stock above to begin paper trading and receive AI coaching after each trade.
+                </div>
+              )}
+            </RoleBasedFeatures>
+          </div>
+        </div>
       </div>
     </Layout>
   )

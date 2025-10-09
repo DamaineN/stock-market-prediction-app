@@ -373,10 +373,13 @@ export default function ProfilePage() {
                         <div className="mt-4">
                           <h4 className="text-sm font-medium text-gray-700 mb-2">Recent XP Gains</h4>
                           <div className="space-y-2 max-h-32 overflow-y-auto">
-                            {xpProgress.recent_activities.slice(0, 3).map((activity) => (
-                              <div key={activity.id} className="flex items-center justify-between py-1 px-2 bg-green-50 rounded text-sm">
-                                <span className="text-gray-700">{activity.description}</span>
-                                <span className="font-semibold text-green-600">+{activity.xp_earned} XP</span>
+                            {xpProgress.recent_activities.slice(0, 3).map((activity, index) => (
+                              <div 
+                                key={activity.id || `activity-${index}-${activity.description?.slice(0, 20)}`} 
+                                className="flex items-center justify-between py-1 px-2 bg-green-50 rounded text-sm"
+                              >
+                                <span className="text-gray-700">{activity.description || 'Unknown activity'}</span>
+                                <span className="font-semibold text-green-600">+{activity.xp_earned || 0} XP</span>
                               </div>
                             ))}
                           </div>
