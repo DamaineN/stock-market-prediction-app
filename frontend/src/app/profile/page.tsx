@@ -31,6 +31,13 @@ export default function ProfilePage() {
   const [toasts, setToasts] = useState<Array<{id: string, message: string, type: ToastType}>>([]);
 
   // Helper functions for role display
+  const formatRoleName = (role: string) => {
+    if (!role) return 'Unknown'
+    return role.split('_').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ')
+  }
+
   const getRoleIcon = (role: string) => {
     switch (role.toLowerCase()) {
       case 'beginner':
@@ -125,12 +132,12 @@ export default function ProfilePage() {
         
         if (result.role_updated) {
           showToast(
-            `Role updated from ${result.previous_role} to ${result.new_role}!`,
+            `Role updated from ${formatRoleName(result.previous_role)} to ${formatRoleName(result.new_role)}!`,
             'success'
           )
         } else {
           showToast(
-            `Role is already synced: ${result.current_role}`,
+            `Role is already synced: ${formatRoleName(result.current_role)}`,
             'info'
           )
         }
@@ -187,7 +194,7 @@ export default function ProfilePage() {
                 <div className="flex items-center mt-2 space-x-4">
                   <div className="flex items-center text-sm text-gray-500">
                     <ShieldCheckIcon className="w-4 h-4 mr-1" />
-                    <span className="capitalize">{getCurrentRole()}</span>
+                    <span>{formatRoleName(getCurrentRole())}</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-500">
                     <CalendarIcon className="w-4 h-4 mr-1" />
@@ -276,7 +283,7 @@ export default function ProfilePage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <ShieldCheckIcon className="w-5 h-5 text-gray-400 mr-2" />
-                      <span className="text-gray-900 capitalize">{getCurrentRole()}</span>
+                      <span className="text-gray-900">{formatRoleName(getCurrentRole())}</span>
                       {xpProgress?.current_role && user?.role && xpProgress.current_role !== user.role && (
                         <span className="ml-2 text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
                           Updated via XP
@@ -394,8 +401,8 @@ export default function ProfilePage() {
                           <div className="flex items-center justify-center mb-2">
                             {getRoleIcon(xpProgress?.current_role || activityStats?.xp_info?.current_role || user.role)}
                           </div>
-                          <div className="text-lg font-bold text-gray-900 capitalize">
-                            {xpProgress?.current_role || activityStats?.xp_info?.current_role || user.role}
+                          <div className="text-lg font-bold text-gray-900">
+                            {formatRoleName(xpProgress?.current_role || activityStats?.xp_info?.current_role || user.role)}
                           </div>
                           <div className="text-xs text-gray-600">Current Role</div>
                         </div>
@@ -416,7 +423,7 @@ export default function ProfilePage() {
                         <div className="p-4 bg-gray-50 rounded-lg">
                           <div className="flex justify-between items-center mb-2">
                             <span className="text-sm font-medium text-gray-700">
-                              Progress to {xpProgress.next_role.next_role.charAt(0).toUpperCase() + xpProgress.next_role.next_role.slice(1)}
+                              Progress to {formatRoleName(xpProgress.next_role.next_role)}
                             </span>
                             <span className="text-sm text-gray-500">
                               {xpProgress.next_role.remaining_xp} XP remaining
