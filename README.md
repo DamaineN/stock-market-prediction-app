@@ -1,4 +1,4 @@
-# 📈 Stock Market Prediction App
+# 📈 Stolckr
 
 A comprehensive AI-powered stock market prediction application built with modern technologies and machine learning models.
 

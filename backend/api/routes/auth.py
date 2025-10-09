@@ -250,6 +250,7 @@ async def get_profile(
             role=user_doc.get("role", "basic"),
             is_verified=user_doc.get("is_verified", False),
             status=user_doc.get("status", "active"),
+            profile_picture=user_doc.get("profile_picture"),
             created_at=user_doc["created_at"],
             updated_at=user_doc["updated_at"],
             last_login=user_doc.get("last_login")
@@ -357,6 +358,10 @@ async def update_profile(
                 # Reset email verification when email changes
                 update_data["is_verified"] = False
         
+        # Handle profile_picture update
+        if profile_data.profile_picture is not None:
+            update_data["profile_picture"] = profile_data.profile_picture
+        
         # Only update if there are changes
         if not update_data:
             raise HTTPException(
@@ -387,6 +392,7 @@ async def update_profile(
             role=updated_user_doc.get("role", "basic"),
             is_verified=updated_user_doc.get("is_verified", False),
             status=updated_user_doc.get("status", "active"),
+            profile_picture=updated_user_doc.get("profile_picture"),
             created_at=updated_user_doc["created_at"],
             updated_at=updated_user_doc["updated_at"],
             last_login=updated_user_doc.get("last_login")

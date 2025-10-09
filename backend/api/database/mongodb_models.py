@@ -87,6 +87,7 @@ class UserBase(BaseModel):
     role: UserRole = UserRole.BEGINNER
     is_verified: bool = False
     status: UserStatus = UserStatus.ACTIVE
+    profile_picture: Optional[str] = None
 
 class UserCreate(UserBase):
     password: str
@@ -101,6 +102,7 @@ class UserUpdate(BaseModel):
 class ProfileUpdateRequest(BaseModel):
     full_name: Optional[str] = Field(None, min_length=1, max_length=100)
     email: Optional[EmailStr] = None
+    profile_picture: Optional[str] = None
 
 class UserInDB(UserBase):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
@@ -175,7 +177,7 @@ class StockInfo(BaseModel):
 # Prediction Models
 class PredictionRequest(BaseModel):
     symbol: str
-    model_type: str  # "lstm", "arima", "ensemble", "moving_average"
+    model_type: str  # "lstm", "arima", "ensemble"
     prediction_days: int = Field(default=30, ge=1, le=365)
     confidence_level: float = Field(default=0.95, ge=0.5, le=0.99)
     user_id: Optional[str] = None
