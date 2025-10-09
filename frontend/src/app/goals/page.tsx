@@ -350,8 +350,8 @@ export default function GoalsPage() {
           </div>
           <div className="p-6">
             <div className="space-y-3">
-              {(xpActivities.length > 0 ? xpActivities : userProgress.recent_activities).map((activity) => (
-                <div key={activity.id} className="flex items-center justify-between py-2">
+              {(xpActivities.length > 0 ? xpActivities : userProgress.recent_activities).map((activity, index) => (
+                <div key={activity.id || `activity-${index}-${activity.description?.slice(0, 20) || 'unknown'}`} className="flex items-center justify-between py-2">
                   <div className="flex items-center space-x-3">
                     {getActivityIcon(activity.activity_type)}
                     <div>
