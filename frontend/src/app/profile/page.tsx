@@ -27,6 +27,16 @@ export default function ProfilePage() {
     full_name: '',
     email: '',
   })
+  const [updating, setUpdating] = useState(false)
+  
+  // Check if form data has changed from original user data
+  const hasChanges = () => {
+    if (!user) return false
+    return (
+      formData.full_name.trim() !== (user.full_name || '').trim() ||
+      formData.email.trim() !== user.email.trim()
+    )
+  }
   const [refreshing, setRefreshing] = useState(false)
   const [toasts, setToasts] = useState<Array<{id: string, message: string, type: ToastType}>>([]);
 
@@ -79,13 +89,67 @@ export default function ProfilePage() {
   }
 
   const handleSave = async () => {
+    // Validate form data
+    if (!formData.full_name.trim()) {
+      showToast('Username is required', 'error')
+      return
+    }
+    
+    if (!formData.email.trim()) {
+      showToast('Email is required', 'error')
+      return
+    }
+    
+    // Check for email format (basic validation)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(formData.email.trim())) {
+      showToast('Please enter a valid email address', 'error')
+      return
+    }
+    
+    if (!hasChanges()) {
+      showToast('No changes to save', 'info')
+      return
+    }
+    
+    setUpdating(true)
     try {
-      // TODO: Implement profile update API call
-      console.log('Updating profile:', formData)
+      const token = localStorage.getItem('access_token')
+      if (!token) {
+        showToast('Authentication required. Please log in again.', 'error')
+        return
+      }
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+      const response = await fetch(`${apiUrl}/api/v1/auth/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          full_name: formData.full_name.trim(),
+          email: formData.email.trim(),
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`)
+      }
+
+      const updatedUser = await response.json()
+      console.log('Profile updated successfully:', updatedUser)
+      
+      showToast('Profile updated successfully!', 'success')
       await refreshUser()
       setIsEditing(false)
     } catch (error) {
       console.error('Failed to update profile:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      showToast(`Failed to update profile: ${errorMessage}`, 'error')
+    } finally {
+      setUpdating(false)
     }
   }
 
@@ -226,9 +290,17 @@ export default function ProfilePage() {
                   </button>
                   <button
                     onClick={handleSave}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    disabled={updating || !hasChanges()}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                   >
-                    Save Changes
+                    {updating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Updating...
+                      </>
+                    ) : (
+                      'Save Changes'
+                    )}
                   </button>
                 </div>
               )}
@@ -238,7 +310,7 @@ export default function ProfilePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Full Name
+                    Username
                   </label>
                   {isEditing ? (
                     <input

@@ -98,6 +98,10 @@ class UserUpdate(BaseModel):
     is_verified: Optional[bool] = None
     status: Optional[UserStatus] = None
 
+class ProfileUpdateRequest(BaseModel):
+    full_name: Optional[str] = Field(None, min_length=1, max_length=100)
+    email: Optional[EmailStr] = None
+
 class UserInDB(UserBase):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     hashed_password: str

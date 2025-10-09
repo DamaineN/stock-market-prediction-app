@@ -15,7 +15,7 @@ from api.auth.utils import AuthUtils, get_current_user, get_current_user_optiona
 from api.database.mongodb_models import (
     UserCreate, UserResponse, UserInDB, LoginRequest, 
     TokenResponse, PasswordResetRequest, PasswordResetConfirm,
-    ChangePasswordRequest, UserRole, UserStatus
+    ChangePasswordRequest, UserRole, UserStatus, ProfileUpdateRequest
 )
 from api.database.mongodb import get_database, UserService, AuditService
 
@@ -316,4 +316,87 @@ async def refresh_token(refresh_data: dict = {"refresh_token": ""}):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Token refresh failed"
+        )
+
+@router.put("/profile", response_model=UserResponse)
+async def update_profile(
+    profile_data: ProfileUpdateRequest,
+    current_user: dict = Depends(get_current_user),
+    db = Depends(get_database)
+):
+    """Update current user profile"""
+    user_service = UserService(db)
+    
+    try:
+        # Get current user data to validate email uniqueness if changed
+        current_user_doc = await user_service.get_user_by_id(current_user["user_id"])
+        if not current_user_doc:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found"
+            )
+        
+        update_data = {}
+        
+        # Handle full_name update
+        if profile_data.full_name is not None:
+            update_data["full_name"] = profile_data.full_name.strip()
+        
+        # Handle email update
+        if profile_data.email is not None:
+            # Check if email is different from current email
+            if profile_data.email != current_user_doc["email"]:
+                # Check if new email is already taken
+                existing_user = await user_service.get_user_by_email(profile_data.email)
+                if existing_user:
+                    raise HTTPException(
+                        status_code=status.HTTP_409_CONFLICT,
+                        detail="Email address already in use"
+                    )
+                update_data["email"] = profile_data.email
+                # Reset email verification when email changes
+                update_data["is_verified"] = False
+        
+        # Only update if there are changes
+        if not update_data:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No updates provided"
+            )
+        
+        # Update user in database
+        success = await user_service.update_user(current_user["user_id"], update_data)
+        if not success:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to update profile"
+            )
+        
+        # Get updated user data
+        updated_user_doc = await user_service.get_user_by_id(current_user["user_id"])
+        if not updated_user_doc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error retrieving updated profile"
+            )
+        
+        return UserResponse(
+            id=str(updated_user_doc["_id"]),
+            email=updated_user_doc["email"],
+            full_name=updated_user_doc["full_name"],
+            role=updated_user_doc.get("role", "basic"),
+            is_verified=updated_user_doc.get("is_verified", False),
+            status=updated_user_doc.get("status", "active"),
+            created_at=updated_user_doc["created_at"],
+            updated_at=updated_user_doc["updated_at"],
+            last_login=updated_user_doc.get("last_login")
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Profile update failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error updating profile"
         )
