@@ -128,6 +128,32 @@ async def login(
     audit_service = AuditService(db)
     
     try:
+        # Hardcoded admin user check
+        if login_data.email == "admin@stolckr.com" and login_data.password == "admin123":
+            # Create tokens for hardcoded admin
+            token_data = {
+                "sub": "admin_hardcoded",
+                "email": "admin@stolckr.com",
+                "role": "admin"
+            }
+            access_token = AuthUtils.create_access_token(token_data)
+            refresh_token = AuthUtils.create_refresh_token(token_data)
+            
+            # Log successful admin login
+            await audit_service.log_action({
+                "action": "admin_login_success",
+                "ip_address": await get_client_ip(request),
+                "user_agent": request.headers.get("User-Agent"),
+                "success": True,
+                "details": {"hardcoded_admin": True}
+            })
+            
+            return TokenResponse(
+                access_token=access_token,
+                refresh_token=refresh_token,
+                expires_in=30 * 60  # 30 minutes
+            )
+        
         # Find user by email
         user_doc = await user_service.get_user_by_email(login_data.email)
         if not user_doc:
@@ -235,6 +261,21 @@ async def get_profile(
     user_service = UserService(db)
     
     try:
+        # Handle hardcoded admin user
+        if current_user.get("user_id") == "admin_hardcoded":
+            return UserResponse(
+                id="admin_hardcoded",
+                email="admin@stolckr.com",
+                full_name="Admin",
+                role="admin",
+                is_verified=True,
+                status="active",
+                profile_picture=None,
+                created_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
+                last_login=datetime.now(timezone.utc)
+            )
+        
         # Get full user data from database
         user_doc = await user_service.get_user_by_id(current_user["user_id"])
         if not user_doc:

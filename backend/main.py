@@ -78,7 +78,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(health.router, prefix="/api/v1", tags=["Health"])
-from api.routes import stocks, predictions, auth, watchlist, ai_insights, xp_goals, dashboard, simple_paper_trading
+from api.routes import stocks, predictions, auth, watchlist, ai_insights, xp_goals, dashboard, simple_paper_trading, admin
 app.include_router(stocks.router, prefix="/api/v1", tags=["Stocks"])
 app.include_router(predictions.router, prefix="/api/v1", tags=["Predictions"])
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
@@ -87,6 +87,7 @@ app.include_router(ai_insights.router, prefix="/api/v1", tags=["AI Insights"])
 app.include_router(simple_paper_trading.router, prefix="/api/v1", tags=["Simple Paper Trading"])
 app.include_router(xp_goals.router, prefix="/api/v1/xp", tags=["XP & Goals"])
 app.include_router(dashboard.router, prefix="/api/v1/dashboard", tags=["Dashboard"])
+app.include_router(admin.router, prefix="/api/v1", tags=["Admin"])
 # app.include_router(websocket.router, prefix="/api/v1", tags=["WebSocket"])
 
 @app.get("/")

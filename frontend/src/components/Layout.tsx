@@ -11,6 +11,7 @@ import {
   BookmarkIcon,
   UserIcon,
   TrophyIcon,
+  CogIcon,
   Bars3Icon,
   XMarkIcon,
   ArrowRightOnRectangleIcon
@@ -21,7 +22,8 @@ import {
   MagnifyingGlassIcon as MagnifyingSolid,
   BookmarkIcon as BookmarkSolid,
   UserIcon as UserSolid,
-  TrophyIcon as TrophySolid
+  TrophyIcon as TrophySolid,
+  CogIcon as CogSolid
 } from '@heroicons/react/24/solid'
 import { ProfilePicture } from '@/components/profile/ProfilePictureSelector'
 
@@ -29,19 +31,33 @@ interface LayoutProps {
   children: React.ReactNode
 }
 
-const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, iconSolid: HomeSolid },
-  { name: 'Search Stocks', href: '/search', icon: MagnifyingGlassIcon, iconSolid: MagnifyingSolid },
-  { name: 'Predictions', href: '/predictions', icon: ChartBarIcon, iconSolid: ChartBarSolid },
-  { name: 'Watchlist', href: '/watchlist', icon: BookmarkIcon, iconSolid: BookmarkSolid },
-  { name: 'Goals', href: '/goals', icon: TrophyIcon, iconSolid: TrophySolid },
-  { name: 'Profile', href: '/profile', icon: UserIcon, iconSolid: UserSolid },
-]
+const getNavigation = (isAdmin: boolean) => {
+  const baseNavigation = [
+    { name: 'Dashboard', href: '/dashboard', icon: HomeIcon, iconSolid: HomeSolid },
+    { name: 'Search Stocks', href: '/search', icon: MagnifyingGlassIcon, iconSolid: MagnifyingSolid },
+    { name: 'Predictions', href: '/predictions', icon: ChartBarIcon, iconSolid: ChartBarSolid },
+    { name: 'Watchlist', href: '/watchlist', icon: BookmarkIcon, iconSolid: BookmarkSolid },
+    { name: 'Goals', href: '/goals', icon: TrophyIcon, iconSolid: TrophySolid },
+    { name: 'Profile', href: '/profile', icon: UserIcon, iconSolid: UserSolid },
+  ]
+  
+  if (isAdmin) {
+    baseNavigation.push({
+      name: 'Admin Dashboard', 
+      href: '/admin/dashboard', 
+      icon: CogIcon, 
+      iconSolid: CogSolid
+    })
+  }
+  
+  return baseNavigation
+}
 
 export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
   const { user, logout } = useAuth()
+  const navigation = getNavigation(user?.role === 'admin')
 
   return (
     <div className="min-h-screen bg-gray-50 flex">

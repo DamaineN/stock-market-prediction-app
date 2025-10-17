@@ -71,6 +71,31 @@ export function AuthProvider({ children }: AuthProviderProps) {
       
       // Set as authenticated first
       setIsAuthenticated(true)
+
+      // If hardcoded admin, synthesize profile and redirect
+      try {
+        const tokenParts = tokens.access_token.split('.')
+        const payload = JSON.parse(atob(tokenParts[1]))
+        if (payload?.email === 'admin@stolckr.com' && payload?.role === 'admin') {
+          const adminProfile = {
+            id: 'admin_hardcoded',
+            email: 'admin@stolckr.com',
+            full_name: 'Admin',
+            role: 'admin',
+            is_verified: true,
+            status: 'active',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            profile_picture: null,
+          }
+          setUser(adminProfile as any)
+          // Redirect admin to admin dashboard
+          setTimeout(() => {
+            window.location.href = '/admin/dashboard'
+          }, 100)
+          return
+        }
+      } catch (_) {}
       
       // Try to get user profile with retry logic
       let userProfile = null
