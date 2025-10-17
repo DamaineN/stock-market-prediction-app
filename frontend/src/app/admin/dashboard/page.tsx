@@ -27,7 +27,7 @@ const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-
+ 
   // Check admin access
   useEffect(() => {
     if (!isAuthenticated) {
