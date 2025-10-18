@@ -1,0 +1,1074 @@
+2025-10-19 00:42:32,212 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 00:42:32,425 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 00:42:35,699 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:42:37,591 - api.database.mongodb - ERROR - Failed to connect to MongoDB: localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 5.0s, Topology Description: <TopologyDescription id: 68f3c3780d95ee92d73ad8d2, topology_type: Unknown, servers: [<ServerDescription ('localhost', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('localhost:27017: [WinError 10061] No connection could be made because the target machine actively refused it (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-10-19 00:42:39,633 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:42:48,831 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:48:25,164 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 00:48:26,465 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 00:48:26,466 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 00:48:48,267 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 00:49:08,086 - watchfiles.main - INFO - 31 changes detected
+2025-10-19 00:49:08,690 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 00:49:09,044 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 00:49:09,172 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 00:49:09,399 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 00:49:10,013 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 00:49:10,013 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 00:49:13,023 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 00:49:13,539 - watchfiles.main - INFO - 26 changes detected
+2025-10-19 00:49:13,954 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 00:49:14,308 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 00:49:14,663 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 00:49:15,021 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 00:49:15,429 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 00:49:15,784 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 00:49:16,143 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 00:49:16,505 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:49:16,862 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 00:49:17,220 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 00:49:17,982 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:49:18,341 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 00:49:18,697 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 00:49:19,055 - watchfiles.main - INFO - 8 changes detected
+2025-10-19 00:49:19,667 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 00:49:20,022 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 00:49:20,381 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 00:49:21,092 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 00:49:29,098 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 00:49:29,805 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:49:30,368 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:49:47,352 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:49:47,703 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:49:52,333 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:49:54,929 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:50:03,601 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:50:11,618 - watchfiles.main - INFO - 44 changes detected
+2025-10-19 00:50:12,177 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 00:50:12,536 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 00:50:12,892 - watchfiles.main - INFO - 9 changes detected
+2025-10-19 00:50:13,249 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 00:50:14,058 - watchfiles.main - INFO - 32 changes detected
+2025-10-19 00:50:14,410 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:50:14,770 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 00:50:15,179 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 00:50:15,533 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 00:50:15,887 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:50:16,295 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 00:50:17,154 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 00:50:18,211 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:50:18,664 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:50:20,035 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:50:20,395 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 00:50:20,857 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:50:21,471 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:53:13,325 - watchfiles.main - INFO - 42 changes detected
+2025-10-19 00:53:13,535 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 00:53:15,080 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 00:53:20,148 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 00:53:20,216 - watchfiles.main - INFO - 11 changes detected
+2025-10-19 00:53:21,465 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 00:53:21,465 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 00:53:51,122 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:53:56,294 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 00:53:56,316 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:53:56,320 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:53:57,189 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 00:53:57,189 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 00:54:14,894 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:54:15,258 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:54:42,950 - watchfiles.main - INFO - 74 changes detected
+2025-10-19 00:54:43,659 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 00:54:44,025 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 00:54:44,386 - watchfiles.main - INFO - 9 changes detected
+2025-10-19 00:54:44,746 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 00:54:45,658 - watchfiles.main - INFO - 32 changes detected
+2025-10-19 00:54:46,168 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 00:54:46,531 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 00:54:46,885 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 00:54:47,345 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 00:54:47,748 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 00:54:48,606 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 00:54:49,520 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:54:49,872 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 00:54:50,229 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 00:54:50,839 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:54:51,196 - watchfiles.main - INFO - 1 change detected
+2025-10-19 00:54:52,408 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 00:55:29,494 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:00:10,294 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:00:11,612 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:00:11,613 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:00:25,428 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:00:25,780 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:00:38,520 - watchfiles.main - INFO - 83 changes detected
+2025-10-19 01:00:39,176 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 01:00:39,583 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:00:39,938 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:00:40,292 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:00:40,649 - watchfiles.main - INFO - 32 changes detected
+2025-10-19 01:00:41,612 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:00:42,428 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:00:42,986 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:00:43,345 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:00:43,702 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:00:44,061 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:00:44,869 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 01:00:45,223 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:00:52,074 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 01:01:09,241 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 01:01:14,234 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:01:44,978 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:01:45,345 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:01:45,703 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:01:45,927 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:01:46,062 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:01:47,184 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:01:47,184 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:01:57,572 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 01:02:08,868 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 01:02:09,232 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:02:12,004 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:02:12,972 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:02:13,331 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:02:13,687 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:02:14,046 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:02:14,504 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:02:14,957 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:02:15,311 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:02:15,667 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 01:02:30,771 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:12:56,430 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:12:57,580 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:12:57,580 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:13:10,198 - watchfiles.main - INFO - 94 changes detected
+2025-10-19 01:13:10,755 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 01:13:11,114 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:13:11,467 - watchfiles.main - INFO - 9 changes detected
+2025-10-19 01:13:17,963 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:13:18,320 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:13:18,677 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:13:19,337 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:13:19,689 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:13:20,600 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 01:13:20,965 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:13:29,710 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:14:09,641 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:14:12,076 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:14:12,076 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:14:56,419 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 01:14:56,783 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:15:46,137 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:15:46,892 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 01:15:47,298 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:15:55,854 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:15:56,207 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 01:15:56,564 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 01:15:57,726 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:16:03,714 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:16:04,077 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 01:16:04,495 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 01:16:17,749 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:16:18,128 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 01:16:18,513 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 01:16:42,032 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:16:42,419 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:16:43,455 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:16:43,814 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 01:16:50,813 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:16:51,379 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:17:02,423 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:17:02,788 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:17:12,863 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:17:13,246 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:17:14,270 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:17:18,149 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:17:18,506 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:17:23,081 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:17:23,631 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:17:34,913 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:17:40,286 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:17:40,479 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:17:40,558 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:17:41,551 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:17:41,551 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:17:50,089 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 01:17:51,082 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:17:51,095 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:17:56,979 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 01:17:57,337 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 01:17:58,448 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 01:17:58,448 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 01:17:58,813 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:18:02,483 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:18:03,500 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:18:04,110 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:18:28,212 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:18:28,701 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:18:29,067 - watchfiles.main - INFO - 23 changes detected
+2025-10-19 01:18:29,426 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:18:39,614 - watchfiles.main - INFO - 354 changes detected
+2025-10-19 01:18:40,026 - watchfiles.main - INFO - 137 changes detected
+2025-10-19 01:18:40,380 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:18:46,237 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:18:47,856 - watchfiles.main - INFO - 170 changes detected
+2025-10-19 01:18:48,469 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 01:18:49,037 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:18:54,739 - watchfiles.main - INFO - 76 changes detected
+2025-10-19 01:19:02,653 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:19:03,108 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:19:03,474 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:19:28,990 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:19:29,353 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:19:29,711 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 01:19:30,068 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:20:06,674 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:20:07,231 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 01:20:07,590 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:20:07,997 - watchfiles.main - INFO - 13 changes detected
+2025-10-19 01:20:08,401 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:20:08,755 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 01:20:09,969 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:20:11,234 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 01:20:11,587 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 01:20:11,994 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:20:12,348 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 01:20:12,706 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:20:13,065 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:20:13,471 - watchfiles.main - INFO - 8 changes detected
+2025-10-19 01:20:13,827 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:20:15,744 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:20:16,101 - watchfiles.main - INFO - 36 changes detected
+2025-10-19 01:20:30,392 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:20:31,058 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:20:31,662 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:20:58,472 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:21:03,538 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:21:03,548 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:21:03,561 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:21:04,771 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:21:04,771 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:21:13,590 - watchfiles.main - INFO - 83 changes detected
+2025-10-19 01:21:13,624 - watchfiles.main - INFO - 83 changes detected
+2025-10-19 01:21:14,098 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:21:14,279 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 01:21:14,499 - watchfiles.main - INFO - 29 changes detected
+2025-10-19 01:21:14,637 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:21:14,856 - watchfiles.main - INFO - 9 changes detected
+2025-10-19 01:21:14,994 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:21:17,676 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:21:17,715 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:21:18,029 - watchfiles.main - INFO - 32 changes detected
+2025-10-19 01:21:18,075 - watchfiles.main - INFO - 32 changes detected
+2025-10-19 01:21:19,336 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:21:19,340 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:21:20,196 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:21:20,705 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:21:20,706 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:21:21,120 - watchfiles.main - INFO - 13 changes detected
+2025-10-19 01:21:21,471 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:21:21,830 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:21:22,585 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 01:21:22,945 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:21:22,945 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:21:31,650 - watchfiles.main - INFO - 27 changes detected
+2025-10-19 01:21:31,665 - watchfiles.main - INFO - 27 changes detected
+2025-10-19 01:21:32,023 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 01:21:32,057 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 01:21:37,875 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:21:37,907 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:21:38,236 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:21:38,267 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:21:43,904 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:21:45,062 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:21:45,619 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:22:10,113 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:22:16,356 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:22:16,780 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 01:22:17,460 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:22:18,026 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:22:18,386 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:22:18,744 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:22:19,103 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:22:23,734 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:22:24,275 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 01:22:24,743 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:22:32,860 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:22:33,264 - watchfiles.main - INFO - 13 changes detected
+2025-10-19 01:22:33,643 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 01:22:34,554 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:22:34,919 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:22:46,595 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:22:46,999 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:23:04,377 - watchfiles.main - INFO - 120 changes detected
+2025-10-19 01:23:04,985 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 01:23:05,391 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:23:05,743 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:23:25,535 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:23:25,989 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:23:26,694 - watchfiles.main - INFO - 34 changes detected
+2025-10-19 01:23:27,915 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 01:23:28,274 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:23:28,633 - watchfiles.main - INFO - 40 changes detected
+2025-10-19 01:23:36,082 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 01:23:36,437 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:24:16,718 - watchfiles.main - INFO - 27 changes detected
+2025-10-19 01:24:17,082 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 01:24:23,701 - absl - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-10-19 01:24:23,833 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:24:36,485 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:24:36,850 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:24:41,784 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:24:42,140 - watchfiles.main - INFO - 23 changes detected
+2025-10-19 01:25:17,732 - yfinance - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: APPLE"}}}
+2025-10-19 01:25:42,109 - watchfiles.main - INFO - 13 changes detected
+2025-10-19 01:25:42,475 - watchfiles.main - INFO - 37 changes detected
+2025-10-19 01:25:53,608 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:25:56,480 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:25:56,506 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:25:58,995 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:25:59,030 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:25:59,048 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:26:00,173 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:26:00,174 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:26:59,264 - absl - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-10-19 01:26:59,361 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:26:59,390 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:27:00,000 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:27:00,019 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:27:11,141 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:27:12,241 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:27:12,847 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:27:54,745 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:27:55,154 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 01:28:54,996 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:28:55,349 - watchfiles.main - INFO - 31 changes detected
+2025-10-19 01:28:55,704 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:29:27,331 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:29:28,140 - watchfiles.main - INFO - 26 changes detected
+2025-10-19 01:29:28,495 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 01:29:28,905 - watchfiles.main - INFO - 35 changes detected
+2025-10-19 01:29:51,201 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:29:51,565 - watchfiles.main - INFO - 26 changes detected
+2025-10-19 01:29:51,922 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:29:52,684 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:29:53,042 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:29:58,678 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:29:59,046 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 01:29:59,411 - watchfiles.main - INFO - 26 changes detected
+2025-10-19 01:30:58,978 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:30:59,431 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:30:59,797 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:31:00,457 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 01:31:02,672 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:31:04,859 - yfinance - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: AAOPL"}}}
+2025-10-19 01:31:36,317 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:31:36,732 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 01:31:41,060 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 01:32:07,282 - absl - WARNING - Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-10-19 01:32:07,587 - tensorflow - WARNING - 5 out of the last 40 calls to <function TensorFlowTrainer.make_predict_function.<locals>.one_step_on_data_distributed at 0x0000011AA334F4C0> triggered tf.function retracing. Tracing is expensive and the excessive number of tracings could be due to (1) creating @tf.function repeatedly in a loop, (2) passing tensors with different shapes, (3) passing Python objects instead of tensors. For (1), please define your @tf.function outside of the loop. For (2), @tf.function has reduce_retracing=True option that can avoid unnecessary retracing. For (3), please refer to https://www.tensorflow.org/guide/function#controlling_retracing and https://www.tensorflow.org/api_docs/python/tf/function for  more details.
+2025-10-19 01:32:13,997 - absl - WARNING - Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-10-19 01:32:36,796 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 01:32:37,150 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 01:32:41,230 - watchfiles.main - INFO - 8 changes detected
+2025-10-19 01:32:41,595 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 01:34:07,125 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:34:07,925 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:34:08,483 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:34:18,360 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:34:18,728 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:34:19,092 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:34:19,800 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 01:34:20,166 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 01:35:19,309 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:35:26,363 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:35:27,077 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:35:27,694 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:35:32,693 - models.arima.arima_predictor - ERROR - Error in ARIMA prediction for AAPL: 0
+2025-10-19 01:35:35,950 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:35:36,355 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:35:36,770 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:35:37,893 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:35:38,248 - watchfiles.main - INFO - 13 changes detected
+2025-10-19 01:35:44,340 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:35:44,877 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:35:45,243 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:35:49,523 - models.arima.arima_predictor - ERROR - Error in ARIMA prediction for AAPL: 0
+2025-10-19 01:35:51,043 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:35:51,433 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:35:52,018 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:35:53,078 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:35:53,437 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:36:02,653 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:36:03,443 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:36:04,161 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:36:04,571 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:36:04,926 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 01:36:11,826 - models.arima.arima_predictor - ERROR - Error in ARIMA prediction for AAPL: 0
+2025-10-19 01:36:36,521 - absl - WARNING - Compiled the loaded model, but the compiled metrics have yet to be built. `model.compile_metrics` will be empty until you train or evaluate the model.
+2025-10-19 01:36:44,571 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:36:45,270 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:36:45,675 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:37:23,173 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:37:23,572 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:37:23,928 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:37:24,656 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:37:25,067 - watchfiles.main - INFO - 35 changes detected
+2025-10-19 01:37:33,181 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:37:34,023 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:37:34,485 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:37:42,197 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:37:42,571 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:37:42,999 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:37:43,659 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:37:44,021 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:37:49,056 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:37:49,433 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:37:49,892 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:37:50,454 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:37:50,814 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 01:37:59,870 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:38:00,719 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:38:01,230 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:38:01,839 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:38:02,200 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:38:02,558 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:38:14,584 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:39:49,577 - watchfiles.main - INFO - 233 changes detected
+2025-10-19 01:39:50,099 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:39:50,513 - watchfiles.main - INFO - 29 changes detected
+2025-10-19 01:39:50,868 - watchfiles.main - INFO - 9 changes detected
+2025-10-19 01:41:45,138 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:41:45,492 - watchfiles.main - INFO - 32 changes detected
+2025-10-19 01:41:46,301 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:41:46,658 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:41:47,568 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 01:41:47,921 - watchfiles.main - INFO - 49 changes detected
+2025-10-19 01:41:49,033 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 01:41:49,400 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:42:24,910 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:42:25,093 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:42:27,214 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 01:42:32,556 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:42:32,868 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:42:34,016 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:42:34,016 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:42:39,866 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:42:40,021 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:42:41,607 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:42:42,018 - watchfiles.main - INFO - 12 changes detected
+2025-10-19 01:42:44,080 - watchfiles.main - INFO - 27 changes detected
+2025-10-19 01:42:44,444 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 01:42:46,991 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:42:47,009 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:42:47,623 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:42:47,804 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:42:47,806 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:42:52,000 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:42:52,368 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:42:57,555 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:42:57,703 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:42:59,233 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:42:59,646 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:43:04,576 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:43:04,627 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:43:05,294 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:43:05,412 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:43:05,412 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:43:07,604 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:43:07,822 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:43:09,377 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:43:09,738 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:43:14,499 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:43:14,520 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:43:15,233 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:43:15,273 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:43:15,273 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:43:22,085 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:43:33,780 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:43:35,001 - watchfiles.main - INFO - 8 changes detected
+2025-10-19 01:43:36,962 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:43:37,322 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:43:43,484 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:43:43,526 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:43:44,381 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:43:44,382 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:43:44,984 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:43:52,190 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 01:43:52,546 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:43:52,905 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:44:17,090 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:44:17,314 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:44:19,134 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:44:19,492 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:44:25,071 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:44:25,133 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:44:25,592 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:44:26,066 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:44:26,066 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:44:42,062 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:44:47,994 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:44:49,548 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 01:44:53,628 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:44:54,488 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:44:56,025 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:44:56,384 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:44:56,794 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:45:02,629 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:45:02,632 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:45:03,501 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:45:03,501 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:45:03,743 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:45:11,459 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:45:11,645 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:45:13,411 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:45:13,871 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:45:20,118 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:45:20,182 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 01:45:20,690 - watchfiles.main - INFO - 23 changes detected
+2025-10-19 01:45:20,988 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:45:20,989 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:45:21,356 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:45:24,790 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:45:25,141 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 01:45:25,748 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:45:25,948 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:45:27,830 - watchfiles.main - INFO - 29 changes detected
+2025-10-19 01:45:28,491 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 01:45:28,893 - watchfiles.main - INFO - 30 changes detected
+2025-10-19 01:45:29,603 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:45:29,969 - watchfiles.main - INFO - 8 changes detected
+2025-10-19 01:45:30,330 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 01:45:35,542 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:45:35,568 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:45:36,435 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:45:36,453 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:45:36,453 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:45:36,796 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:45:36,965 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:45:38,920 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:45:39,535 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:45:39,892 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:46:28,926 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:48:32,715 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:49:36,538 - watchfiles.main - INFO - 8 changes detected
+2025-10-19 01:49:37,666 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:49:42,337 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:49:42,391 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:49:43,710 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:49:43,710 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:49:47,319 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:49:47,499 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:49:49,182 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:49:54,172 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:49:54,222 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:49:55,130 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:49:55,132 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:51:15,005 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 01:51:36,210 - models.arima.arima_predictor - ERROR - Error in ARIMA prediction for GOOGL: 0
+2025-10-19 01:54:53,950 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:54:54,168 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:54:55,854 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:55:01,097 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:55:01,143 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:55:01,658 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:55:02,356 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:55:02,356 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:55:36,015 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:55:36,159 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:55:37,866 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:55:43,237 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:55:43,517 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:55:43,873 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:55:44,179 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:55:44,179 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:56:12,484 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:56:12,663 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:56:14,422 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:56:18,300 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:56:19,881 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:56:23,809 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:56:25,251 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:56:30,285 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:56:30,458 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:56:30,646 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:56:31,800 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:56:31,801 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:56:33,291 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:56:36,616 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:56:37,982 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:56:42,011 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:56:43,594 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:56:45,361 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:56:47,725 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:56:49,107 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:56:50,772 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:56:53,092 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:56:54,504 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:56:55,011 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:56:55,012 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:56:55,625 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:56:55,945 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:56:55,945 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:57:18,271 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:57:18,513 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:57:20,060 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:57:25,344 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:57:25,347 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:57:25,750 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:57:26,307 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:57:26,307 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:57:28,365 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:57:28,508 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:57:30,012 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:57:35,317 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:57:35,348 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:57:36,160 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:57:36,606 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:57:36,606 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:58:17,830 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:58:18,021 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 01:58:19,742 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 01:58:24,839 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 01:58:24,880 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:58:25,641 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:58:25,695 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 01:58:25,695 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 01:58:35,805 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:59:15,670 - watchfiles.main - INFO - 1 change detected
+2025-10-19 01:59:24,892 - watchfiles.main - INFO - 132 changes detected
+2025-10-19 01:59:25,509 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 01:59:25,968 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 01:59:34,118 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:59:34,523 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 01:59:35,279 - watchfiles.main - INFO - 23 changes detected
+2025-10-19 01:59:35,640 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:59:37,005 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 01:59:37,364 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:59:38,128 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 01:59:38,490 - watchfiles.main - INFO - 35 changes detected
+2025-10-19 01:59:47,241 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 01:59:52,032 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 01:59:52,393 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 01:59:54,260 - watchfiles.main - INFO - 38 changes detected
+2025-10-19 01:59:55,323 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 01:59:58,391 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 01:59:58,749 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 01:59:59,813 - watchfiles.main - INFO - 29 changes detected
+2025-10-19 02:00:00,169 - watchfiles.main - INFO - 23 changes detected
+2025-10-19 02:00:00,948 - watchfiles.main - INFO - 23 changes detected
+2025-10-19 02:00:01,305 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:00:01,663 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 02:00:49,316 - models.ensemble.ml_models - WARNING - Extreme scaled values detected for AMZN, clipping
+2025-10-19 02:01:41,483 - absl - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-10-19 02:01:41,569 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:01:42,178 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:02:16,323 - models.arima.arima_predictor - ERROR - Error in ARIMA prediction for AMZN: 0
+2025-10-19 02:03:25,318 - models.ensemble.ml_models - WARNING - Extreme scaled values detected for AMZN, clipping
+2025-10-19 02:03:44,125 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:03:44,340 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:03:46,130 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:03:47,495 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:03:51,166 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:03:52,870 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:03:54,282 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:03:57,458 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:03:59,079 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:04:00,444 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:04:04,280 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:04:04,313 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:04:04,675 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:04:05,621 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:04:05,622 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:04:07,118 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:04:07,831 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:04:12,470 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:04:12,509 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:04:13,313 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:04:13,313 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:04:18,761 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:04:19,124 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:04:20,087 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 02:04:20,448 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 02:04:21,310 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 02:04:21,666 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 02:04:26,964 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:04:27,325 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:04:27,683 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 02:04:28,091 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 02:04:28,748 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:04:29,112 - watchfiles.main - INFO - 27 changes detected
+2025-10-19 02:04:39,587 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:04:40,175 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 02:04:40,586 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 02:04:41,655 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 02:04:42,016 - watchfiles.main - INFO - 13 changes detected
+2025-10-19 02:04:46,704 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:04:47,119 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 02:04:47,632 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 02:04:48,248 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:04:48,602 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 02:04:52,881 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:04:53,241 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 02:04:53,852 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 02:04:54,357 - watchfiles.main - INFO - 4 changes detected
+2025-10-19 02:04:54,742 - watchfiles.main - INFO - 13 changes detected
+2025-10-19 02:04:59,283 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:04:59,826 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 02:05:00,245 - watchfiles.main - INFO - 14 changes detected
+2025-10-19 02:05:01,301 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:05:01,658 - watchfiles.main - INFO - 10 changes detected
+2025-10-19 02:05:09,349 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:05:09,539 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:05:11,313 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:05:16,247 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 02:05:17,447 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:05:17,469 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 02:05:18,585 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:05:18,585 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:05:18,686 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:05:29,001 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 02:05:38,903 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:05:39,057 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:05:40,869 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:05:43,792 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 02:05:44,560 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 02:05:44,927 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:05:46,802 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 02:05:47,157 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 02:05:47,512 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:05:47,870 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 02:05:48,279 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 02:05:48,786 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:05:49,147 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 02:05:54,848 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:05:55,354 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:05:55,598 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:05:56,740 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:05:56,741 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:05:58,624 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:06:05,816 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:06:05,836 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:06:06,195 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:06:06,819 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:06:06,819 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:06:16,312 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:06:16,528 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:06:18,148 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:06:24,250 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:06:24,635 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:06:24,660 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:06:25,806 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:06:25,807 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:06:25,870 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:07:20,019 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:07:20,247 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:07:22,102 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:07:27,587 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:07:27,737 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:07:28,549 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:07:28,939 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:07:28,939 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:07:51,869 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:07:52,674 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:08:06,457 - watchfiles.main - INFO - 152 changes detected
+2025-10-19 02:08:06,975 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:08:07,387 - watchfiles.main - INFO - 29 changes detected
+2025-10-19 02:08:07,741 - watchfiles.main - INFO - 9 changes detected
+2025-10-19 02:08:24,959 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 02:08:26,318 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 02:08:26,726 - watchfiles.main - INFO - 33 changes detected
+2025-10-19 02:08:27,436 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:08:27,813 - watchfiles.main - INFO - 39 changes detected
+2025-10-19 02:08:28,975 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 02:08:29,328 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 02:08:30,338 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 02:08:38,999 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 02:08:39,358 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 02:08:40,168 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:08:40,526 - watchfiles.main - INFO - 27 changes detected
+2025-10-19 02:08:40,936 - watchfiles.main - INFO - 65 changes detected
+2025-10-19 02:09:01,362 - yfinance - ERROR - HTTP Error 404: {"quoteSummary":{"result":null,"error":{"code":"Not Found","description":"Quote not found for symbol: TESLA"}}}
+2025-10-19 02:09:32,681 - absl - WARNING - You are saving your model as an HDF5 file via `model.save()` or `keras.saving.save_model(model)`. This file format is considered legacy. We recommend using instead the native Keras format, e.g. `model.save('my_model.keras')` or `keras.saving.save_model(model, 'my_model.keras')`. 
+2025-10-19 02:09:32,791 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:09:33,454 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:09:36,118 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:09:36,326 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:09:38,381 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:09:40,854 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 02:09:41,217 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 02:09:45,402 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:09:47,192 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:09:53,798 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:09:53,806 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:09:54,715 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:09:55,055 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:09:55,055 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:09:55,117 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:09:55,292 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:09:57,135 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:09:57,492 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:10:00,119 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 02:10:00,636 - watchfiles.main - INFO - 22 changes detected
+2025-10-19 02:10:01,304 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:10:01,669 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 02:10:06,970 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:10:06,973 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:10:07,786 - watchfiles.main - INFO - 11 changes detected
+2025-10-19 02:10:07,838 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:10:07,838 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:10:08,345 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:10:28,048 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:10:28,213 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:10:30,149 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:10:36,266 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:10:36,299 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:10:37,008 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:10:37,092 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:10:37,092 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:10:45,833 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:10:46,023 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:10:47,620 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:10:53,273 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:10:53,312 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:10:54,123 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:10:54,125 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:10:54,269 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:10:56,590 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:10:56,753 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:10:58,503 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:11:00,721 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 02:11:05,107 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:11:05,151 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:11:05,961 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:11:05,961 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:11:06,060 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:11:07,982 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:11:08,347 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 02:11:42,589 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:11:42,994 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:12:03,583 - watchfiles.main - INFO - 108 changes detected
+2025-10-19 02:12:04,201 - watchfiles.main - INFO - 28 changes detected
+2025-10-19 02:12:04,557 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 02:12:04,916 - watchfiles.main - INFO - 9 changes detected
+2025-10-19 02:12:09,648 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 02:12:10,001 - watchfiles.main - INFO - 32 changes detected
+2025-10-19 02:12:10,763 - watchfiles.main - INFO - 18 changes detected
+2025-10-19 02:12:11,126 - watchfiles.main - INFO - 19 changes detected
+2025-10-19 02:12:12,033 - watchfiles.main - INFO - 27 changes detected
+2025-10-19 02:12:12,385 - watchfiles.main - INFO - 25 changes detected
+2025-10-19 02:12:13,497 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 02:12:13,863 - watchfiles.main - INFO - 20 changes detected
+2025-10-19 02:12:19,278 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 02:12:22,729 - watchfiles.main - INFO - 27 changes detected
+2025-10-19 02:12:23,081 - watchfiles.main - INFO - 21 changes detected
+2025-10-19 02:12:24,042 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:12:24,402 - watchfiles.main - INFO - 63 changes detected
+2025-10-19 02:12:45,206 - models.ensemble.ml_models - WARNING - Extreme scaled values detected for GOOGL, clipping
+2025-10-19 02:13:24,283 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:13:24,648 - watchfiles.main - INFO - 38 changes detected
+2025-10-19 02:14:47,009 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:14:47,189 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:14:48,830 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:14:50,196 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:14:53,378 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:14:54,865 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:14:56,229 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:14:58,447 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:14:59,844 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:15:01,308 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:15:04,489 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:15:05,975 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:15:07,336 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:15:11,044 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:15:11,112 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:15:12,521 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:15:12,521 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:15:13,978 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:15:18,309 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:15:19,012 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:15:19,064 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:15:19,987 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:15:19,988 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:15:39,231 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:15:39,371 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:15:40,954 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:15:45,966 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:15:45,986 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:15:46,691 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:15:46,720 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:15:46,720 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:15:50,325 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:15:50,546 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:15:52,080 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:15:55,102 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:15:56,299 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:16:00,980 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:02,493 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:16:05,969 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:07,249 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:16:10,977 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:12,266 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:16:17,548 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:16:17,604 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:16:18,369 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:18,792 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:16:18,792 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:16:21,644 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:21,868 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:16:23,446 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:16:26,618 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:27,920 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:16:33,055 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:34,724 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:16:38,000 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:39,441 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:16:45,091 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:16:45,410 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:16:45,449 - watchfiles.main - INFO - 6 changes detected
+2025-10-19 02:16:46,353 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:16:46,353 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:16:46,361 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:52,007 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:52,188 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:16:53,536 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:16:57,368 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:16:58,857 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:17:04,494 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:17:04,640 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:17:04,851 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:17:05,412 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:17:05,434 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:17:05,434 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:17:16,338 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:17:16,565 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:17:18,131 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:17:22,668 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:17:24,240 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:17:25,653 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:17:29,327 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:17:29,623 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:17:29,691 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:17:30,400 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:17:30,960 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:17:30,961 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:17:34,786 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:17:35,014 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:17:36,590 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:17:37,904 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:17:41,653 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:17:41,680 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:17:42,397 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:17:42,441 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:17:42,442 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:17:52,143 - passlib.handlers.bcrypt - WARNING - (trapped) error reading bcrypt version
+Traceback (most recent call last):
+  File "C:\Users\damai\stock-market-prediction-app\venv\Lib\site-packages\passlib\handlers\bcrypt.py", line 620, in _load_backend_mixin
+    version = _bcrypt.__about__.__version__
+              ^^^^^^^^^^^^^^^^^
+AttributeError: module 'bcrypt' has no attribute '__about__'
+2025-10-19 02:19:11,752 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:19:23,121 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:19:23,481 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:19:30,192 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 02:19:30,545 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:19:36,954 - watchfiles.main - INFO - 53 changes detected
+2025-10-19 02:19:41,919 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:19:52,931 - watchfiles.main - INFO - 86 changes detected
+2025-10-19 02:19:53,299 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:20:08,202 - watchfiles.main - INFO - 11 changes detected
+2025-10-19 02:20:13,907 - watchfiles.main - INFO - 89 changes detected
+2025-10-19 02:20:14,111 - api.database.mongodb - INFO - Disconnected from MongoDB
+2025-10-19 02:20:16,140 - watchfiles.main - INFO - 17 changes detected
+2025-10-19 02:20:16,549 - watchfiles.main - INFO - 110 changes detected
+2025-10-19 02:20:16,906 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:20:17,315 - watchfiles.main - INFO - 29 changes detected
+2025-10-19 02:20:17,668 - watchfiles.main - INFO - 9 changes detected
+2025-10-19 02:20:18,027 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 02:20:19,241 - watchfiles.main - INFO - 87 changes detected
+2025-10-19 02:20:20,101 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 02:20:22,168 - watchfiles.main - INFO - 15 changes detected
+2025-10-19 02:20:26,342 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:20:26,784 - main - INFO - Starting Stock Market Prediction API...
+2025-10-19 02:20:26,802 - watchfiles.main - INFO - 24 changes detected
+2025-10-19 02:20:27,571 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:20:28,123 - api.database.mongodb - INFO - Database indexes created successfully
+2025-10-19 02:20:28,123 - api.database.mongodb - INFO - Connected to MongoDB successfully
+2025-10-19 02:20:28,123 - main - INFO - MongoDB connected successfully
+2025-10-19 02:20:45,300 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:21:13,268 - watchfiles.main - INFO - 32 changes detected
+2025-10-19 02:21:13,625 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:21:20,594 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:23:28,893 - watchfiles.main - INFO - 5 changes detected
+2025-10-19 02:23:40,816 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:23:46,484 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:24:04,798 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:24:10,899 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:24:17,207 - watchfiles.main - INFO - 41 changes detected
+2025-10-19 02:24:23,015 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:24:23,382 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:24:31,450 - watchfiles.main - INFO - 46 changes detected
+2025-10-19 02:24:39,000 - watchfiles.main - INFO - 7 changes detected
+2025-10-19 02:25:48,620 - watchfiles.main - INFO - 1 change detected
+2025-10-19 02:25:48,996 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:25:49,357 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:25:54,492 - watchfiles.main - INFO - 36 changes detected
+2025-10-19 02:25:54,874 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:25:55,242 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:25:55,601 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:26:00,836 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:26:01,194 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:26:01,553 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:26:01,909 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:26:07,904 - watchfiles.main - INFO - 16 changes detected
+2025-10-19 02:26:08,271 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:26:08,638 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:26:08,996 - watchfiles.main - INFO - 2 changes detected
+2025-10-19 02:26:13,529 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:26:13,893 - watchfiles.main - INFO - 3 changes detected
+2025-10-19 02:26:14,252 - watchfiles.main - INFO - 2 changes detected
