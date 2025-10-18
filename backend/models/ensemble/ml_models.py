@@ -4,7 +4,10 @@ Includes Linear Regression, Random Forest, XGBoost, and SVR models
 """
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+# Malaysian timezone (UTC+8)
+MY_TIMEZONE = timezone(timedelta(hours=8))
 from typing import List, Dict, Any, Optional, Tuple
 import asyncio
 import logging
@@ -17,7 +20,6 @@ from sklearn.model_selection import TimeSeriesSplit
 try:
     from sklearn.linear_model import LinearRegression
     from sklearn.ensemble import RandomForestRegressor
-    from sklearn.svm import SVR
     SKLEARN_AVAILABLE = True
 except ImportError:
     SKLEARN_AVAILABLE = False
@@ -44,7 +46,6 @@ class MLEnsemblePredictor:
         self.model_configs = {
             "Linear Regression": {"enabled": SKLEARN_AVAILABLE, "class": LinearRegression},
             "Random Forest": {"enabled": SKLEARN_AVAILABLE, "class": RandomForestRegressor, "params": {"n_estimators": 100, "random_state": 42}},
-            "SVR": {"enabled": SKLEARN_AVAILABLE, "class": SVR, "params": {"kernel": "rbf", "gamma": "scale"}},
             "XGBoost": {"enabled": XGBOOST_AVAILABLE, "class": xgb.XGBRegressor, "params": {"n_estimators": 100, "random_state": 42}}
         }
         
@@ -217,7 +218,7 @@ class LinearRegressionPredictor(MLEnsemblePredictor):
                         "last_price": round(float(df['close'].iloc[-1]), 2)
                     },
                     "status": "completed",
-                    "created_at": datetime.utcnow().isoformat()
+                    "created_at": datetime.now(MY_TIMEZONE).isoformat()
                 }
             
             # Prepare data
@@ -280,7 +281,8 @@ class LinearRegressionPredictor(MLEnsemblePredictor):
                 # Calculate confidence interval (simplified)
                 residuals = y - model.predict(X_scaled)
                 std_error = np.std(residuals) * np.sqrt(1 + i * 0.1)  # Increasing uncertainty
-                confidence_margin = min(std_error * 1.96, pred_price * 0.25)  # Cap at 25% of price
+                confidence_margin = max(std_error * 1.96, pred_price * 0.02)  # Ensure minimum 2% uncertainty
+                confidence_margin = min(confidence_margin, pred_price * 0.25)  # Cap at 25% of price
                 
                 predictions.append({
                     "date": pred_date.strftime("%Y-%m-%d"),
@@ -314,7 +316,7 @@ class LinearRegressionPredictor(MLEnsemblePredictor):
                     "prediction_method": "Linear Regression with Technical Indicators"
                 },
                 "status": "completed",
-                "created_at": datetime.utcnow().isoformat()
+                "created_at": datetime.now(MY_TIMEZONE).isoformat()
             }
             
         except Exception as e:
@@ -325,7 +327,7 @@ class LinearRegressionPredictor(MLEnsemblePredictor):
                 "predictions": [],
                 "metadata": {"error": str(e)},
                 "status": "failed",
-                "created_at": datetime.utcnow().isoformat()
+                "created_at": datetime.now(MY_TIMEZONE).isoformat()
             }
     
     async def backtest(
@@ -472,7 +474,7 @@ class RandomForestPredictor(LinearRegressionPredictor):
                         "last_price": round(float(df['close'].iloc[-1]), 2)
                     },
                     "status": "completed",
-                    "created_at": datetime.utcnow().isoformat()
+                    "created_at": datetime.now(MY_TIMEZONE).isoformat()
                 }
             
             # Prepare data
@@ -538,7 +540,8 @@ class RandomForestPredictor(LinearRegressionPredictor):
                 # Calculate confidence interval
                 residuals = y - model.predict(X_scaled)
                 std_error = np.std(residuals) * np.sqrt(1 + i * 0.1)  # Increasing uncertainty
-                confidence_margin = min(std_error * 1.96, pred_price * 0.3)  # Cap at 30% of price
+                confidence_margin = max(std_error * 1.96, pred_price * 0.03)  # Ensure minimum 3% uncertainty
+                confidence_margin = min(confidence_margin, pred_price * 0.3)  # Cap at 30% of price
                 
                 predictions.append({
                     "date": pred_date.strftime("%Y-%m-%d"),
@@ -711,7 +714,8 @@ class XGBoostPredictor(LinearRegressionPredictor):
                 # Calculate confidence interval
                 residuals = y - model.predict(X_scaled)
                 std_error = np.std(residuals) * np.sqrt(1 + i * 0.1)
-                confidence_margin = min(std_error * 1.96, pred_price * 0.25)  # Cap at 25% of price
+                confidence_margin = max(std_error * 1.96, pred_price * 0.025)  # Ensure minimum 2.5% uncertainty
+                confidence_margin = min(confidence_margin, pred_price * 0.25)  # Cap at 25% of price
                 
                 predictions.append({
                     "date": pred_date.strftime("%Y-%m-%d"),
@@ -761,183 +765,3 @@ class XGBoostPredictor(LinearRegressionPredictor):
                 "created_at": datetime.utcnow().isoformat()
             }
 
-class SVRPredictor(LinearRegressionPredictor):
-    """Support Vector Regression predictor"""
-    
-    def __init__(self, lookback_days: int = 30, kernel: str = "rbf"):
-        super().__init__(lookback_days)
-        self.model_name = "SVR"
-        self.kernel = kernel
-    
-    async def predict(
-        self, 
-        symbol: str, 
-        historical_data: List[Dict[str, Any]], 
-        prediction_days: int = 30,
-        confidence_level: float = 0.95
-    ) -> Dict[str, Any]:
-        """Generate predictions using Support Vector Regression"""
-        try:
-            if len(historical_data) < self.lookback_days + 30:
-                raise ValueError(f"Need at least {self.lookback_days + 30} days of historical data")
-            
-            df = pd.DataFrame(historical_data)
-            df['date'] = pd.to_datetime(df['date'])
-            df = df.sort_values('date').reset_index(drop=True)
-            
-            # Validate price data
-            if df['close'].isna().all() or (df['close'] <= 0).any():
-                raise ValueError("Invalid price data detected")
-            
-            if not SKLEARN_AVAILABLE:
-                predicted_prices = self._fallback_prediction(historical_data, prediction_days)
-                predictions = []
-                last_date = df['date'].iloc[-1]
-                
-                for i, pred_price in enumerate(predicted_prices):
-                    pred_date = last_date + timedelta(days=i+1)
-                    volatility = df['close'].tail(30).std()
-                    confidence_margin = volatility * 1.96
-                    
-                    predictions.append({
-                        "date": pred_date.strftime("%Y-%m-%d"),
-                        "predicted_price": round(float(pred_price), 2),
-                        "lower_bound": round(float(max(0, pred_price - confidence_margin)), 2),
-                        "upper_bound": round(float(pred_price + confidence_margin), 2),
-                        "confidence": confidence_level
-                    })
-                
-                return {
-                    "symbol": symbol,
-                    "model": f"{self.model_name} (Fallback)",
-                    "predictions": predictions,
-                    "metadata": {
-                        "lookback_days": self.lookback_days,
-                        "fallback_mode": True,
-                        "sklearn_available": False,
-                        "data_points_used": len(df),
-                        "last_price": round(float(df['close'].iloc[-1]), 2)
-                    },
-                    "status": "completed",
-                    "created_at": datetime.utcnow().isoformat()
-                }
-            
-            # Prepare data
-            X, y = self._prepare_ml_data(df)
-            
-            if len(X) == 0:
-                raise ValueError("Not enough valid data after feature engineering")
-            
-            # Validate and clean data
-            if np.any(np.isinf(X)) or np.any(np.isnan(X)):
-                logger.warning(f"Invalid features detected for {symbol}, cleaning data")
-                X = np.nan_to_num(X, nan=0, posinf=0, neginf=0)
-            
-            if np.any(np.isinf(y)) or np.any(np.isnan(y)):
-                logger.warning(f"Invalid target values detected for {symbol}, cleaning data")
-                y = np.nan_to_num(y, nan=np.nanmean(y), posinf=np.nanmean(y), neginf=np.nanmean(y))
-            
-            # Scale features - SVR is sensitive to feature scaling
-            scaler = StandardScaler()
-            X_scaled = scaler.fit_transform(X)
-            
-            # Additional validation after scaling
-            if np.any(np.abs(X_scaled) > 5):
-                logger.warning(f"Extreme scaled values detected for {symbol}, clipping")
-                X_scaled = np.clip(X_scaled, -5, 5)
-            
-            # Scale target values for SVR (helps with convergence)
-            y_mean = np.mean(y)
-            y_std = np.std(y)
-            y_scaled = (y - y_mean) / y_std if y_std > 0 else y - y_mean
-            
-            # Train model with conservative parameters
-            model = SVR(
-                kernel=self.kernel,
-                C=1.0,  # Regularization parameter
-                epsilon=0.1,  # Epsilon in the epsilon-SVR model
-                gamma='scale'
-            )
-            model.fit(X_scaled, y_scaled)
-            
-            # Generate predictions with bounds checking
-            predictions = []
-            last_date = df['date'].iloc[-1]
-            last_price = float(df['close'].iloc[-1])
-            
-            # Use the last sequence to predict future values
-            last_sequence = X_scaled[-1:].copy()
-            
-            for i in range(prediction_days):
-                pred_scaled = model.predict(last_sequence)[0]
-                # Unscale the prediction
-                pred_price = pred_scaled * y_std + y_mean if y_std > 0 else pred_scaled + y_mean
-                
-                # Validate prediction and apply bounds
-                if np.isnan(pred_price) or np.isinf(pred_price) or pred_price <= 0:
-                    # Use trend-based fallback
-                    recent_trend = np.mean(np.diff(df['close'].tail(10)))
-                    pred_price = last_price * (1 + recent_trend/last_price * (i+1) * 0.1)
-                    logger.warning(f"Invalid SVR prediction detected for {symbol}, using trend fallback")
-                
-                # Apply reasonable bounds (max 20% change per day compounded)
-                max_change = last_price * (1.2 ** (i+1))
-                min_change = last_price * (0.8 ** (i+1))
-                pred_price = np.clip(pred_price, min_change, max_change)
-                
-                pred_date = last_date + timedelta(days=i+1)
-                
-                # Calculate confidence interval (SVR doesn't provide natural uncertainty)
-                residuals_scaled = y_scaled - model.predict(X_scaled)
-                residuals = residuals_scaled * y_std if y_std > 0 else residuals_scaled
-                std_error = np.std(residuals) * np.sqrt(1 + i * 0.1)
-                confidence_margin = min(std_error * 1.96, pred_price * 0.2)  # Cap at 20% of price
-                
-                predictions.append({
-                    "date": pred_date.strftime("%Y-%m-%d"),
-                    "predicted_price": round(float(pred_price), 2),
-                    "lower_bound": round(float(max(0, pred_price - confidence_margin)), 2),
-                    "upper_bound": round(float(pred_price + confidence_margin), 2),
-                    "confidence": confidence_level
-                })
-                
-                # Update sequence for next prediction with bounds
-                if hasattr(scaler, 'transform'):
-                    price_change = (pred_price - last_price) / last_price
-                    last_sequence = np.roll(last_sequence, -1, axis=1)
-                    last_sequence[0, -1] = np.clip(price_change, -0.1, 0.1)  # Limit to ±10%
-            
-            # Calculate accuracy
-            train_pred_scaled = model.predict(X_scaled)
-            train_pred = train_pred_scaled * y_std + y_mean if y_std > 0 else train_pred_scaled + y_mean
-            r2 = r2_score(y, train_pred)
-            accuracy_score = max(0.6, min(0.95, r2 if not np.isnan(r2) else 0.75))
-            
-            return {
-                "symbol": symbol,
-                "model": self.model_name,
-                "predictions": predictions,
-                "metadata": {
-                    "lookback_days": self.lookback_days,
-                    "kernel": self.kernel,
-                    "r2_score": round(float(r2 if not np.isnan(r2) else 0.75), 3),
-                    "accuracy_score": round(float(accuracy_score), 3),
-                    "data_points_used": len(df),
-                    "features_used": X.shape[1],
-                    "last_price": round(last_price, 2),
-                    "prediction_method": "Support Vector Regression with Technical Indicators"
-                },
-                "status": "completed",
-                "created_at": datetime.utcnow().isoformat()
-            }
-            
-        except Exception as e:
-            logger.error(f"Error in SVR prediction for {symbol}: {str(e)}")
-            return {
-                "symbol": symbol,
-                "model": self.model_name,
-                "predictions": [],
-                "metadata": {"error": str(e)},
-                "status": "failed",
-                "created_at": datetime.utcnow().isoformat()
-            }

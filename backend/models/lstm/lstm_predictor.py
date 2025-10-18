@@ -4,7 +4,10 @@ Uses deep learning to capture complex patterns in time series data
 """
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+# Malaysian timezone (UTC+8)
+MY_TIMEZONE = timezone(timedelta(hours=8))
 from typing import List, Dict, Any, Optional, Tuple
 import asyncio
 import logging
@@ -129,7 +132,7 @@ class LSTMPredictor:
                 for i, pred_price in enumerate(predicted_prices):
                     pred_date = last_date + timedelta(days=i+1)
                     volatility = df['close'].tail(30).std()
-                    confidence_margin = volatility * 1.96
+                    confidence_margin = max(volatility * 1.96, pred_price * 0.03)  # Ensure minimum 3% uncertainty
                     
                     predictions.append({
                         "date": pred_date.strftime("%Y-%m-%d"),
@@ -218,6 +221,7 @@ class LSTMPredictor:
                 # Calculate confidence interval
                 recent_volatility = df['close'].tail(30).std()
                 confidence_margin = recent_volatility * 1.96 * np.sqrt((i + 1) / 30)
+                confidence_margin = max(confidence_margin, pred_price * 0.025)  # Ensure minimum 2.5% uncertainty
                 
                 pred_date = last_date + timedelta(days=i+1)
                 predictions.append({
@@ -253,7 +257,7 @@ class LSTMPredictor:
                     "prediction_method": "LSTM Neural Network"
                 },
                 "status": "completed",
-                "created_at": datetime.utcnow().isoformat()
+                "created_at": datetime.now(MY_TIMEZONE).isoformat()
             }
             
         except Exception as e:

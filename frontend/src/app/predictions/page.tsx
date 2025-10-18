@@ -48,10 +48,9 @@ function PredictionsContent() {
   const mapToBackendModelName = (frontendName: string): string => {
     const modelNameMap: Record<string, string> = {
       'lstm': 'LSTM',
-      'arima': 'ARIMA',
+      'linear_regression': 'Linear Regression',
       'random_forest': 'Random Forest',
       'xgboost': 'XGBoost',
-      'svr': 'SVR',
     }
     return modelNameMap[frontendName] || frontendName
   }
@@ -110,10 +109,9 @@ function PredictionsContent() {
 
   const modelOptions = [
     { value: 'lstm', name: 'LSTM Neural Network', description: 'Advanced deep learning model with TensorFlow', status: 'available' },
-    { value: 'arima', name: 'ARIMA', description: 'Statistical time series model', status: 'available' },
+    { value: 'linear_regression', name: 'Linear Regression', description: 'Classical linear regression model', status: 'available' },
     { value: 'random_forest', name: 'Random Forest', description: 'Ensemble tree-based model', status: 'available' },
     { value: 'xgboost', name: 'XGBoost', description: 'Gradient boosting model', status: 'available' },
-    { value: 'svr', name: 'Support Vector Regression', description: 'SVM-based regression model', status: 'available' },
   ]
 
   return (
