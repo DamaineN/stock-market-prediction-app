@@ -31,5 +31,11 @@ out/
 .DS_Store
 Thumbs.db
 
+# Log files (constantly changing)
+*.log
+app.log
+backend/app.log
+logs/
+
 # Temporary deployment files
 .vercel
