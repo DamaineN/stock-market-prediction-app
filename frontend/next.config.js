@@ -8,9 +8,17 @@ const nextConfig = {
     // Ignore ESLint errors during build for deployment
     ignoreDuringBuilds: true,
   },
+  // Configure for GitHub Pages deployment
+  output: 'export',
+  trailingSlash: true,
+  basePath: process.env.NODE_ENV === 'production' ? '/stock-market-prediction-app' : '',
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/stock-market-prediction-app/' : '',
+  images: {
+    unoptimized: true,
+  },
   async rewrites() {
     // In development, proxy to local backend
-    // In production, Vercel will handle routing via vercel.json
+    // In production, use GitHub backend API
     if (process.env.NODE_ENV === 'development') {
       return [
         {
