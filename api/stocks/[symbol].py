@@ -1,7 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 import json
-import yfinance as yf
-import pandas as pd
+import requests
 from datetime import datetime
 from urllib.parse import urlparse, parse_qs
 
@@ -40,20 +39,26 @@ class handler(BaseHTTPRequestHandler):
     
     def handle_stock_info(self, symbol):
         try:
-            ticker = yf.Ticker(symbol)
-            info = ticker.info
+            # Mock stock data for demo (in production, use real API)
+            mock_stocks = {
+                "AAPL": {"name": "Apple Inc.", "sector": "Technology", "industry": "Consumer Electronics", "market_cap": 3000000000, "price": 150.25},
+                "GOOGL": {"name": "Alphabet Inc.", "sector": "Technology", "industry": "Internet Services", "market_cap": 2000000000, "price": 2800.50},
+                "MSFT": {"name": "Microsoft Corporation", "sector": "Technology", "industry": "Software", "market_cap": 2800000000, "price": 420.75},
+                "TSLA": {"name": "Tesla, Inc.", "sector": "Consumer Cyclical", "industry": "Auto Manufacturers", "market_cap": 800000000, "price": 250.30}
+            }
             
-            if not info or 'regularMarketPrice' not in info:
+            if symbol not in mock_stocks:
                 self.send_error_response(404, f"Stock information not found for {symbol}")
                 return
             
+            stock_data = mock_stocks[symbol]
             response = {
                 "symbol": symbol,
-                "name": info.get('longName', info.get('shortName', '')),
-                "sector": info.get('sector'),
-                "industry": info.get('industry'),
-                "market_cap": info.get('marketCap'),
-                "price": info.get('regularMarketPrice', info.get('currentPrice'))
+                "name": stock_data["name"],
+                "sector": stock_data["sector"],
+                "industry": stock_data["industry"],
+                "market_cap": stock_data["market_cap"],
+                "price": stock_data["price"]
             }
             
             self.wfile.write(json.dumps(response).encode())
