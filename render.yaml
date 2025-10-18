@@ -1,37 +1,25 @@
 services:
-  # Backend API Service
+  # Backend API Service (Frontend deployed on Vercel)
   - type: web
-    name: stolckr-backend
+    name: stock-market-prediction-backend
     env: python
-    region: ohio
+    region: oregon
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: cd backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    buildCommand: pip install -r ../requirements.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.12
+        value: 3.12.0
       - key: API_HOST
         value: 0.0.0.0
       - key: CORS_ORIGINS
-        value: '["*"]'
+        value: '["https://your-frontend.vercel.app", "http://localhost:3000"]'
       - key: DEBUG_MODE
         value: false
       - key: SECRET_KEY
         generateValue: true
-        
-  # Frontend Web Service  
-  - type: web
-    name: stolckr-frontend
-    env: node
-    region: ohio  
-    plan: free
-    buildCommand: cd frontend && npm ci && npm run build
-    startCommand: cd frontend && npm start
-    envVars:
-      - key: NODE_VERSION
-        value: 18
-      - key: BACKEND_URL
-        fromService:
-          type: web
-          name: stolckr-backend
-          property: host
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
