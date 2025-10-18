@@ -53,9 +53,11 @@ class Settings(BaseSettings):
         """Generate PostgreSQL connection URL"""
         return f"postgresql://{self.postgres_username}:{self.postgres_password}@{self.postgres_host}:{self.postgres_port}/{self.postgres_database}"
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": False,
+        "protected_namespaces": ()
+    }
 
 # Global settings instance
 settings = Settings()

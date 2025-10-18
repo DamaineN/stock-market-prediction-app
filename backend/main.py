@@ -39,16 +39,23 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting Stock Market Prediction API...")
     
-    # Initialize MongoDB connection
-    from api.database.mongodb import mongodb
-    await mongodb.connect()
+    # Initialize MongoDB connection (optional for deployment)
+    try:
+        from api.database.mongodb import mongodb
+        await mongodb.connect()
+        logger.info("MongoDB connected successfully")
+    except Exception as e:
+        logger.warning(f"MongoDB connection failed: {e}. Running without database.")
     
     yield
     
     # Shutdown
     print("Shutting down Stock Market Prediction API...")
-    from api.database.mongodb import mongodb
-    await mongodb.disconnect()
+    try:
+        from api.database.mongodb import mongodb
+        await mongodb.disconnect()
+    except Exception as e:
+        logger.warning(f"MongoDB disconnect warning: {e}")
 
 # Create FastAPI app
 app = FastAPI(
