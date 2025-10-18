@@ -4,9 +4,29 @@
     {
       "src": "frontend/package.json",
       "use": "@vercel/next"
+    },
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python"
     }
   ],
   "routes": [
+    {
+      "src": "/api/v1/health",
+      "dest": "/api/health.py"
+    },
+    {
+      "src": "/api/v1/auth/login",
+      "dest": "/api/auth/login.py"
+    },
+    {
+      "src": "/api/v1/stocks/([^/]+)/info",
+      "dest": "/api/stocks/$1.py"
+    },
+    {
+      "src": "/api/v1/stocks/([^/]+)/historical",
+      "dest": "/api/stocks/$1.py?type=historical"
+    },
     {
       "src": "/(.*)",
       "dest": "frontend/$1"
