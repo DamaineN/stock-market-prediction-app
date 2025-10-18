@@ -18,6 +18,22 @@ const RoleQuiz: React.FC<RoleQuizProps> = ({ onComplete, onBack }) => {
   const [answers, setAnswers] = useState<QuizAnswers>({});
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
 
+  // Safety checks for quizQuestions
+  if (!quizQuestions || !Array.isArray(quizQuestions) || quizQuestions.length === 0) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardContent className="p-6">
+          <p className="text-center text-red-500">Error: Quiz data not available</p>
+          {onBack && (
+            <Button onClick={onBack} variant="outline" className="mt-4">
+              Back
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
   const progress = ((currentQuestion + 1) / quizQuestions.length) * 100;
   const isLastQuestion = currentQuestion === quizQuestions.length - 1;
   const currentAnswer = answers[currentQuestion];
@@ -134,6 +150,22 @@ const RoleQuiz: React.FC<RoleQuizProps> = ({ onComplete, onBack }) => {
   }
 
   const question = quizQuestions[currentQuestion];
+  
+  // Safety check for current question
+  if (!question) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardContent className="p-6">
+          <p className="text-center text-red-500">Error: Invalid question</p>
+          {onBack && (
+            <Button onClick={onBack} variant="outline" className="mt-4">
+              Back
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

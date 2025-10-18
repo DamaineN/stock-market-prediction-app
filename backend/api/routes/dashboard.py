@@ -5,6 +5,9 @@ Provides real-time user statistics and dashboard data
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional
 from datetime import datetime, timezone, timedelta
+
+# Malaysian timezone (UTC+8)
+MY_TIMEZONE = timezone(timedelta(hours=8))
 from bson import ObjectId
 
 from api.auth.utils import get_current_user
@@ -39,7 +42,7 @@ def calculate_activity_streak(recent_logins: list) -> tuple[int, int, str]:
     last_activity = login_dates[0].isoformat() if login_dates else None
     
     # Calculate current streak
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(MY_TIMEZONE).date()
     yesterday = today - timedelta(days=1)
     
     # Start checking from today or yesterday
@@ -121,18 +124,25 @@ async def get_dashboard_stats(
         # Format predictions data with frontend-expected field names
         formatted_predictions = []
         for pred in recent_predictions:
+            # Handle both new and legacy field names for backwards compatibility
+            predicted_price = pred.get("predicted_price") or pred.get("target_price")
+            model_name = pred.get("model_type") or pred.get("prediction_type") or pred.get("model") or "Unknown"
+            confidence = pred.get("confidence", 0.85)
+            
+            # Ensure confidence is in valid range
+            if confidence is None or confidence <= 0 or confidence > 1:
+                confidence = 0.85
+            
             formatted_predictions.append({
                 "id": str(pred["_id"]),
                 "symbol": pred.get("symbol", "N/A"),
-                "model": pred.get("prediction_type", pred.get("model", "LSTM")),  # Map to 'model'
-                "prediction": pred.get("target_price", pred.get("predicted_price")),  # Map to 'prediction'
-                "predicted_price": pred.get("target_price", pred.get("predicted_price")),  # Also provide as fallback
-                "date": pred.get("created_at").isoformat() if pred.get("created_at") else None,  # Map to 'date'
-                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,  # Also keep original
-                "confidence": pred.get("confidence", 0.95),  # Default confidence if missing
-                "status": pred.get("status", "pending"),
-                # Legacy fields for compatibility
-                "prediction_type": pred.get("prediction_type", "unknown")
+                "model": model_name,
+                "prediction": predicted_price,
+                "predicted_price": predicted_price,
+                "date": pred.get("created_at").isoformat() if pred.get("created_at") else None,
+                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,
+                "confidence": confidence,
+                "status": pred.get("status", "pending")
             })
         
         stats = {
@@ -231,7 +241,7 @@ async def get_real_time_metrics(
         user_id = ObjectId(current_user["user_id"])
         
         # Count predictions made today
-        today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+        today = datetime.now(MY_TIMEZONE).replace(hour=0, minute=0, second=0, microsecond=0)
         predictions_today = await db.predictions.count_documents({
             "user_id": user_id,
             "created_at": {"$gte": today}
@@ -245,7 +255,7 @@ async def get_real_time_metrics(
             "predictions_today": predictions_today,
             "total_xp": xp_stats.get("total_xp", 0),
             "current_role": xp_stats.get("current_role", "beginner"),
-            "last_updated": datetime.now(timezone.utc).isoformat()
+            "last_updated": datetime.now(MY_TIMEZONE).isoformat()
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get real-time metrics: {str(e)}")
@@ -272,25 +282,31 @@ async def get_recent_predictions(
         # Format predictions data with frontend-expected field names
         formatted_predictions = []
         for pred in recent_predictions:
+            # Handle both new and legacy field names for backwards compatibility
+            predicted_price = pred.get("predicted_price") or pred.get("target_price")
+            model_name = pred.get("model_type") or pred.get("prediction_type") or pred.get("model") or "Unknown"
+            confidence = pred.get("confidence", 0.85)
+            
+            # Ensure confidence is in valid range
+            if confidence is None or confidence <= 0 or confidence > 1:
+                confidence = 0.85
+            
             formatted_predictions.append({
                 "id": str(pred["_id"]),
                 "symbol": pred.get("symbol", "N/A"),
-                "model": pred.get("prediction_type", pred.get("model", "LSTM")),  # Map to 'model'
-                "prediction": pred.get("target_price", pred.get("predicted_price")),  # Map to 'prediction'
-                "predicted_price": pred.get("target_price", pred.get("predicted_price")),  # Also provide as fallback
-                "date": pred.get("created_at").isoformat() if pred.get("created_at") else None,  # Map to 'date'
-                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,  # Also keep original
-                "confidence": pred.get("confidence", 0.95),  # Default confidence if missing
-                "status": pred.get("status", "pending"),
-                # Legacy fields for compatibility
-                "prediction_type": pred.get("prediction_type", "unknown"),
-                "target_price": pred.get("target_price")
+                "model": model_name,
+                "prediction": predicted_price,
+                "predicted_price": predicted_price,
+                "date": pred.get("created_at").isoformat() if pred.get("created_at") else None,
+                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,
+                "confidence": confidence,
+                "status": pred.get("status", "pending")
             })
         
         return {
             "predictions": formatted_predictions,
             "total_count": total_count,
-            "last_updated": datetime.now(timezone.utc).isoformat()
+            "last_updated": datetime.now(MY_TIMEZONE).isoformat()
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get recent predictions: {str(e)}")
@@ -317,7 +333,7 @@ async def get_dashboard_summary(
             "model_accuracy": 0.0,  # Placeholder - would need actual calculation
             "watchlist_items": watchlist_items, 
             "active_models": 1,  # Placeholder - would track active ML models
-            "last_updated": datetime.now(timezone.utc).isoformat()
+            "last_updated": datetime.now(MY_TIMEZONE).isoformat()
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get dashboard summary: {str(e)}")
@@ -353,7 +369,7 @@ async def get_activity_streak(
                 "total_xp": xp_stats.get("total_xp", 0),
                 "current_role": xp_stats.get("current_role", "beginner")
             },
-            "last_updated": datetime.now(timezone.utc).isoformat()
+            "last_updated": datetime.now(MY_TIMEZONE).isoformat()
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get activity streak: {str(e)}")
@@ -382,7 +398,7 @@ async def refresh_dashboard_data(
                 "total_xp": xp_stats.get("total_xp", 0),
                 "current_role": xp_stats.get("current_role", "beginner")
             },
-            "refreshed_at": datetime.now(timezone.utc).isoformat()
+            "refreshed_at": datetime.now(MY_TIMEZONE).isoformat()
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to refresh dashboard data: {str(e)}")
@@ -428,5 +444,5 @@ async def dashboard_health_check():
     return {
         "status": "healthy",
         "service": "dashboard-api",
-        "timestamp": datetime.now(timezone.utc).isoformat()
+        "timestamp": datetime.now(MY_TIMEZONE).isoformat()
     }

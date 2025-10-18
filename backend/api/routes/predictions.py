@@ -3,7 +3,7 @@ ML Prediction API routes
 """
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Depends
 from typing import Optional, List, Dict, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pydantic import BaseModel
 import asyncio
 
@@ -144,7 +144,7 @@ async def create_prediction(
                 "prediction_days": request.prediction_days,
                 "results": results,
                 "status": "active",
-                "created_at": datetime.utcnow()
+                "created_at": datetime.now(timezone(timedelta(hours=8)))  # Malaysian time (UTC+8)
             }
             
             # Log the prediction details for debugging
@@ -163,7 +163,7 @@ async def create_prediction(
             "results": results,
             "metadata": {
                 "confidence_level": request.confidence_level,
-                "created_at": datetime.utcnow().isoformat(),
+                "created_at": datetime.now(timezone(timedelta(hours=8))).isoformat(),  # Malaysian time
                 "models_used": list(results.keys()),
                 "available_models": available_models
             }
@@ -234,7 +234,7 @@ async def get_available_models():
             "model_details": model_info,
             "special_options": ["all"],
             "total_models": len(available_models),
-            "created_at": datetime.utcnow().isoformat()
+            "created_at": datetime.now(timezone(timedelta(hours=8))).isoformat()  # Malaysian time
         }
     
     except Exception as e:

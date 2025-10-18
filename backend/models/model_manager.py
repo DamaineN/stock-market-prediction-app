@@ -10,11 +10,10 @@ import numpy as np
 
 # Import all prediction models
 from models.lstm.lstm_predictor import LSTMPredictor
-from models.arima.arima_predictor import ARIMAPredictor
 from models.ensemble.ml_models import (
+    LinearRegressionPredictor,
     RandomForestPredictor, 
-    XGBoostPredictor, 
-    SVRPredictor
+    XGBoostPredictor
 )
 
 logger = logging.getLogger(__name__)
@@ -25,10 +24,9 @@ class ModelManager:
     def __init__(self):
         self.models = {
             "LSTM": LSTMPredictor(),
-            "ARIMA": ARIMAPredictor(),
+            "Linear Regression": LinearRegressionPredictor(),
             "Random Forest": RandomForestPredictor(),
-            "XGBoost": XGBoostPredictor(),
-            "SVR": SVRPredictor()
+            "XGBoost": XGBoostPredictor()
         }
         
     
@@ -193,19 +191,12 @@ class ModelManager:
         model = self.models[model_name]
         info = {
             "name": model_name,
-            "class": model.__class__.__name__,
-            "weight_in_ensemble": self.model_weights.get(model_name, 0.1)
+            "class": model.__class__.__name__
         }
         
         # Add model-specific parameters
-        if hasattr(model, 'short_window'):
-            info["short_window"] = model.short_window
-        if hasattr(model, 'long_window'):
-            info["long_window"] = model.long_window
         if hasattr(model, 'sequence_length'):
             info["sequence_length"] = model.sequence_length
-        if hasattr(model, 'order'):
-            info["arima_order"] = model.order
         if hasattr(model, 'lookback_days'):
             info["lookback_days"] = model.lookback_days
         
