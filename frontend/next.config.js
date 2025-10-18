@@ -10,15 +10,17 @@ const nextConfig = {
   },
   async rewrites() {
     // In development, proxy to local backend
-    // In production, proxy to Render backend
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
+    if (process.env.NODE_ENV === 'development') {
+      return [
+        {
+          source: '/api/v1/:path*',
+          destination: 'http://localhost:8000/api/v1/:path*',
+        },
+      ];
+    }
     
-    return [
-      {
-        source: '/api/v1/:path*',
-        destination: `${backendUrl}/api/v1/:path*`,
-      },
-    ];
+    // In production, no rewrites (frontend will handle API calls directly)
+    return [];
   },
 }
 
