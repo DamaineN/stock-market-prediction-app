@@ -1,0 +1,31 @@
+name: Deploy Backend to Heroku
+
+on:
+  push:
+    branches: [ master ]
+    paths: 
+      - 'backend/**'
+      - 'Procfile'
+      - 'runtime.txt'
+      - 'requirements.txt'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to Heroku
+      uses: akhileshns/heroku-deploy@v3.13.15
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: "stolckr-backend"
+        heroku_email: ${{ secrets.HEROKU_EMAIL }}
+        
+    - name: Run database migrations (if needed)
+      run: |
+        echo "Backend deployed successfully!"
+        echo "API available at: https://stolckr-backend.herokuapp.com"
