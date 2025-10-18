@@ -1,19 +1,11 @@
 {
   "version": 2,
   "name": "stock-market-prediction-frontend",
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "frontend/$1"
-    }
-  ],
+  "buildCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/.next",
+  "installCommand": "cd frontend && npm install",
+  "framework": "nextjs",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://your-backend.onrender.com"
+    "NEXT_PUBLIC_API_URL": "https://stolckr-backend.onrender.com"
   }
 }
