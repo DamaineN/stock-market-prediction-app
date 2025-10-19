@@ -133,14 +133,22 @@ async def get_dashboard_stats(
             if confidence is None or confidence <= 0 or confidence > 1:
                 confidence = 0.85
             
+            # Convert UTC timestamp to Malaysian timezone
+            created_at_utc = pred.get("created_at")
+            if created_at_utc:
+                created_at_malaysia = created_at_utc.astimezone(MY_TIMEZONE)
+                created_at_str = created_at_malaysia.isoformat()
+            else:
+                created_at_str = None
+            
             formatted_predictions.append({
                 "id": str(pred["_id"]),
                 "symbol": pred.get("symbol", "N/A"),
                 "model": model_name,
                 "prediction": predicted_price,
                 "predicted_price": predicted_price,
-                "date": pred.get("created_at").isoformat() if pred.get("created_at") else None,
-                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,
+                "date": created_at_str,
+                "created_at": created_at_str,
                 "confidence": confidence,
                 "status": pred.get("status", "pending")
             })
@@ -291,14 +299,22 @@ async def get_recent_predictions(
             if confidence is None or confidence <= 0 or confidence > 1:
                 confidence = 0.85
             
+            # Convert UTC timestamp to Malaysian timezone
+            created_at_utc = pred.get("created_at")
+            if created_at_utc:
+                created_at_malaysia = created_at_utc.astimezone(MY_TIMEZONE)
+                created_at_str = created_at_malaysia.isoformat()
+            else:
+                created_at_str = None
+            
             formatted_predictions.append({
                 "id": str(pred["_id"]),
                 "symbol": pred.get("symbol", "N/A"),
                 "model": model_name,
                 "prediction": predicted_price,
                 "predicted_price": predicted_price,
-                "date": pred.get("created_at").isoformat() if pred.get("created_at") else None,
-                "created_at": pred.get("created_at").isoformat() if pred.get("created_at") else None,
+                "date": created_at_str,
+                "created_at": created_at_str,
                 "confidence": confidence,
                 "status": pred.get("status", "pending")
             })

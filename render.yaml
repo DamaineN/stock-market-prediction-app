@@ -1,37 +1,44 @@
 services:
-  # Backend API Service
+  # Backend API Service (Frontend deployed on Vercel)
   - type: web
     name: stolckr-backend
     env: python
-    region: ohio
+    region: oregon
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: cd backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    buildCommand: pip install -r ../requirements.txt
+    startCommand: python -m uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.10.12
+        value: 3.11.11
       - key: API_HOST
         value: 0.0.0.0
-      - key: CORS_ORIGINS
-        value: '["*"]'
+      - key: API_PORT
+        value: $PORT
       - key: DEBUG_MODE
         value: false
+      - key: MODEL_SAVE_PATH
+        value: ./models/saved/
+      - key: DATA_CACHE_PATH
+        value: ./data/cache/
+      - key: PREDICTION_CACHE_HOURS
+        value: 1
+      - key: ALPHA_VANTAGE_RATE_LIMIT
+        value: 5
+      - key: YAHOO_FINANCE_RATE_LIMIT
+        value: 2000
+      - key: LOG_LEVEL
+        value: INFO
+      - key: TIMEZONE
+        value: Asia/Kuala_Lumpur
+      # These should be set manually in Render dashboard:
       - key: SECRET_KEY
-        generateValue: true
-        
-  # Frontend Web Service  
-  - type: web
-    name: stolckr-frontend
-    env: node
-    region: ohio  
-    plan: free
-    buildCommand: cd frontend && npm ci && npm run build
-    startCommand: cd frontend && npm start
-    envVars:
-      - key: NODE_VERSION
-        value: 18
-      - key: BACKEND_URL
-        fromService:
-          type: web
-          name: stolckr-backend
-          property: host
+        sync: false
+      - key: MONGODB_URL
+        sync: false
+      - key: MONGODB_DATABASE_NAME
+        sync: false
+      - key: ALPHA_VANTAGE_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
