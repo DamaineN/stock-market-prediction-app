@@ -10,10 +10,10 @@ import numpy as np
 
 # Import all prediction models
 from models.lstm.lstm_predictor import LSTMPredictor
-from models.ensemble.ml_models import (
-    LinearRegressionPredictor,
-    RandomForestPredictor, 
-    XGBoostPredictor
+from models.ensemble.simple_ml_models import (
+    SimpleLinearRegressionPredictor,
+    SimpleRandomForestPredictor, 
+    SimpleXGBoostPredictor
 )
 
 logger = logging.getLogger(__name__)
@@ -24,9 +24,9 @@ class ModelManager:
     def __init__(self):
         self.models = {
             "LSTM": LSTMPredictor(),
-            "Linear Regression": LinearRegressionPredictor(),
-            "Random Forest": RandomForestPredictor(),
-            "XGBoost": XGBoostPredictor()
+            "Linear Regression": SimpleLinearRegressionPredictor(),
+            "Random Forest": SimpleRandomForestPredictor(),
+            "XGBoost": SimpleXGBoostPredictor()
         }
         
     

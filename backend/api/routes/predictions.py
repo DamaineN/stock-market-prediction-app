@@ -4,7 +4,7 @@ ML Prediction API routes
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Depends
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timedelta, timezone
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import asyncio
 
 from models.model_manager import ModelManager
@@ -19,8 +19,8 @@ router = APIRouter()
 class PredictionRequest(BaseModel):
     symbol: str
     model_type: str  # "lstm", "arima", "ensemble", "all"
-    prediction_days: int = 30
-    confidence_level: float = 0.95
+    prediction_days: int = Field(default=30, ge=1, le=30, description="Number of days to predict (1-30)")
+    confidence_level: float = Field(default=0.95, ge=0.5, le=0.99, description="Confidence level (0.5-0.99)")
 
 class PredictionResponse(BaseModel):
     symbol: str

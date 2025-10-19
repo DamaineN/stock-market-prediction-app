@@ -1,0 +1,5 @@
+Model,MAE,RMSE,MAPE (%),Directional Accuracy
+LSTM,36.5464,38.5634,14.96,48.98
+Linear Regression,19.4048,23.4184,8.06,34.69
+Random Forest,19.4048,23.4184,8.06,34.69
+XGBoost,19.4048,23.4184,8.06,34.69

@@ -205,6 +205,7 @@ class LSTMPredictor:
             last_sequence = scaled_data[-self.sequence_length:]
             current_sequence = last_sequence.copy()
             last_date = df['date'].iloc[-1]
+            last_actual_price = float(df['close'].iloc[-1])
             
             for i in range(prediction_days):
                 # Predict next price
@@ -213,6 +214,25 @@ class LSTMPredictor:
                 
                 # Inverse transform to get actual price
                 pred_price = self.scaler.inverse_transform([[pred_scaled]])[0][0]
+                
+                # Apply reasonable bounds and validation
+                if np.isnan(pred_price) or np.isinf(pred_price) or pred_price <= 0:
+                    # Use trend-based fallback
+                    recent_prices = df['close'].tail(10).values
+                    trend = np.mean(np.diff(recent_prices))
+                    pred_price = last_actual_price + (trend * (i + 1))
+                
+                # Limit extreme changes (max 10% per day)
+                max_daily_change = 0.10
+                if i == 0:
+                    max_price = last_actual_price * (1 + max_daily_change)
+                    min_price = last_actual_price * (1 - max_daily_change)
+                else:
+                    # For subsequent days, allow compound growth
+                    max_price = last_actual_price * ((1 + max_daily_change) ** (i + 1))
+                    min_price = last_actual_price * ((1 - max_daily_change) ** (i + 1))
+                
+                pred_price = np.clip(pred_price, min_price, max_price)
                 
                 # Update sequence for next prediction
                 current_sequence = np.roll(current_sequence, -1)

@@ -258,23 +258,25 @@ class LinearRegressionPredictor(MLEnsemblePredictor):
             last_date = df['date'].iloc[-1]
             
             # Use the last sequence to predict future values
-            last_sequence = X_scaled[-1:].copy()
+            current_sequence = X_scaled[-1:].copy()
             last_price = float(df['close'].iloc[-1])
+            previous_price = last_price
             
             for i in range(prediction_days):
-                pred_price = model.predict(last_sequence)[0]
+                pred_price = model.predict(current_sequence)[0]
                 
                 # Validate prediction and apply bounds
                 if np.isnan(pred_price) or np.isinf(pred_price) or pred_price <= 0:
                     # Use trend-based fallback
                     recent_trend = np.mean(np.diff(df['close'].tail(10)))
-                    pred_price = last_price * (1 + recent_trend/last_price * (i+1) * 0.1)
+                    pred_price = previous_price + recent_trend
                     logger.warning(f"Invalid Linear Regression prediction detected for {symbol}, using trend fallback")
                 
-                # Apply reasonable bounds (max 25% change per day compounded)
-                max_change = last_price * (1.25 ** (i+1))
-                min_change = last_price * (0.75 ** (i+1))
-                pred_price = np.clip(pred_price, min_change, max_change)
+                # Apply realistic bounds (max 5% change per day)
+                max_daily_change = 0.05
+                max_price = previous_price * (1 + max_daily_change)
+                min_price = previous_price * (1 - max_daily_change)
+                pred_price = np.clip(pred_price, min_price, max_price)
                 
                 pred_date = last_date + timedelta(days=i+1)
                 
