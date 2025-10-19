@@ -1,5 +1,5 @@
 """
-Stock data API routes
+Stock data API route
 """
 from fastapi import APIRouter, HTTPException, Query, Depends
 from typing import Optional, List
