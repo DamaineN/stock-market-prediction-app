@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from api.collectors.yahoo_finance import YahooFinanceCollector
 from api.collectors.alpha_vantage import AlphaVantageCollector
+from api.services.dataset_manager import DatasetManager
 from api.auth.utils import get_current_user_optional
 from api.database.mongodb import get_database
 from api.services.xp_service import XPService
@@ -35,10 +36,19 @@ async def get_historical_data(
     current_user: dict = Depends(get_current_user_optional),
     db = Depends(get_database)
 ):
-    """Get historical stock data from Yahoo Finance"""
+    """Get historical stock data from datasets (with Yahoo Finance fallback)"""
     try:
-        collector = YahooFinanceCollector()
-        data = await collector.get_historical_data(symbol.upper(), period, interval)
+        # Try dataset manager first
+        dataset_manager = DatasetManager()
+        data = dataset_manager.load_historical_data(symbol.upper(), period, interval)
+        
+        source = "Historical Dataset"
+        
+        # Fallback to Yahoo Finance if no dataset available and symbol not in predefined list
+        if not data and symbol.upper() not in dataset_manager.AVAILABLE_STOCKS:
+            collector = YahooFinanceCollector()
+            data = await collector.get_historical_data(symbol.upper(), period, interval)
+            source = "Yahoo Finance (Fallback)"
         
         if not data:
             raise HTTPException(status_code=404, detail=f"No data found for symbol {symbol}")
@@ -62,7 +72,7 @@ async def get_historical_data(
                 "interval": interval,
                 "count": len(data),
                 "last_updated": datetime.utcnow().isoformat(),
-                "source": "Yahoo Finance"
+                "source": source
             }
         )
     
@@ -71,10 +81,16 @@ async def get_historical_data(
 
 @router.get("/stocks/{symbol}/info")
 async def get_stock_info(symbol: str):
-    """Get basic stock information"""
+    """Get basic stock information from datasets (with Yahoo Finance fallback)"""
     try:
-        collector = YahooFinanceCollector()
-        info = await collector.get_stock_info(symbol.upper())
+        # Try dataset manager first
+        dataset_manager = DatasetManager()
+        info = dataset_manager.get_stock_info(symbol.upper())
+        
+        # Fallback to Yahoo Finance if not in predefined list
+        if not info and symbol.upper() not in dataset_manager.AVAILABLE_STOCKS:
+            collector = YahooFinanceCollector()
+            info = await collector.get_stock_info(symbol.upper())
         
         if not info:
             raise HTTPException(status_code=404, detail=f"Stock information not found for {symbol}")
@@ -167,15 +183,18 @@ async def search_stocks(
     query: str = Query(description="Search query for stock symbols or company names"),
     limit: int = Query(default=10, le=50, description="Maximum number of results")
 ):
-    """Search for stocks by symbol or company name"""
+    """Search for stocks by symbol or company name from available datasets"""
     try:
-        collector = YahooFinanceCollector()
-        results = await collector.search_stocks(query, limit)
+        # Use dataset manager for search (returns only available stocks)
+        dataset_manager = DatasetManager()
+        results = dataset_manager.search_stocks(query, limit)
         
         return {
             "query": query,
             "results": results,
-            "count": len(results)
+            "count": len(results),
+            "available_stocks_only": True,
+            "message": "Showing only stocks with available historical datasets"
         }
     
     except Exception as e:

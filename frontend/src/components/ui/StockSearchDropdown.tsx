@@ -17,7 +17,7 @@ interface StockSearchDropdownProps {
 
 export default function StockSearchDropdown({
   onSelect,
-  placeholder = "Search for a stock (e.g., Apple, Microsoft, Tesla)",
+  placeholder = "Search stocks (AAPL, MSFT, TSLA, etc.) - 10 stocks available",
   label = "Search Stock",
   selectedStock = null,
   onClear,
@@ -46,11 +46,27 @@ export default function StockSearchDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // Load all available stocks (for dropdown behavior)
+  const loadAllStocks = async () => {
+    setSearchLoading(true)
+    try {
+      const response = await StocksService.searchStocks('', 10) // Empty query returns all available stocks
+      setSearchResults(response.results)
+      setShowResults(true)
+    } catch (error) {
+      console.error('Failed to load available stocks:', error)
+      setSearchResults([])
+      setShowResults(false)
+    } finally {
+      setSearchLoading(false)
+    }
+  }
+
   // Auto-search as user types
   const handleSearch = async (query: string) => {
     if (!query.trim()) {
-      setSearchResults([])
-      setShowResults(false)
+      // Show all available stocks when no search term
+      await loadAllStocks()
       return
     }
     
@@ -61,21 +77,8 @@ export default function StockSearchDropdown({
       setShowResults(true)
     } catch (error) {
       console.error('Search failed:', error)
-      // Mock results for demo when API fails
-      const mockResults = [
-        {
-          symbol: query.toUpperCase(),
-          name: `${query.toUpperCase()} Corporation`,
-          type: 'Stock',
-          region: 'US',
-          marketOpen: '09:30',
-          marketClose: '16:00',
-          timezone: 'EST',
-          currency: 'USD'
-        }
-      ]
-      setSearchResults(mockResults)
-      setShowResults(true)
+      // Fallback: still try to load all available stocks
+      await loadAllStocks()
     } finally {
       setSearchLoading(false)
     }
@@ -142,6 +145,12 @@ export default function StockSearchDropdown({
               if (selectedStock && e.target.value !== selectedStock.symbol) {
                 // Clear selected stock if user is typing something different
                 if (onClear) onClear()
+              }
+            }}
+            onFocus={() => {
+              // Show all available stocks when input is focused
+              if (!showResults && !searchTerm) {
+                loadAllStocks()
               }
             }}
             onKeyPress={handleKeyPress}

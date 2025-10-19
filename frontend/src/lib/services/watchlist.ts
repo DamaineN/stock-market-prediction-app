@@ -1,13 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-
-// Helper function to get auth header
-const getAuthHeaders = () => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
-  }
-}
+import { apiClient } from './apiClient'
 
 // Watchlist types
 export interface WatchlistItem {
@@ -45,67 +36,27 @@ export interface WatchlistStats {
 // Watchlist API service
 export class WatchlistService {
   static async getWatchlist(): Promise<WatchlistResponse> {
-    const response = await fetch(`${API_URL}/api/v1/watchlist`, {
-      headers: getAuthHeaders()
-    })
-    
-    if (!response.ok) {
-      throw new Error('Failed to fetch watchlist')
-    }
-    
-    return await response.json()
+    return await apiClient.get<WatchlistResponse>('/api/v1/watchlist')
   }
 
   static async addToWatchlist(item: AddToWatchlistRequest): Promise<WatchlistItem> {
-    const response = await fetch(`${API_URL}/api/v1/watchlist`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(item)
-    })
-    
-    if (!response.ok) {
-      throw new Error('Failed to add to watchlist')
-    }
-    
-    return await response.json()
+    return await apiClient.post<WatchlistItem>('/api/v1/watchlist', item)
   }
 
   static async removeFromWatchlist(symbol: string): Promise<void> {
-    const response = await fetch(`${API_URL}/api/v1/watchlist/${symbol.toUpperCase()}`, {
-      method: 'DELETE',
-      headers: getAuthHeaders()
-    })
-    
-    if (!response.ok) {
-      throw new Error('Failed to remove from watchlist')
-    }
+    await apiClient.delete(`/api/v1/watchlist/${symbol.toUpperCase()}`)
   }
 
   static async updateWatchlistItem(symbol: string, updates: Partial<WatchlistItem>): Promise<WatchlistItem> {
-    try {
-      const response = await apiClient.put(`/watchlist/${symbol.toUpperCase()}`, updates)
-      return handleApiResponse<WatchlistItem>(response)
-    } catch (error) {
-      handleApiError(error)
-    }
+    return await apiClient.put<WatchlistItem>(`/api/v1/watchlist/${symbol.toUpperCase()}`, updates)
   }
 
   static async getWatchlistStats(): Promise<WatchlistStats> {
-    try {
-      const response = await apiClient.get('/watchlist/stats')
-      return handleApiResponse<WatchlistStats>(response)
-    } catch (error) {
-      handleApiError(error)
-    }
+    return await apiClient.get<WatchlistStats>('/api/v1/watchlist/stats')
   }
 
   static async refreshWatchlistPrices(): Promise<WatchlistResponse> {
-    try {
-      const response = await apiClient.post('/watchlist/refresh')
-      return handleApiResponse<WatchlistResponse>(response)
-    } catch (error) {
-      handleApiError(error)
-    }
+    return await apiClient.post<WatchlistResponse>('/api/v1/watchlist/refresh')
   }
 
   // Helper methods

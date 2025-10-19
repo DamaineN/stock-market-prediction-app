@@ -165,7 +165,7 @@ export default function SearchPage() {
         <div className="bg-white p-6 rounded-lg shadow">
           <StockSearchDropdown
             onSelect={handleStockSelect}
-            placeholder="Search for stocks (e.g., Apple, Google, Microsoft)"
+            placeholder="Choose from 10 available stocks with historical datasets"
             label="Search Stocks"
             maxResults={10}
             showFullSearch={false}

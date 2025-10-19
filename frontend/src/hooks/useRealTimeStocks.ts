@@ -50,21 +50,19 @@ export function useRealTimeStocks(initialSymbols: string[] = []) {
     onError: handleError
   })
 
-  // Get realistic base price for symbol
+  // Get realistic base price for symbol (from historical datasets)
   const getBasePriceForSymbol = useCallback((symbol: string): number => {
     const basePrices: Record<string, number> = {
-      'AAPL': 185.50,
-      'GOOGL': 2750.30,
-      'GOOG': 2760.15,
-      'MSFT': 425.75,
-      'TSLA': 245.80,
-      'NVDA': 875.40,
-      'META': 520.25,
-      'AMZN': 3450.80,
-      'NFLX': 485.90,
-      'SPY': 455.30,
-      'QQQ': 390.15,
-      'VTI': 265.80
+      'AAPL': 252.29,
+      'GOOGL': 253.30,
+      'MSFT': 513.58,
+      'TSLA': 439.31,
+      'AMZN': 213.04,
+      'META': 716.92,
+      'NVDA': 183.22,
+      'NFLX': 291.31,
+      'TSMC': 492.42,
+      'SPY': 492.42
     }
     return basePrices[symbol] || 150.00
   }, [])

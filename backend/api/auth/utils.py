@@ -17,8 +17,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT settings
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+ACCESS_TOKEN_EXPIRE_MINUTES = 240  # 4 hours instead of 30 minutes
+REFRESH_TOKEN_EXPIRE_DAYS = 30  # 30 days instead of 7
 
 # HTTP Bearer for JWT
 security = HTTPBearer()

@@ -1,3 +1,5 @@
+import { apiClient } from './apiClient'
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 // Authentication types
@@ -165,16 +167,14 @@ export class AuthService {
   }
 
   static logout(): void {
-    localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+    apiClient.clearAuth()
   }
 
   static isAuthenticated(): boolean {
-    const token = localStorage.getItem('access_token')
-    return !!token
+    return apiClient.isAuthenticated()
   }
 
   static getToken(): string | null {
-    return localStorage.getItem('access_token')
+    return apiClient.getToken()
   }
 }

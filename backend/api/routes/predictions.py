@@ -9,6 +9,7 @@ import asyncio
 
 from models.model_manager import ModelManager
 from api.collectors.yahoo_finance import YahooFinanceCollector
+from api.services.dataset_manager import DatasetManager
 from api.auth.utils import get_current_user
 from api.database.mongodb import get_database
 from api.services.xp_service import XPService
@@ -43,13 +44,22 @@ async def create_prediction(
 ):
     """Generate stock price predictions using specified model"""
     try:
-        # Get historical data for the symbol
-        data_collector = YahooFinanceCollector()
-        historical_data = await data_collector.get_historical_data(
+        # Get historical data for the symbol (prioritize datasets)
+        dataset_manager = DatasetManager()
+        historical_data = dataset_manager.load_historical_data(
             request.symbol, 
             period="2y",  # Get 2 years of data for better predictions
             interval="1d"
         )
+        
+        # Fallback to Yahoo Finance if no dataset and not in predefined list
+        if not historical_data and request.symbol.upper() not in dataset_manager.AVAILABLE_STOCKS:
+            data_collector = YahooFinanceCollector()
+            historical_data = await data_collector.get_historical_data(
+                request.symbol, 
+                period="2y",
+                interval="1d"
+            )
         
         if not historical_data:
             raise HTTPException(
@@ -274,13 +284,22 @@ async def backtest_model(
 ):
     """Backtest model performance on historical data"""
     try:
-        # Get historical data for backtesting
-        data_collector = YahooFinanceCollector()
-        historical_data = await data_collector.get_historical_data(
+        # Get historical data for backtesting (prioritize datasets)
+        dataset_manager = DatasetManager()
+        historical_data = dataset_manager.load_historical_data(
             symbol.upper(), 
             period="2y",  # Get 2 years of data for backtesting
             interval="1d"
         )
+        
+        # Fallback to Yahoo Finance if no dataset and not in predefined list
+        if not historical_data and symbol.upper() not in dataset_manager.AVAILABLE_STOCKS:
+            data_collector = YahooFinanceCollector()
+            historical_data = await data_collector.get_historical_data(
+                symbol.upper(), 
+                period="2y",
+                interval="1d"
+            )
         
         if not historical_data:
             raise HTTPException(
