@@ -32,21 +32,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const checkAuthStatus = async () => {
     try {
       const token = localStorage.getItem('access_token')
+      console.log('Checking auth status, token exists:', !!token)
+      
       if (!token) {
+        console.log('No token found, setting not authenticated')
         setIsLoading(false)
         return
       }
 
       // Verify token is still valid
+      console.log('Verifying token...')
       const tokenStatus: VerifyTokenResponse = await AuthService.verifyToken()
+      console.log('Token verification result:', tokenStatus)
       
       if (tokenStatus.valid) {
         // Get user profile
+        console.log('Token valid, fetching profile...')
         const userProfile = await AuthService.getProfile()
+        console.log('Profile fetched:', userProfile)
         setUser(userProfile)
         setIsAuthenticated(true)
       } else {
         // Token invalid, clear auth state
+        console.log('Token invalid, clearing auth state')
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
         setUser(null)
@@ -67,12 +75,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true)
+      console.log('Attempting login for:', email)
       const tokens = await AuthService.login({ email, password })
+      console.log('Login successful, tokens received:', !!tokens)
       
       // Set as authenticated first
       setIsAuthenticated(true)
 
-      // If hardcoded admin, synthesize profile and redirect
+      // If hardcoded admin, synthesize profile and set user
       try {
         const tokenParts = tokens.access_token.split('.')
         const payload = JSON.parse(atob(tokenParts[1]))
@@ -89,10 +99,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
             profile_picture: null,
           }
           setUser(adminProfile as any)
-          // Redirect admin to admin dashboard
-          setTimeout(() => {
-            window.location.href = '/admin/dashboard'
-          }, 100)
+          // Don't redirect here - let the login page handle routing
           return
         }
       } catch (_) {}

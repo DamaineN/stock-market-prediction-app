@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     yahoo_finance_api_key: str = Field(default="", env="YAHOO_FINANCE_API_KEY")
     
     # Database Configuration
-    mongodb_connection_string: str = Field(default="mongodb://localhost:27017", env="MONGODB_CONNECTION_STRING")
+    mongodb_connection_string: str = Field(default="mongodb://localhost:27017", env=["MONGODB_CONNECTION_STRING", "MONGODB_URL"])
     mongodb_database_name: str = Field(default="stock_prediction_app", env="MONGODB_DATABASE_NAME")
     
     postgres_host: str = Field(default="localhost", env="POSTGRES_HOST")
@@ -41,12 +41,20 @@ class Settings(BaseSettings):
     alpha_vantage_rate_limit: int = Field(default=5, env="ALPHA_VANTAGE_RATE_LIMIT")
     yahoo_finance_rate_limit: int = Field(default=2000, env="YAHOO_FINANCE_RATE_LIMIT")
     
-    # Security
+    # Security & JWT
     secret_key: str = Field(default="your-secret-key-change-in-production", env="SECRET_KEY")
+    algorithm: str = Field(default="HS256", env="ALGORITHM")
+    access_token_expire_minutes: int = Field(default=30, env="ACCESS_TOKEN_EXPIRE_MINUTES")
     cors_origins: List[str] = Field(
         default=["http://localhost:3000", "https://stock-market-prediction-1yh5i9epc-damaines-projects.vercel.app", "*"],
         env="CORS_ORIGINS"
     )
+    
+    # API URLs
+    next_public_api_url: str = Field(default="http://localhost:8000", env="NEXT_PUBLIC_API_URL")
+    
+    # Timezone
+    timezone: str = Field(default="UTC", env="TIMEZONE")
     
     @property
     def postgres_url(self) -> str:
@@ -56,7 +64,8 @@ class Settings(BaseSettings):
     model_config = {
         "env_file": ".env",
         "case_sensitive": False,
-        "protected_namespaces": ()
+        "protected_namespaces": (),
+        "extra": "ignore"  # Allow extra fields from .env file
     }
 
 # Global settings instance

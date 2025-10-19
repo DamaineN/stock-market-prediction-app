@@ -311,13 +311,21 @@ async def update_user(
             )
         
         # Log the admin action
+        admin_user_id = admin_user["user_id"]
+        # Handle hardcoded admin user ID
+        if admin_user_id == "admin_hardcoded":
+            audit_user_id = None  # Don't store invalid ObjectId
+        else:
+            audit_user_id = ObjectId(admin_user_id)
+        
         await audit_service.log_action({
-            "user_id": ObjectId(admin_user["user_id"]),
+            "user_id": audit_user_id,
             "action": "admin_user_update",
             "resource": f"user:{user_id}",
             "details": {
                 "updated_fields": update_fields,
-                "target_user_email": user_doc["email"]
+                "target_user_email": user_doc["email"],
+                "admin_user": admin_user["email"] if admin_user_id == "admin_hardcoded" else admin_user_id
             },
             "success": True
         })
@@ -387,28 +395,62 @@ async def delete_user(
         user_email = user_doc["email"]
         
         # Delete user and associated data
-        user_obj_id = ObjectId(user_id)
+        # Use the user_id as-is since IDs are stored as strings in the database
+        logger.info(f"Starting deletion of user {user_id} ({user_email})")
         
-        # Delete from various collections
-        await db.users.delete_one({"_id": user_obj_id})
-        await db.watchlists.delete_many({"user_id": user_obj_id})
-        await db.portfolios.delete_many({"user_id": user_obj_id})
-        await db.paper_trading_portfolios.delete_many({"user_id": user_obj_id})
-        await db.paper_trading_holdings.delete_many({"user_id": user_obj_id})
-        await db.trade_history.delete_many({"user_id": user_obj_id})
-        await db.predictions.delete_many({"user_id": user_obj_id})
-        await db.user_profiles.delete_many({"user_id": user_obj_id})
-        await db.investment_goals.delete_many({"user_id": user_obj_id})
-        await db.xp_activities.delete_many({"user_id": user_obj_id})
-        await db.user_activities.delete_many({"user_id": user_obj_id})
+        # Delete from various collections (using string user_id, not ObjectId)
+        users_delete_result = await db.users.delete_one({"_id": user_id})
+        logger.info(f"Users collection delete result: {users_delete_result.deleted_count} documents deleted")
+        
+        # For related collections, try both string and ObjectId formats for user_id references
+        # Most likely they also use string format, but let's be safe
+        try:
+            user_obj_id = ObjectId(user_id) if ObjectId.is_valid(user_id) else None
+        except:
+            user_obj_id = None
+            
+        # Delete from related collections - try both string and ObjectId user_id formats
+        for collection_name in ["watchlists", "portfolios", "paper_trading_portfolios", 
+                               "paper_trading_holdings", "trade_history", "predictions", 
+                               "user_profiles", "investment_goals", "xp_activities", "user_activities"]:
+            collection = getattr(db, collection_name)
+            # Try string user_id first
+            string_result = await collection.delete_many({"user_id": user_id})
+            # Try ObjectId user_id if conversion was successful
+            objectid_result = None
+            if user_obj_id:
+                objectid_result = await collection.delete_many({"user_id": user_obj_id})
+            
+            total_deleted = string_result.deleted_count + (objectid_result.deleted_count if objectid_result else 0)
+            if total_deleted > 0:
+                logger.info(f"  {collection_name}: {total_deleted} documents deleted")
+        
+        # Verify user was actually deleted
+        deleted_user_check = await user_service.get_user_by_id(user_id)
+        if deleted_user_check:
+            logger.error(f"CRITICAL: User {user_id} still exists after deletion attempt!")
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="User deletion failed - user still exists in database"
+            )
+        
+        logger.info(f"✅ User {user_id} ({user_email}) successfully deleted from database")
         
         # Log the deletion
+        admin_user_id = admin_user["user_id"]
+        # Handle hardcoded admin user ID
+        if admin_user_id == "admin_hardcoded":
+            audit_user_id = None  # Don't store invalid ObjectId
+        else:
+            audit_user_id = ObjectId(admin_user_id)
+        
         await audit_service.log_action({
-            "user_id": ObjectId(admin_user["user_id"]),
+            "user_id": audit_user_id,
             "action": "admin_user_delete",
             "resource": f"user:{user_id}",
             "details": {
-                "deleted_user_email": user_email
+                "deleted_user_email": user_email,
+                "admin_user": admin_user["email"] if admin_user_id == "admin_hardcoded" else admin_user_id
             },
             "success": True
         })
@@ -467,13 +509,21 @@ async def create_admin_user(
         user_id = await user_service.create_user(user_doc)
         
         # Log the creation
+        admin_user_id = admin_user["user_id"]
+        # Handle hardcoded admin user ID
+        if admin_user_id == "admin_hardcoded":
+            audit_user_id = None  # Don't store invalid ObjectId
+        else:
+            audit_user_id = ObjectId(admin_user_id)
+        
         await audit_service.log_action({
-            "user_id": ObjectId(admin_user["user_id"]),
+            "user_id": audit_user_id,
             "action": "admin_user_create",
             "resource": f"user:{user_id}",
             "details": {
                 "created_user_email": user_data.email,
-                "created_user_role": user_data.role.value
+                "created_user_role": user_data.role.value,
+                "admin_user": admin_user["email"] if admin_user_id == "admin_hardcoded" else admin_user_id
             },
             "success": True
         })

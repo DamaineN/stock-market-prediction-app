@@ -46,8 +46,7 @@ pyjwt==2.8.0
 passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0
 
-# Real-time & WebSocket
-websockets==12.0
+# Real-time updates handled via HTTP polling
 
 # Additional utilities
 psutil==5.9.6

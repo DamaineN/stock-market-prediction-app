@@ -117,7 +117,7 @@ export class AuthService {
         return { valid: false }
       }
 
-      const response = await fetch(`${API_URL}/api/v1/auth/verify`, {
+      const response = await fetch(`${API_URL}/api/v1/auth/verify-token`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

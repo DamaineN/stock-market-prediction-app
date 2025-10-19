@@ -30,7 +30,13 @@ export default function LoginPage() {
 
     try {
       await login(formData.email, formData.password)
-      router.push('/dashboard')
+      
+      // Check if admin user and redirect accordingly
+      if (formData.email === 'admin@stolckr.com') {
+        router.push('/admin/dashboard')
+      } else {
+        router.push('/dashboard')
+      }
     } catch (error) {
       console.error('Login error:', error)
       setError(error instanceof Error ? error.message : 'Login failed')
@@ -130,7 +136,7 @@ export default function LoginPage() {
                 Demo credentials for testing:
               </p>
               <p className="text-xs text-gray-400 mt-1">
-                Email: demo@example.com | Password: password123
+                Admin: admin@stolckr.com | Password: admin123
               </p>
             </div>
           </div>
