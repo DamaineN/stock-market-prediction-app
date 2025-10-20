@@ -81,12 +81,12 @@ def fix_dataset(csv_file):
         
         # Save back to the same file
         df.to_csv(csv_file, index=False)
-        print(f"  ✅ Fixed {csv_file.name}\n")
+        print(f"Fixed {csv_file.name}\n")
         
         return True
         
     except Exception as e:
-        print(f"  ❌ Error fixing {csv_file.name}: {e}\n")
+        print(f"Error fixing {csv_file.name}: {e}\n")
         return False
 
 def main():
