@@ -217,7 +217,7 @@ stock-market-prediction-app/
 5. Advanced cybersecurity measures
 6. Advanced risk management tools
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -225,7 +225,7 @@ stock-market-prediction-app/
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📞 Support
+## Support
 
 For questions and support, please contact:
 - **Email**: damaine334@example.com
