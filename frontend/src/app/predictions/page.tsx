@@ -200,7 +200,6 @@ function PredictionsContent() {
               </h3>
               <p className="text-sm text-gray-700">
                 <span className="font-medium">Model:</span> {prediction.model_type} | 
-                <span className="font-medium">Confidence:</span> 95% | 
                 <span className="font-medium">Generated:</span> {new Date(prediction.metadata?.created_at).toLocaleDateString()}
               </p>
             </div>
