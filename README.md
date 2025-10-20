@@ -1,8 +1,8 @@
-# 📈 Stolckr
+# Stolckr
 
 A comprehensive AI-powered stock market prediction application built with modern technologies and machine learning models.
 
-## 🏗️ Architecture Overview
+## Architecture Overview
 
 This application features a modern microservices architecture with clear separation of concerns:
 
@@ -13,7 +13,7 @@ This application features a modern microservices architecture with clear separat
 - **Authentication**: JWT-based with role-based access control
 - **ML Pipeline**: TensorFlow/Keras for deep learning, Scikit-learn for traditional ML
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 stock-market-prediction-app/
@@ -42,7 +42,7 @@ stock-market-prediction-app/
 └── README.md
 ```
 
-## 🚀 Getting Started
+## How to Start
 
 ### Prerequisites
 
@@ -109,12 +109,7 @@ stock-market-prediction-app/
    ```
    Frontend will be available at: http://localhost:3000
 
-## 🔧 Configuration
-
-### API Keys Required
-
-1. **Alpha Vantage**: Get free API key from [alphavantage.co](https://www.alphavantage.co)
-2. **Yahoo Finance**: Optional premium features
+## Configuration
 
 ### Database Setup
 
@@ -124,21 +119,13 @@ stock-market-prediction-app/
 3. Add `MONGODB_CONNECTION_STRING` to `.env` file
 4. The application will create necessary collections automatically
 
-**Note**: The application can run without database connection using mock data for testing purposes.
-
-## 📊 Features
-
-### Data Collection & Preprocessing
-- ✅ **Automatic data fetching** from multiple sources
-- ✅ **Real-time and historical data** support
-- ✅ **Data cleaning and preprocessing** pipelines
-- ✅ **Rate limiting and error handling**
+## Features
 
 ### Machine Learning Models
-- 🔄 **LSTM (Long Short-Term Memory)** - Primary prediction engine
-- 🔄 **ARIMA** - Statistical baseline for short-term patterns
-- 🔄 **Random Forest & SVM** - Ensemble model components
-- 🔄 **Linear Regression** - Simple baseline comparison
+- **LSTM (Long Short-Term Memory)** 
+- **XGBoost** 
+- **Random Forest**
+- **Linear Regression** 
 
 ### API Endpoints
 
@@ -187,17 +174,16 @@ stock-market-prediction-app/
 - `GET /api/v1/dashboard/activity` - User activity stats
 
 ### User Interface Features
-- ✅ **Interactive charts** with Recharts and Chart.js
-- ✅ **Real-time price tracking** via HTTP polling
-- ✅ **Prediction visualization** with confidence intervals
-- ✅ **Paper trading simulation** with virtual portfolio
-- ✅ **Responsive design** with Tailwind CSS
-- ✅ **Role-based user experience** (Beginner, Casual, Paper Trader)
-- ✅ **AI trading insights** and recommendations
-- ✅ **XP system** with goals and achievements
-- ✅ **User authentication** and profile management
+- **Interactive charts** with Recharts and Chart.js
+- **Prediction visualization** with confidence intervals
+- **Paper trading simulation** with virtual portfolio
+- **Responsive design** with Tailwind CSS
+- **Role-based user experience** (Beginner, Casual, Paper Trader)
+- **Trading insights** and recommendations
+- **XP system** with goals and achievements
+- **User authentication** and profile management
 
-## 🛠️ Development
+## Development
 
 ### Tech Stack
 
@@ -218,108 +204,20 @@ stock-market-prediction-app/
 - Lucide React (Icons)
 
 **Database**:
-- MongoDB Atlas (Primary database with mock data fallback)
+- MongoDB Atlas 
 
 **Deployment**:
 - Local development (Backend: uvicorn, Frontend: Next.js dev server)
-- Production-ready with Docker support
 
-### Code Quality
-
-- **ESLint** for JavaScript/TypeScript linting
-- **Black** for Python code formatting
-- **Pytest** for Python testing
-- **Jest** for JavaScript testing
-- **Pre-commit hooks** for code quality
-
-## 📈 ML Model Details
-
-### LSTM (Primary Model)
-- **Purpose**: Captures sequential patterns and volatility
-- **Input**: Time-series price data with technical indicators
-- **Architecture**: Multi-layer LSTM with dropout regularization
-- **Training**: Rolling window approach with early stopping
-
-### ARIMA (Baseline)
-- **Purpose**: Short-term stationary pattern detection
-- **Method**: Automatic parameter selection (p, d, q)
-- **Best for**: Stable market conditions
-
-### Ensemble Models
-- **Combination**: LSTM + ARIMA + Random Forest
-- **Weighting**: Dynamic based on recent performance
-- **Confidence**: Monte Carlo simulation for uncertainty
-
-## 🚢 Deployment
-
-### Frontend (Vercel)
-```bash
-# Deploy to Vercel
-cd frontend
-vercel --prod
-```
-
-### Backend (Docker)
-```bash
-# Build Docker image
-docker build -t stock-prediction-api .
-
-# Run container
-docker run -p 8000:8000 --env-file .env stock-prediction-api
-```
-
-## 🔍 Testing
-
-### Backend Tests
-```bash
-# Run Python tests
-pytest tests/ -v --cov=api --cov=models
-```
-
-### Frontend Tests
-```bash
-# Run React tests
-cd frontend
-npm test
-```
-
-## 📋 Current Status
-
-### ✅ Completed
-- [x] Full-stack architecture with FastAPI + Next.js
-- [x] User authentication and authorization (JWT)
-- [x] Role-based access control (Beginner, Casual, Paper Trader)
-- [x] Stock data integration with Yahoo Finance
-- [x] Historical dataset management (10 major stocks)
-- [x] LSTM neural network models for prediction
-- [x] Ensemble ML models (Random Forest, XGBoost, LightGBM)
-- [x] Real-time price tracking and visualization
-- [x] Interactive charts and technical indicators
-- [x] Paper trading simulation with portfolio management
-- [x] AI-powered trading insights and recommendations
-- [x] XP system with goals and achievements
-- [x] Responsive web interface with modern design
-- [x] MongoDB integration with fallback to mock data
-- [x] Comprehensive API documentation
-- [x] Admin dashboard for user management
-
-### 🔄 Active Features
-- ✅ **10 Stocks Available**: AAPL, GOOGL, MSFT, TSLA, AMZN, META, NVDA, NFLX, TSMC, SPY
-- ✅ **7 ML Models**: Moving Average, LSTM, ARIMA, Linear Regression, Random Forest, XGBoost, SVR
-- ✅ **3 User Roles**: Each with tailored experience and features
-- ✅ **Paper Trading**: Buy/sell simulation with real-time P&L tracking
-- ✅ **AI Coach**: Personalized trading advice after each transaction
-
-### 📋 Future Enhancements
-1. Expand stock universe beyond current 10 stocks
-2. Add cryptocurrency and forex support
-3. Implement advanced portfolio analytics
-4. Add social features (leaderboards, sharing)
-5. Mobile app development
+### Future Enhancements
+1. Incorporate real-time data collection with real broker APIs
+2. Implement advanced portfolio analytics
+3. Add social features (leaderboards, sharing)
+4. Mobile app development
+5. Advanced cybersecurity measures
 6. Advanced risk management tools
-7. Integration with real broker APIs
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -327,16 +225,10 @@ npm test
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Support
+## Support
 
 For questions and support, please contact:
-- **Email**: your-email@example.com
+- **Email**: damaine334@example.com
 - **GitHub Issues**: [Create an issue](../../issues)
 
 ---
-
-**Built with ❤️ for accurate stock market predictions**
