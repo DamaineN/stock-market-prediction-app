@@ -196,6 +196,9 @@ const AdminDashboard: React.FC = () => {
                   <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Name</th>
                   <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Email</th>
                   <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Role</th>
+                  <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>XP</th>
+                  <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Last Login</th>
+                  <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Login Streak</th>
                   <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Status</th>
                   <th style={{ padding: '12px', textAlign: 'left', border: '1px solid #dee2e6' }}>Actions</th>
                 </tr>
@@ -216,6 +219,9 @@ const AdminDashboard: React.FC = () => {
                         {user.role.toUpperCase()}
                       </span>
                     </td>
+                    <td style={{ padding: '12px', border: '1px solid #dee2e6' }}>{user.total_xp}</td>
+                    <td style={{ padding: '12px', border: '1px solid #dee2e6' }}>{user.last_login}</td>
+                    <td style={{ padding: '12px', border: '1px solid #dee2e6' }}>{user.login_streak}</td>
                     <td style={{ padding: '12px', border: '1px solid #dee2e6' }}>
                       <span style={{
                         padding: '4px 8px',
