@@ -8,8 +8,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 import numpy as np
 
-# from models.model_manager import ModelManager  # Temporarily disabled
-from api.collectors.yahoo_finance import YahooFinanceCollector
+from api.services.dataset_manager import DatasetManager
 from api.database.mongodb_models import AIInsight, RecommendationType
 
 logger = logging.getLogger(__name__)
@@ -19,7 +18,7 @@ class AIInsightsService:
     
     def __init__(self):
         # self.model_manager = ModelManager()  # Temporarily disabled
-        self.data_collector = YahooFinanceCollector()
+        self.dataset_manager = DatasetManager()  # Load historical datasets
         
         # Confidence thresholds for recommendations
         self.BUY_THRESHOLD = 0.7
@@ -48,29 +47,15 @@ class AIInsightsService:
             Dictionary containing AI insight and recommendation
         """
         try:
-            # Get historical data (simplified for testing)
+            # Get historical data
             try:
-                historical_data = await self.data_collector.get_historical_data(
-                    symbol=symbol,
-                    period="1y",
-                    interval="1d"
-                )
+                historical_data = self.dataset_manager.load_historical_data(
+                symbol=symbol,
+                period="1y",       # last 1 year
+                interval="1d"
+)       
             except Exception as data_error:
                 logger.error(f"Data collection failed for {symbol}: {str(data_error)}")
-                # Use mock historical data
-                historical_data = [
-                    {"close": 150.0, "volume": 1000000, "date": "2024-01-01"},
-                    {"close": 152.0, "volume": 1100000, "date": "2024-01-02"},
-                    {"close": 148.0, "volume": 900000, "date": "2024-01-03"}
-                ]
-            
-            if not historical_data or len(historical_data) == 0:
-                # Generate mock data
-                historical_data = [
-                    {"close": 150.0, "volume": 1000000, "date": "2024-01-01"},
-                    {"close": 152.0, "volume": 1100000, "date": "2024-01-02"},
-                    {"close": 148.0, "volume": 900000, "date": "2024-01-03"}
-                ]
             
             # Analyze current market data first
             current_price = historical_data[-1]["close"]
@@ -457,9 +442,9 @@ class AIInsightsService:
         """Assess risk level based on volatility and other factors"""
         volatility = technical_indicators["volatility"]
         
-        if volatility > 4:
+        if volatility > 2:
             return "high"
-        elif volatility > 2:
+        elif volatility > 1:
             return "medium"
         else:
             return "low"
