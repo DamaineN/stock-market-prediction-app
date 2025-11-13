@@ -21,16 +21,16 @@ class AIInsightsService:
         self.dataset_manager = DatasetManager()  # Load historical datasets
         
         # Confidence thresholds for recommendations
-        self.BUY_THRESHOLD = 0.7
-        self.SELL_THRESHOLD = 0.3
-        self.HOLD_THRESHOLD_LOW = 0.4
-        self.HOLD_THRESHOLD_HIGH = 0.6
+        self.BUY_THRESHOLD = 0.6
+        self.SELL_THRESHOLD = 0.2
+        self.HOLD_THRESHOLD_LOW = 0.3
+        self.HOLD_THRESHOLD_HIGH = 0.5
         
         # Technical indicator weights
         self.indicator_weights = {
-            "model_agreement": 0.4,
-            "trend_strength": 0.25,
-            "volatility": 0.15,
+            "model_agreement": 0.3,
+            "trend_strength": 0.15,
+            "volatility": 0.05,
             "volume": 0.1,
             "support_resistance": 0.1
         }
@@ -317,13 +317,13 @@ class AIInsightsService:
         # RSI factor (oversold = bullish, overbought = bearish)
         rsi = technical_indicators["rsi"]
         if rsi < 30:
-            factors["rsi"] = 0.8
+            factors["rsi"] = 0.5
         elif rsi < 50:
-            factors["rsi"] = 0.6
+            factors["rsi"] = 0.3
         elif rsi < 70:
-            factors["rsi"] = 0.4
-        else:
             factors["rsi"] = 0.2
+        else:
+            factors["rsi"] = 0.1
         
         # Price vs moving average factor
         price_vs_sma = (technical_indicators["price_vs_sma_20"] + technical_indicators["price_vs_sma_50"]) / 2
@@ -361,12 +361,12 @@ class AIInsightsService:
         # Determine recommendation
         if overall_score >= self.BUY_THRESHOLD:
             insight_type = RecommendationType.BUY
-            target_price = current_price * 1.1  # 10% upside target
-            stop_loss_price = current_price * 0.95  # 5% stop loss
+            target_price = current_price * 0.8 
+            stop_loss_price = current_price * 0.7 
         elif overall_score <= self.SELL_THRESHOLD:
             insight_type = RecommendationType.SELL
-            target_price = current_price * 0.9  # 10% downside target
-            stop_loss_price = current_price * 1.05  # 5% stop loss for short
+            target_price = current_price * 0.8 
+            stop_loss_price = current_price * 0.7
         else:
             insight_type = RecommendationType.HOLD
             target_price = None
@@ -374,19 +374,17 @@ class AIInsightsService:
         
         # Generate reasoning
         reasoning_parts = []
-        
-        if factors["model_prediction"] > 0.6:
-            reasoning_parts.append("Multiple prediction models suggest upward price movement")
-        elif factors["model_prediction"] < 0.4:
+
+        if target_price < current_price:
+            insight_type = RecommendationType.SELL
             reasoning_parts.append("Multiple prediction models suggest downward price movement")
+        elif target_price > current_price:
+            insight_type = RecommendationType.BUY
+            reasoning_parts.append("Multiple prediction models suggest upward price movement")
         else:
+            insight_type = RecommendationType.HOLD
             reasoning_parts.append("Prediction models show mixed signals")
-        
-        if factors["model_agreement"] > 0.7:
-            reasoning_parts.append("High model agreement increases confidence")
-        elif factors["model_agreement"] < 0.4:
-            reasoning_parts.append("Low model agreement suggests uncertainty")
-        
+            
         if rsi < 30:
             reasoning_parts.append("Stock appears oversold (RSI < 30)")
         elif rsi > 70:

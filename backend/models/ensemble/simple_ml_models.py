@@ -104,7 +104,7 @@ class SimpleMLPredictor:
         symbol: str, 
         historical_data: List[Dict[str, Any]], 
         prediction_days: int = 30,
-        confidence_level: float = 0.95
+        confidence_level: float = 0.50
     ) -> Dict[str, Any]:
         """Generate predictions"""
         try:

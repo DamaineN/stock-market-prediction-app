@@ -275,50 +275,6 @@ export default function AIInsight({ symbol, userRole = 'beginner', onInsightGene
           </div>
         </div>
 
-        {/* Market Analysis */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h5 className="font-medium text-gray-900 mb-2 flex items-center">
-              <TrendingUpIcon className="w-4 h-4 mr-1" />
-              Market Sentiment
-            </h5>
-            <p className="text-sm text-gray-700 capitalize">{insight.market_sentiment}</p>
-          </div>
-          
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h5 className="font-medium text-gray-900 mb-2 flex items-center">
-              <ChartBarIcon className="w-4 h-4 mr-1" />
-              Model Agreement
-            </h5>
-            <p className="text-sm text-gray-700">
-              {insight.model_predictions.length} models analyzed
-            </p>
-          </div>
-        </div>
-
-        {/* Model Predictions Summary */}
-        <div>
-          <h5 className="font-medium text-gray-900 mb-3">Model Predictions (7-day outlook)</h5>
-          <div className="space-y-2">
-            {insight.model_predictions.slice(0, 3).map((prediction, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <span className="font-medium text-gray-900">{prediction.model}</span>
-                  <span className="text-xs text-gray-500">
-                    {(prediction.accuracy * 100).toFixed(0)}% accuracy
-                  </span>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-gray-900">${prediction.predicted_7d.toFixed(2)}</p>
-                  <p className={`text-xs ${prediction.change_7d >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {prediction.change_7d >= 0 ? '+' : ''}{prediction.change_7d.toFixed(1)}%
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* Technical Analysis Toggle */}
         <div>
           <button

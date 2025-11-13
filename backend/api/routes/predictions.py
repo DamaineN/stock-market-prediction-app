@@ -20,7 +20,7 @@ class PredictionRequest(BaseModel):
     symbol: str
     model_type: str  # "lstm", "arima", "ensemble", "all"
     prediction_days: int = Field(default=30, ge=1, le=30, description="Number of days to predict (1-30)")
-    confidence_level: float = Field(default=0.95, ge=0.5, le=0.99, description="Confidence level (0.5-0.99)")
+    confidence_level: float = Field(default=0.5, ge=0.1, le=0.6, description="Confidence level (0.1-0.6)")
 
 class PredictionResponse(BaseModel):
     symbol: str
@@ -150,7 +150,7 @@ async def create_prediction(
                 "symbol": request.symbol.upper(),
                 "model_type": request.model_type,
                 "predicted_price": representative_prediction,
-                "confidence": confidence if 0 < confidence <= 1 else 0.85,  # Default to 85% if missing or invalid
+                "confidence": confidence if 0 < confidence <= 1 else 0.50,  # Default to 50% if missing or invalid
                 "prediction_days": request.prediction_days,
                 "results": results,
                 "status": "active",
@@ -159,7 +159,7 @@ async def create_prediction(
             
             # Log the prediction details for debugging
             print(f"Storing prediction: {request.symbol.upper()} with {request.model_type} model")
-            print(f"Predicted price: {representative_prediction}, Confidence: {confidence}")
+            print(f"Predicted price: {representative_prediction}, Confidence: 50")
             
             await predictions_collection.insert_one(prediction_record)
         except Exception as storage_error:

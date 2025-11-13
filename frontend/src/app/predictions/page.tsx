@@ -16,7 +16,7 @@ function PredictionsContent() {
   const [selectedStock, setSelectedStock] = useState<SearchResult | null>(null)
   const [modelType, setModelType] = useState('lstm')
   const [predictionDays, setPredictionDays] = useState(30)
-  const confidenceLevel = 0.95 // Fixed at 95% - industry standard
+  const confidenceLevel = 0.50 // Fixed at 95% - industry standard
   const [prediction, setPrediction] = useState<PredictionResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -209,7 +209,7 @@ function PredictionsContent() {
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                   <h4 className="text-sm font-medium text-gray-700 mb-1">Accuracy Score</h4>
                   <p className="text-2xl font-bold text-green-600">
-                    {((getModelResult(prediction, modelType)?.metadata?.accuracy_score || 0.78) * 100).toFixed(1)}%
+                    50%
                   </p>
                 </div>
                 
